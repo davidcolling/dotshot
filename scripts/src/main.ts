@@ -70,7 +70,7 @@ var output = function (input) {
     }
 
     class Food extends CenteredShape {
-        isGrowing: boolean;;
+        isGrowing: boolean;
         growAge: number;
 
         constructor(x, y) {
