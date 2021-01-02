@@ -360,7 +360,7 @@ var World = /** @class */ (function () {
                 if (this.nPCs[i] != null) {
                     //check for shots
                     if (this.isShotByAny(this.nPCs[i], this.bullets)) {
-                        this.nPCs[i].hp--;
+                        this.nPCs[i].takeDamage(1);
                     }
                     if (this.player != null) {
                         var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));

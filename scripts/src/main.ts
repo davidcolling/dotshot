@@ -466,7 +466,7 @@ class World {
 
                 //check for shots
                 if (this.isShotByAny(this.nPCs[i], this.bullets)) {
-                    this.nPCs[i].hp--;
+                    this.nPCs[i].takeDamage(1);
                 }
 
                 if (this.player != null) {
