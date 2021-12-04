@@ -51,12 +51,29 @@ var output = function (input) {
         }
         point = function () {
             if (input.mouseX < width / 2) {
-                this.direction = 360  - ((width / 2) - input.mouseX);
+                this.direction = Math.abs(360  - ((width / 2) - input.mouseX));
             } else {
-                this.direction = ((width / 2) - input.mouseX);
+                this.direction = Math.abs(((width / 2) - input.mouseX));
             }
             console.log(this.direction);
         }
+        move = function () {
+            var dx;
+            var dy
+            if (this.direction > 0 && this.direction < 90) {
+                dx += this.direction;
+                dy += this.direction - 90;
+            } else if (this.direction > 90 && this.direction < 180) {
+                dx += 180 - this.direction;
+                dy += this.direction - 90;
+            } else if (this.direction > 180 && this.direction < 270) {
+                dx += this.direction - 360;
+            } else if (this.direction > 270 && this.direction < 360) {
+                dx += this.direction - 360;
+            }
+            this.x += 5 * (dx / 90);
+            this.y += 5 * (dy / 90);
+        };
     }
 
     var drawStars = function (stars) {
@@ -69,16 +86,7 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "w":
-                ships[0].move(0, -5);
-                break;
-            case "s":
-                ships[0].move(0, 5);
-                break;
-            case "d":
-                ships[0].move(5, 0);
-                break;
-            case "a":
-                ships[0].move(-5, 0);
+                ships[0].move();
                 break;
         }
     }
