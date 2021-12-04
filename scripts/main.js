@@ -1,4 +1,11 @@
 var output = function (input) {
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    var bigStars;
+    var mediumStars;
+    var tinyStars;
+    var shootingStars;
+
     class Star {
         constructor(size, x, y) {
             this.size = size;
@@ -19,13 +26,6 @@ var output = function (input) {
             );
         }
     }
-
-    var height = window.innerHeight;
-    var width = window.innerWidth;
-    var bigStars;
-    var mediumStars;
-    var tinyStars;
-    var shootingStars;
 
     input.setup = function () {
         input.createCanvas(width, height);
