@@ -9,6 +9,15 @@ var output = function (input) {
             this.x += dx;
             this.y += dy;
         };
+        draw = function () {
+            input.noStroke();
+            input.fill(256, 256, 256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
     }
 
     var height = window.innerHeight;
@@ -21,11 +30,13 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
         var starCount = 20 + Math.floor(Math.random() * 20);
+
         bigStars = new Array(starCount);
         mediumStars = new Array(starCount);
         tinyStars = new Array(starCount);
         shootingStars = new Array(1);
         shootingStars[0] = new Star(2, 10, 10);
+
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
                 3, 
@@ -55,25 +66,7 @@ var output = function (input) {
 
     var drawStars = function (stars) {
         for (var i = 0; i < stars.length; i++) {
-            input.noStroke();
-            input.fill(256, 256, 256, 256);
-            input.circle(
-                stars[i].x, 
-                stars[i].y, 
-                stars[i].size
-            );
-        }
-    };
-
-    var twinkleStars = function (stars) {
-        for (var i = 0; i < stars.length; i++) {
-            if (stars[i].size == 3) {
-                if (Math.random() < 0.001) {
-                    stars[i].size = 10;
-                }
-            } else {
-                stars[i].size = 3;
-            }
+            stars[i].draw();
         }
     };
 
@@ -97,5 +90,4 @@ var output = function (input) {
 };
 
 var display = new p5(output, "canvas");
-
 
