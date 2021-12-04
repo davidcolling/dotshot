@@ -59,20 +59,22 @@ var output = function (input) {
         }
         move = function () {
             var dx;
-            var dy
-            if (this.direction > 0 && this.direction < 90) {
-                dx += this.direction;
-                dy += this.direction - 90;
-            } else if (this.direction > 90 && this.direction < 180) {
-                dx += 180 - this.direction;
-                dy += this.direction - 90;
-            } else if (this.direction > 180 && this.direction < 270) {
-                dx += this.direction - 360;
-            } else if (this.direction > 270 && this.direction < 360) {
-                dx += this.direction - 360;
+            var dy;
+            if (this.direction >= 0 && this.direction < 90) {
+                dx = this.direction;
+                dy = -1 * (90 - this.direction);
+            } else if (this.direction >= 90 && this.direction < 180) {
+                dx = 180 - this.direction;
+                dy = this.direction - 90;
+            } else if (this.direction >= 180 && this.direction < 270) {
+                dx = -1 * (this.direction - 180);
+                dy = 270 - this.direction;
+            } else if (this.direction >= 270 && this.direction < 360) {
+                dx = this.direction - 360;
+                dy = -1 * (this.direction - 270);
             }
-            this.x += 5 * (dx / 90);
-            this.y += 5 * (dy / 90);
+            this.x += 2 * (dx / 90);
+            this.y += 2 * (dy / 90);
         };
     }
 
@@ -99,7 +101,7 @@ var output = function (input) {
         mediumStars = new Array(starCount);
         tinyStars = new Array(starCount);
         ships = new Array(1);
-        ships[0] = new Ship(7, 10, 10);
+        ships[0] = new Ship(7, width / 2, height / 2);
 
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
