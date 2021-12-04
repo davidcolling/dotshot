@@ -5,24 +5,18 @@ var output = function (input) {
             this.x = x;
             this.y = y;
         }
-    }
-
-    class ShootingStar extends Star {
-        constructor(size, x, y) {
-            super(size, x, y);
-            this.dx = 5 * (Math.random() - 0.5);
-            this.dy = 5 * (Math.random() - 0.5);
-        };
-
-        move = function () {
-            this.x += this.dx;
-            this.y += this.dy;
+        move = function (dx, dy) {
+            this.x += dx;
+            this.y += dy;
         };
     }
 
     var height = window.innerHeight;
     var width = window.innerWidth;
-    var currentShootingStarAge = 0;
+    var bigStars;
+    var mediumStars;
+    var tinyStars;
+    var shootingStars;
 
     input.setup = function () {
         input.createCanvas(width, height);
@@ -31,7 +25,7 @@ var output = function (input) {
         mediumStars = new Array(starCount);
         tinyStars = new Array(starCount);
         shootingStars = new Array(1);
-        shootingStars[0] = null;
+        shootingStars[0] = new Star(2, 10, 10);
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
                 3, 
@@ -53,13 +47,7 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-
-        p = new ShootingStar(
-            2, 
-            Math.floor(Math.random() * width), 
-            Math.floor(Math.random() * height), 
-        );
-
+        drawStars(shootingStars);
         drawStars(bigStars);
         drawStars(mediumStars);
         drawStars(tinyStars);
@@ -88,14 +76,26 @@ var output = function (input) {
             }
         }
     };
+
+    document.addEventListener('keydown', recordKey);
+    function recordKey(e) {
+        switch (e.key) {
+            case "w":
+                shootingStars[0].move(0, -5);
+                break;
+            case "s":
+                shootingStars[0].move(0, 5);
+                break;
+            case "d":
+                shootingStars[0].move(5, 0);
+                break;
+            case "a":
+                shootingStars[0].move(-5, 0);
+                break;
+        }
+    }
 };
 
 var display = new p5(output, "canvas");
 
-document.addEventListener('keydown', recordKey);
-function recordKey(e) {
-    switch (e.key) {
-        case "w":
-            break;
-    }
-}
+
