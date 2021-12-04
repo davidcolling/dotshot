@@ -27,6 +27,30 @@ var output = function (input) {
         }
     }
 
+    var drawStars = function (stars) {
+        for (var i = 0; i < stars.length; i++) {
+            stars[i].draw();
+        }
+    };
+
+    document.addEventListener('keydown', recordKey);
+    function recordKey(e) {
+        switch (e.key) {
+            case "w":
+                shootingStars[0].move(0, -5);
+                break;
+            case "s":
+                shootingStars[0].move(0, 5);
+                break;
+            case "d":
+                shootingStars[0].move(5, 0);
+                break;
+            case "a":
+                shootingStars[0].move(-5, 0);
+                break;
+        }
+    }
+
     input.setup = function () {
         input.createCanvas(width, height);
         var starCount = 20 + Math.floor(Math.random() * 20);
@@ -63,30 +87,6 @@ var output = function (input) {
         drawStars(mediumStars);
         drawStars(tinyStars);
     };
-
-    var drawStars = function (stars) {
-        for (var i = 0; i < stars.length; i++) {
-            stars[i].draw();
-        }
-    };
-
-    document.addEventListener('keydown', recordKey);
-    function recordKey(e) {
-        switch (e.key) {
-            case "w":
-                shootingStars[0].move(0, -5);
-                break;
-            case "s":
-                shootingStars[0].move(0, 5);
-                break;
-            case "d":
-                shootingStars[0].move(5, 0);
-                break;
-            case "a":
-                shootingStars[0].move(-5, 0);
-                break;
-        }
-    }
 };
 
 var display = new p5(output, "canvas");
