@@ -4,7 +4,7 @@ var output = function (input) {
     var bigStars;
     var mediumStars;
     var tinyStars;
-    var shootingStars;
+    var ships;
 
     class Shape {
         constructor(size, x, y) {
@@ -34,6 +34,31 @@ var output = function (input) {
         }
     }
 
+    class Ship extends Shape {
+        constructor(size, x, y) {
+            super(size, x, y);
+            this.direction = 180;
+        }
+        draw = function () {
+            input.noStroke();
+            input.fill(256, 256, 256, 256);
+            input.rect(
+                this.x, 
+                this.y, 
+                this.size,
+                this.size
+            );
+        }
+        point = function () {
+            if (input.mouseX < width / 2) {
+                this.direction = 360  - ((width / 2) - input.mouseX);
+            } else {
+                this.direction = ((width / 2) - input.mouseX);
+            }
+            console.log(this.direction);
+        }
+    }
+
     var drawStars = function (stars) {
         for (var i = 0; i < stars.length; i++) {
             stars[i].draw();
@@ -44,16 +69,16 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "w":
-                shootingStars[0].move(0, -5);
+                ships[0].move(0, -5);
                 break;
             case "s":
-                shootingStars[0].move(0, 5);
+                ships[0].move(0, 5);
                 break;
             case "d":
-                shootingStars[0].move(5, 0);
+                ships[0].move(5, 0);
                 break;
             case "a":
-                shootingStars[0].move(-5, 0);
+                ships[0].move(-5, 0);
                 break;
         }
     }
@@ -65,8 +90,8 @@ var output = function (input) {
         bigStars = new Array(starCount);
         mediumStars = new Array(starCount);
         tinyStars = new Array(starCount);
-        shootingStars = new Array(1);
-        shootingStars[0] = new Star(2, 10, 10);
+        ships = new Array(1);
+        ships[0] = new Ship(7, 10, 10);
 
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
@@ -89,7 +114,8 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-        drawStars(shootingStars);
+        ships[0].point();
+        drawStars(ships);
         drawStars(bigStars);
         drawStars(mediumStars);
         drawStars(tinyStars);
