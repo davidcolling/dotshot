@@ -96,5 +96,6 @@ document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
         case "w":
-
+            break;
+    }
 }
