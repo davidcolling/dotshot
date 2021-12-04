@@ -6,7 +6,7 @@ var output = function (input) {
     var tinyStars;
     var shootingStars;
 
-    class Star {
+    class Shape {
         constructor(size, x, y) {
             this.size = size;
             this.x = x;
@@ -16,6 +16,13 @@ var output = function (input) {
             this.x += dx;
             this.y += dy;
         };
+        draw = function (){};
+    }
+
+    class Star extends Shape {
+        constructor(size, x, y) {
+            super(size, x, y);
+        }
         draw = function () {
             input.noStroke();
             input.fill(256, 256, 256, 256);
