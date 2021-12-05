@@ -107,7 +107,7 @@ var output = function (input) {
 
     var moveBullets = function(bullets) {
         for (var i = 0; i < bullets.length; i++) {
-            bullets[i].move(2);
+            bullets[i].move(15);
         }
     }
 
