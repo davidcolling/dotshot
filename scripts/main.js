@@ -64,6 +64,7 @@ var output = function (input) {
     class Bullet extends Moveable {
         constructor(x, y, direction) {
             super(3, x, y, direction);
+            this.age = 0;
         }
         draw = function () {
             input.noStroke();
@@ -73,6 +74,7 @@ var output = function (input) {
                 this.y, 
                 this.size,
             );
+            this.age++;
         }
     }
 
@@ -111,7 +113,11 @@ var output = function (input) {
 
     var moveBullets = function(bullets) {
         for (var i = 0; i < bullets.length; i++) {
-            bullets[i].move(15);
+            if (bullets[i].age < 30) {
+                bullets[i].move(15);
+            } else {
+                bullets.pop(i)
+            }
         }
     }
 
