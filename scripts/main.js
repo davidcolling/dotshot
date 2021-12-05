@@ -39,7 +39,31 @@ var output = function (input) {
             super(size, x, y);
             this.direction = direction;
         }
-        move = function() {};
+        move = function (velocity) {
+            var dx;
+            var dy;
+            if (this.direction >= 0 && this.direction < 90) {
+                dx = this.direction;
+                dy = -1 * (90 - this.direction);
+            } else if (this.direction >= 90 && this.direction < 180) {
+                dx = 180 - this.direction;
+                dy = this.direction - 90;
+            } else if (this.direction >= 180 && this.direction < 270) {
+                dx = -1 * (this.direction - 180);
+                dy = 270 - this.direction;
+            } else if (this.direction >= 270 && this.direction < 360) {
+                dx = this.direction - 360;
+                dy = -1 * (this.direction - 270);
+            }
+            this.x += velocity * (dx / 90);
+            this.y += velocity * (dy / 90);
+        };
+    }
+
+    class Bullet extends Moveable {
+        constructor(x, y, direction) {
+            super(1, x, y, direction);
+        }
     }
 
     class Ship extends Moveable {
@@ -64,25 +88,6 @@ var output = function (input) {
             }
             console.log(this.direction);
         }
-        move = function () {
-            var dx;
-            var dy;
-            if (this.direction >= 0 && this.direction < 90) {
-                dx = this.direction;
-                dy = -1 * (90 - this.direction);
-            } else if (this.direction >= 90 && this.direction < 180) {
-                dx = 180 - this.direction;
-                dy = this.direction - 90;
-            } else if (this.direction >= 180 && this.direction < 270) {
-                dx = -1 * (this.direction - 180);
-                dy = 270 - this.direction;
-            } else if (this.direction >= 270 && this.direction < 360) {
-                dx = this.direction - 360;
-                dy = -1 * (this.direction - 270);
-            }
-            this.x += 2 * (dx / 90);
-            this.y += 2 * (dy / 90);
-        };
     }
 
     var drawStars = function (stars) {
@@ -95,7 +100,7 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "w":
-                ships[0].move();
+                ships[0].move(2);
                 break;
         }
     }
