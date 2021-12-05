@@ -97,7 +97,7 @@ var output = function (input) {
             } else {
                 this.direction = Math.abs(((width / 2) - input.mouseX));
             }
-            if ( !(this.direction >= 0 && this.direction <= 360) ) {
+            if ( !(this.direction >= 0 && this.direction < 360) ) {
                 this.direction = oldDirection;
             }
         }
