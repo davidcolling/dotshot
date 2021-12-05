@@ -91,10 +91,14 @@ var output = function (input) {
             );
         }
         point = function () {
+            var oldDirection = this.direction;
             if (input.mouseX < width / 2) {
                 this.direction = Math.abs(360  - ((width / 2) - input.mouseX));
             } else {
                 this.direction = Math.abs(((width / 2) - input.mouseX));
+            }
+            if ( !(this.direction >= 0 && this.direction <= 360) ) {
+                this.direction = oldDirection;
             }
         }
     }
