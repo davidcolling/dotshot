@@ -5,6 +5,7 @@ var output = function (input) {
     var mediumStars;
     var tinyStars;
     var ships;
+    var bullets;
 
     class Shape {
         constructor(size, x, y) {
@@ -62,7 +63,16 @@ var output = function (input) {
 
     class Bullet extends Moveable {
         constructor(x, y, direction) {
-            super(1, x, y, direction);
+            super(3, x, y, direction);
+        }
+        draw = function () {
+            input.noStroke();
+            input.fill(256, 256, 256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size,
+            );
         }
     }
 
@@ -86,7 +96,6 @@ var output = function (input) {
             } else {
                 this.direction = Math.abs(((width / 2) - input.mouseX));
             }
-            console.log(this.direction);
         }
     }
 
@@ -96,11 +105,21 @@ var output = function (input) {
         }
     };
 
+    var moveBullets = function(bullets) {
+        for (var i = 0; i < bullets.length; i++) {
+            bullets[i].move(2);
+        }
+    }
+
     document.addEventListener('keydown', recordKey);
     function recordKey(e) {
         switch (e.key) {
             case "w":
                 ships[0].move(2);
+                break;
+            case "r":
+                bullet = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
+                bullets.push(bullet);
                 break;
         }
     }
@@ -114,6 +133,8 @@ var output = function (input) {
         tinyStars = new Array(starCount);
         ships = new Array(1);
         ships[0] = new Ship(7, width / 2, height / 2);
+        bullets = new Array(1);
+        bullets[0] = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
 
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
@@ -137,6 +158,9 @@ var output = function (input) {
     input.draw = function () {
         input.clear();
         ships[0].point();
+        moveBullets(bullets);
+
+        drawStars(bullets);
         drawStars(ships);
         drawStars(bigStars);
         drawStars(mediumStars);
