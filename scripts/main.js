@@ -34,10 +34,17 @@ var output = function (input) {
         }
     }
 
-    class Ship extends Shape {
-        constructor(size, x, y) {
+    class Moveable extends Shape {
+        constructor(size, x, y, direction) {
             super(size, x, y);
-            this.direction = 180;
+            this.direction = direction;
+        }
+        move = function() {};
+    }
+
+    class Ship extends Moveable {
+        constructor(size, x, y) {
+            super(size, x, y, 180);
         }
         draw = function () {
             input.noStroke();
