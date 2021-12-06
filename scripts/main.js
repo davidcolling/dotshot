@@ -98,9 +98,8 @@ var output = function (input) {
                     directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
                     directionToPrey += 270;
                 }
+                this.direction = directionToPrey;
             }
-
-            this.direction = directionToPrey;
         }
         drawBullets = function () {
             for (var i = 0; i < this.bullets.length; i++) {
