@@ -106,7 +106,7 @@ var output = function (input) {
         draw = function () {
             input.noStroke();
             input.fill(256, 256, 256, 256);
-            input.rect(
+            input.circle(
                 this.x, 
                 this.y, 
                 this.size,
@@ -122,7 +122,7 @@ var output = function (input) {
         draw = function () {
             input.noStroke();
             input.fill(256, 0, 0, 256);
-            input.rect(
+            input.circle(
                 this.x, 
                 this.y, 
                 this.size,
@@ -170,7 +170,7 @@ var output = function (input) {
         if (frameCount % 20 == 0) {
             ships[1].fire();
         }
-        ships[1].move(1);
+        ships[1].move(0.5);
 
         drawAll(ships);
     };
