@@ -80,14 +80,36 @@ var output = function (input) {
 
     class Steerable extends Moveable {
         constructor(size, x, y) {
-            super(size, x, y, 180);
+            super(size, x, y);
         }
-        point = function () {};
+        point = function (x1, y1, x2, y2) {
+            var dx = x1 - x2;
+            var dy = y1 - y2;
+
+            var directionToPrey;
+
+            if (dx != 0 && dy != 0) {
+                if (dx < 0 && dy > 0) { // target is in quadrant 1
+                    directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                } else if (dx < 0 && dy < 0) { // target is in q2
+                    directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                    directionToPrey += 90;
+                } else if (dx > 0 && dy < 0) { // q3
+                    directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                    directionToPrey += 180;
+                } else if (dx > 0 && dy > 0) { // q4
+                    directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                    directionToPrey += 270;
+                }
+            }
+
+            this.direction = directionToPrey;
+        }
     }
 
     class Ship extends Steerable {
         constructor(size, x, y) {
-            super(size, x, y, 180);
+            super(size, x, y);
         }
         draw = function () {
             input.noStroke();
@@ -99,32 +121,11 @@ var output = function (input) {
                 this.size
             );
         }
-        point = function () {
-            var dx = (width / 2) - input.mouseX;
-            var dy = (height / 2) - input.mouseY;
-
-            var directionToPrey;
-
-            if (dx < 0 && dy > 0) { // prey is in quadrant 1
-                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-            } else if (dx < 0 && dy < 0) { // prey is in q2
-                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                directionToPrey += 90;
-            } else if (dx > 0 && dy < 0) { // q3
-                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                directionToPrey += 180;
-            } else if (dx > 0 && dy > 0) { // q4
-                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                directionToPrey += 270;
-            }
-            this.direction = directionToPrey;
-        }
     }
 
     class Pirate extends Steerable {
-        constructor(size, x, y, prey) {
-            super(size, x, y, 180);
-            this.prey = prey;
+        constructor(size, x, y) {
+            super(size, x, y);
         }
         draw = function () {
             input.noStroke();
@@ -135,27 +136,6 @@ var output = function (input) {
                 this.size,
                 this.size
             );
-        }
-        point = function () {
-            var dx = this.x - this.prey.x;
-            var dy = this.y - this.prey.y;
-
-            var directionToPrey;
-
-            if (dx < 0 && dy > 0) { // prey is in quadrant 1
-                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-            } else if (dx < 0 && dy < 0) { // prey is in q2
-                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                directionToPrey += 90;
-            } else if (dx > 0 && dy < 0) { // q3
-                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                directionToPrey += 180;
-            } else if (dx > 0 && dy > 0) { // q4
-                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                directionToPrey += 270;
-            }
-            this.direction = directionToPrey;
-            console.log(this.direction);
         }
     };
 
@@ -225,8 +205,8 @@ var output = function (input) {
         frameCount++;
 
         input.clear();
-        ships[0].point();
-        ships[1].point();
+        ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
+        ships[1].point(ships[1].x, ships[1].y, ships[0].x, ships[0].y);
         if (frameCount % 20 == 0) {
                 bullet = new Bullet(ships[1].x, ships[1].y, ships[1].direction);
                 bullets.push(bullet);
