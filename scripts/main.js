@@ -1,9 +1,6 @@
 var output = function (input) {
     var height = window.innerHeight;
     var width = window.innerWidth;
-    var bigStars;
-    var mediumStars;
-    var tinyStars;
     var ships;
 
     class Shape {
@@ -13,21 +10,6 @@ var output = function (input) {
             this.y = y;
         }
         draw = function (){};
-    }
-
-    class Star extends Shape {
-        constructor(size, x, y) {
-            super(size, x, y);
-        }
-        draw = function () {
-            input.noStroke();
-            input.fill(256, 256, 256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
     }
 
     class Moveable extends Shape {
@@ -149,21 +131,11 @@ var output = function (input) {
         }
     };
 
-    var drawAll = function (stars) {
-        for (var i = 0; i < stars.length; i++) {
-            stars[i].draw();
+    var drawAll = function (shapes) {
+        for (var i = 0; i < shapes.length; i++) {
+            shapes[i].draw();
         }
     };
-
-    var moveBullets = function(bullets) {
-        for (var i = 0; i < bullets.length; i++) {
-            if (bullets[i].age < 30) {
-                bullets[i].move(15);
-            } else {
-                bullets.pop(i)
-            }
-        }
-    }
 
     document.addEventListener('keydown', recordKey);
     function recordKey(e) {
@@ -179,32 +151,11 @@ var output = function (input) {
 
     input.setup = function () {
         input.createCanvas(width, height);
-        var starCount = 20 + Math.floor(Math.random() * 20);
 
-        bigStars = new Array(starCount);
-        mediumStars = new Array(starCount);
-        tinyStars = new Array(starCount);
         ships = new Array(2);
         ships[0] = new Ship(7, width / 2, height / 2);
         ships[1] = new Pirate(7, width / 3, height / 3, ships[0]);
 
-        for (var i = 0; i < starCount; i++) {
-            bigStars[i] = new Star(
-                3, 
-                Math.floor(Math.random() * width), 
-                Math.floor(Math.random() * height)
-            );
-            mediumStars[i] = new Star(
-                2, 
-                Math.floor(Math.random() * width), 
-                Math.floor(Math.random() * height)
-            );
-            tinyStars[i] = new Star(
-                1, 
-                Math.floor(Math.random() * width), 
-                Math.floor(Math.random() * height)
-            );
-        }
     };
 
     var frameCount = 0;
@@ -222,9 +173,6 @@ var output = function (input) {
         ships[1].move(1);
 
         drawAll(ships);
-        drawAll(bigStars);
-        drawAll(mediumStars);
-        drawAll(tinyStars);
     };
 };
 
