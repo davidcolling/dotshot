@@ -106,8 +106,9 @@ var output = function (input) {
     }
 
     class Pirate extends Moveable {
-        constructor(size, x, y) {
+        constructor(size, x, y, prey) {
             super(size, x, y, 180);
+            this.prey = prey;
         }
         draw = function () {
             input.noStroke();
@@ -118,6 +119,25 @@ var output = function (input) {
                 this.size,
                 this.size
             );
+        }
+        point = function () {
+            var dx = this.x - this.prey.x;
+            var dy = this.y - this.prey.y;
+
+            var directionToPrey;
+
+            if (dx < 0 && dy > 0) { // prey is in quadrant 1
+                directionToPrey = Math.tan( Math.abs(dx) / Math.abs(dy) );
+            } else if (dx < 0 && dy < 0) { // prey is in q2
+                directionToPrey = Math.tan( Math.abs(dy) / Math.abs(dx) );
+                directionToPrey += 90;
+            } else if (dx > 0 && dy < 0) { // q3
+                directionToPrey = Math.tan( Math.abs(dx) / Math.abs(dy) );
+                directionToPrey += 180;
+            } else if (dx > 0 && dy > 0) { // q4
+                directionToPrey = Math.tan( Math.abs(dy) / Math.abs(dx) );
+                directionToPrey += 270;
+            }
         }
     };
 
