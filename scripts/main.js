@@ -127,7 +127,7 @@ var output = function (input) {
             var directionToPrey;
 
             if (dx < 0 && dy > 0) { // prey is in quadrant 1
-                directionToPrey = Math.tan( Math.abs(dx) / Math.abs(dy) ) * (180 / Math.PI);
+                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
             } else if (dx < 0 && dy < 0) { // prey is in q2
                 directionToPrey = Math.tan( Math.abs(dy) / Math.abs(dx) );
                 directionToPrey += 90;
