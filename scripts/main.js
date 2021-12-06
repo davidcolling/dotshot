@@ -13,10 +13,6 @@ var output = function (input) {
             this.x = x;
             this.y = y;
         }
-        move = function (dx, dy) {
-            this.x += dx;
-            this.y += dy;
-        };
         draw = function (){};
     }
 
