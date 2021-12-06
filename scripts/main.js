@@ -100,15 +100,24 @@ var output = function (input) {
             );
         }
         point = function () {
-            var oldDirection = this.direction;
-            if (input.mouseX < width / 2) {
-                this.direction = Math.abs(360  - ((width / 2) - input.mouseX));
-            } else {
-                this.direction = Math.abs(((width / 2) - input.mouseX));
+            var dx = (width / 2) - input.mouseX;
+            var dy = (height / 2) - input.mouseY;
+
+            var directionToPrey;
+
+            if (dx < 0 && dy > 0) { // prey is in quadrant 1
+                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+            } else if (dx < 0 && dy < 0) { // prey is in q2
+                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                directionToPrey += 90;
+            } else if (dx > 0 && dy < 0) { // q3
+                directionToPrey = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                directionToPrey += 180;
+            } else if (dx > 0 && dy > 0) { // q4
+                directionToPrey = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                directionToPrey += 270;
             }
-            if ( !(this.direction >= 0 && this.direction < 360) ) {
-                this.direction = oldDirection;
-            }
+            this.direction = directionToPrey;
         }
     }
 
