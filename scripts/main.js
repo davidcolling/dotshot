@@ -152,6 +152,18 @@ var output = function (input) {
         }
     };
 
+    var didCollide = function(obj1, obj2) {
+        return ( 3 > Math.sqrt( (Math.abs(obj1.x - obj2.x) ** 2) + (Math.abs(obj1.y - obj2.y) ** 2)) );
+    };
+
+    var checkCollisions = function(obj, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            if (didCollide(obj, arr[i])) {
+                return true
+            }
+        }
+    };
+
     document.addEventListener('keydown', recordKey);
     function recordKey(e) {
         switch (e.key) {
@@ -188,6 +200,10 @@ var output = function (input) {
             ships[1].fire();
         }
         ships[1].move(0.5);
+
+        if (checkCollisions(ships[0], ships[1].bullets)) {
+            alert("lost");
+        }
 
         drawAll(ships);
     };
