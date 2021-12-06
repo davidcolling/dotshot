@@ -143,7 +143,7 @@ var output = function (input) {
         }
     };
 
-    var drawStars = function (stars) {
+    var drawAll = function (stars) {
         for (var i = 0; i < stars.length; i++) {
             stars[i].draw();
         }
@@ -218,11 +218,11 @@ var output = function (input) {
         ships[1].move(1);
         moveBullets(bullets);
 
-        drawStars(bullets);
-        drawStars(ships);
-        drawStars(bigStars);
-        drawStars(mediumStars);
-        drawStars(tinyStars);
+        drawAll(bullets);
+        drawAll(ships);
+        drawAll(bigStars);
+        drawAll(mediumStars);
+        drawAll(tinyStars);
     };
 };
 
