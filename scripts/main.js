@@ -78,7 +78,14 @@ var output = function (input) {
         }
     }
 
-    class Ship extends Moveable {
+    class Steerable extends Moveable {
+        constructor(size, x, y) {
+            super(size, x, y, 180);
+        }
+        point = function () {};
+    }
+
+    class Ship extends Steerable {
         constructor(size, x, y) {
             super(size, x, y, 180);
         }
@@ -105,7 +112,7 @@ var output = function (input) {
         }
     }
 
-    class Pirate extends Moveable {
+    class Pirate extends Steerable {
         constructor(size, x, y, prey) {
             super(size, x, y, 180);
             this.prey = prey;
