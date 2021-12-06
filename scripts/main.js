@@ -105,6 +105,22 @@ var output = function (input) {
         }
     }
 
+    class Pirate extends Moveable {
+        constructor(size, x, y) {
+            super(size, x, y, 180);
+        }
+        draw = function () {
+            input.noStroke();
+            input.fill(256, 0, 0, 256);
+            input.rect(
+                this.x, 
+                this.y, 
+                this.size,
+                this.size
+            );
+        }
+    };
+
     var drawStars = function (stars) {
         for (var i = 0; i < stars.length; i++) {
             stars[i].draw();
@@ -141,8 +157,9 @@ var output = function (input) {
         bigStars = new Array(starCount);
         mediumStars = new Array(starCount);
         tinyStars = new Array(starCount);
-        ships = new Array(1);
+        ships = new Array(2);
         ships[0] = new Ship(7, width / 2, height / 2);
+        ships[1] = new Pirate(7, width / 3, height / 3);
         bullets = new Array(1);
         bullets[0] = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
 
