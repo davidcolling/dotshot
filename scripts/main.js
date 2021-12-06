@@ -127,7 +127,7 @@ var output = function (input) {
             var directionToPrey;
 
             if (dx < 0 && dy > 0) { // prey is in quadrant 1
-                directionToPrey = Math.tan( Math.abs(dx) / Math.abs(dy) );
+                directionToPrey = Math.tan( Math.abs(dx) / Math.abs(dy) ) * (180 / Math.PI);
             } else if (dx < 0 && dy < 0) { // prey is in q2
                 directionToPrey = Math.tan( Math.abs(dy) / Math.abs(dx) );
                 directionToPrey += 90;
@@ -138,6 +138,8 @@ var output = function (input) {
                 directionToPrey = Math.tan( Math.abs(dy) / Math.abs(dx) );
                 directionToPrey += 270;
             }
+            this.direction = directionToPrey;
+            console.log(this.direction);
         }
     };
 
@@ -179,7 +181,7 @@ var output = function (input) {
         tinyStars = new Array(starCount);
         ships = new Array(2);
         ships[0] = new Ship(7, width / 2, height / 2);
-        ships[1] = new Pirate(7, width / 3, height / 3);
+        ships[1] = new Pirate(7, width / 3, height / 3, ships[0]);
         bullets = new Array(1);
         bullets[0] = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
 
@@ -202,9 +204,17 @@ var output = function (input) {
         }
     };
 
+    var frameCount = 0;
     input.draw = function () {
+        frameCount++;
+
         input.clear();
         ships[0].point();
+        ships[1].point();
+        if (frameCount % 20 == 0) {
+                bullet = new Bullet(ships[1].x, ships[1].y, ships[1].direction);
+                bullets.push(bullet);
+        }
         moveBullets(bullets);
 
         drawStars(bullets);
