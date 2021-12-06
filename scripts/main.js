@@ -5,7 +5,6 @@ var output = function (input) {
     var mediumStars;
     var tinyStars;
     var ships;
-    var bullets;
 
     class Shape {
         constructor(size, x, y) {
@@ -77,6 +76,8 @@ var output = function (input) {
     class Steerable extends Moveable {
         constructor(size, x, y) {
             super(size, x, y);
+            this.bullets = new Array(1);
+            this.bullets[0] = new Bullet(x, y, 0);
         }
         point = function (x1, y1, x2, y2) {
             var dx = x1 - x2;
@@ -100,6 +101,20 @@ var output = function (input) {
             }
 
             this.direction = directionToPrey;
+        }
+        drawBullets = function () {
+            for (var i = 0; i < this.bullets.length; i++) {
+                if (this.bullets[i].age < 30) {
+                    this.bullets[i].move(15);
+                    this.bullets[i].draw();
+                } else {
+                    this.bullets.pop(i)
+                }
+            }
+        }
+        fire = function() {
+            var bullet = new Bullet(this.x, this.y, this.direction);
+            this.bullets.push(bullet);
         }
     }
 
@@ -158,8 +173,7 @@ var output = function (input) {
                 ships[0].move(2);
                 break;
             case "r":
-                bullet = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
-                bullets.push(bullet);
+                ships[0].fire();
                 break;
         }
     }
@@ -174,8 +188,6 @@ var output = function (input) {
         ships = new Array(2);
         ships[0] = new Ship(7, width / 2, height / 2);
         ships[1] = new Pirate(7, width / 3, height / 3, ships[0]);
-        bullets = new Array(1);
-        bullets[0] = new Bullet(ships[0].x, ships[0].y, ships[0].direction);
 
         for (var i = 0; i < starCount; i++) {
             bigStars[i] = new Star(
@@ -202,15 +214,14 @@ var output = function (input) {
 
         input.clear();
         ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
+        ships[0].drawBullets();
         ships[1].point(ships[1].x, ships[1].y, ships[0].x, ships[0].y);
+        ships[1].drawBullets();
         if (frameCount % 20 == 0) {
-                bullet = new Bullet(ships[1].x, ships[1].y, ships[1].direction);
-                bullets.push(bullet);
+            ships[1].fire();
         }
         ships[1].move(1);
-        moveBullets(bullets);
 
-        drawAll(bullets);
         drawAll(ships);
         drawAll(bigStars);
         drawAll(mediumStars);
