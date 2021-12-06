@@ -18,7 +18,7 @@ var output = function (input) {
         }
         draw = function () {
             input.noStroke();
-            input.fill(256, 256, 256, 256);
+            input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -60,7 +60,7 @@ var output = function (input) {
         }
         draw = function () {
             input.noStroke();
-            input.fill(256, 256, 256, 256);
+            input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -120,7 +120,7 @@ var output = function (input) {
         }
         draw = function () {
             input.noStroke();
-            input.fill(256, 256, 256, 256);
+            input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
