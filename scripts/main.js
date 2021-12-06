@@ -12,6 +12,21 @@ var output = function (input) {
         draw = function (){};
     }
 
+    class Dot extends Shape {
+        constructor(x, y) {
+            super(2, x, y);
+        }
+        draw = function () {
+            input.noStroke();
+            input.fill(256, 256, 256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size,
+            );
+        }
+    }
+
     class Moveable extends Shape {
         constructor(size, x, y, direction) {
             super(size, x, y);
@@ -163,6 +178,8 @@ var output = function (input) {
         frameCount++;
 
         input.clear();
+        var dot = new Dot(width / 2, height / 2);
+        dot.draw();
         ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
         ships[0].drawBullets();
         ships[1].point(ships[1].x, ships[1].y, ships[0].x, ships[0].y);
