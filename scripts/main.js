@@ -175,16 +175,16 @@ var output = function (input) {
 
     var frameCount = 0;
     input.draw = function () {
-        frameCount++;
-
         input.clear();
         var dot = new Dot(width / 2, height / 2);
         dot.draw();
         ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
         ships[0].drawBullets();
+
         ships[1].point(ships[1].x, ships[1].y, ships[0].x, ships[0].y);
         ships[1].drawBullets();
-        if (frameCount % 20 == 0) {
+        frameCount++;
+        if (frameCount % 100 == 0) {
             ships[1].fire();
         }
         ships[1].move(0.5);
