@@ -215,6 +215,7 @@ var output = function (input) {
                 bullet = new Bullet(ships[1].x, ships[1].y, ships[1].direction);
                 bullets.push(bullet);
         }
+        ships[1].move(1);
         moveBullets(bullets);
 
         drawStars(bullets);
