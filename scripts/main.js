@@ -222,7 +222,8 @@ var output = function (input) {
 
         for (var i = 1; i < ships.length; i++) {
             if (checkCollisions(ships[0], ships[i].bullets)) {
-                alert("You lose");
+                document.getElementById("result").textContent = "You Lose.";
+                noLoop();
             }
         }
 
