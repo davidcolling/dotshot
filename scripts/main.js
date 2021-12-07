@@ -1,6 +1,7 @@
 var output = function (input) {
     var height = window.innerHeight;
     var width = window.innerWidth;
+    var walls;
     var ships;
 
     class Shape {
@@ -12,12 +13,29 @@ var output = function (input) {
         draw = function (){};
     }
 
+    class Wall {
+        constructor(x1, y1, x2, y2) {
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+        }
+        draw = function () {
+            input.fill(256, 256, 256, 256);
+            input.line(
+                this.x1, 
+                this.y1, 
+                this.x2, 
+                this.y2
+            );
+        }
+    };
+
     class Dot extends Shape {
         constructor(x, y) {
             super(2, x, y);
         }
         draw = function () {
-            input.noStroke();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -50,7 +68,6 @@ var output = function (input) {
             }
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
-            console.log(newX + " " + newY);
             if (
                 10 < newX && 
                 newX < (width - 10) && 
@@ -69,7 +86,6 @@ var output = function (input) {
             this.age = 0;
         }
         draw = function () {
-            input.noStroke();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -129,12 +145,10 @@ var output = function (input) {
             super(size, x, y);
         }
         draw = function () {
-            input.noStroke();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
-                this.size,
                 this.size
             );
         }
@@ -145,12 +159,10 @@ var output = function (input) {
             super(size, x, y);
         }
         draw = function () {
-            input.noStroke();
             input.fill(256, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
-                this.size,
                 this.size
             );
         }
@@ -206,6 +218,8 @@ var output = function (input) {
         ships[2] = new Pirate(7, width / 7, height / 8);
         ships[3] = new Pirate(7, width / 7, height / 4);
 
+        walls = new Array(1);
+        walls[0] = new Wall((width / 2), 1, (width / 2), (height / 2));
     };
 
     var frameCount = 0;
@@ -221,11 +235,12 @@ var output = function (input) {
         animatePirates();
 
         drawAll(ships);
+        drawAll(walls);
 
         for (var i = 1; i < ships.length; i++) {
             if (checkCollisions(ships[0], ships[i].bullets)) {
                 document.getElementById("result").textContent = "You Lose.";
-                noLoop();
+                input.noLoop();
             }
         }
 
