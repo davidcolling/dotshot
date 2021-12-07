@@ -48,8 +48,18 @@ var output = function (input) {
                 dx = this.direction - 360;
                 dy = -1 * (this.direction - 270);
             }
-            this.x += velocity * (dx / 90);
-            this.y += velocity * (dy / 90);
+            var newX = this.x + (velocity * (dx / 90));
+            var newY = this.y + (velocity * (dy / 90));
+            console.log(newX + " " + newY);
+            if (
+                10 < newX && 
+                newX < (width - 10) && 
+                10 < newY && 
+                newY< (height - 10)
+            ) {
+                this.x = newX;
+                this.y = newY;
+            }
         };
     }
 
@@ -179,9 +189,9 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        ships = new Array(2);
+        ships = new Array(1);
         ships[0] = new Ship(7, width / 2, height / 2);
-        ships[1] = new Pirate(7, width / 3, height / 3, ships[0]);
+        hips[1] = new Pirate(7, width / 3, height / 3, ships[0]);
 
     };
 
