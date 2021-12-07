@@ -220,6 +220,8 @@ var output = function (input) {
         frameCount++;
         animatePirates();
 
+        drawAll(ships);
+
         for (var i = 1; i < ships.length; i++) {
             if (checkCollisions(ships[0], ships[i].bullets)) {
                 document.getElementById("result").textContent = "You Lose.";
@@ -232,8 +234,6 @@ var output = function (input) {
                 ships.pop(i);
             }
         }
-
-        drawAll(ships);
     };
 };
 
