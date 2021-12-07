@@ -202,7 +202,7 @@ var output = function (input) {
         ships[1].move(0.5);
 
         if (checkCollisions(ships[0], ships[1].bullets)) {
-            alert("lost");
+            alert("You lose");
         }
 
         drawAll(ships);
