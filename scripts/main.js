@@ -162,6 +162,17 @@ var output = function (input) {
         }
     };
 
+    var animatePirates = function () {
+        for (var i = 1; i < ships.length; i++) {
+            ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
+            ships[i].drawBullets();
+            if (frameCount % 4 == i - 1) {
+                ships[i].fire();
+            }
+            ships[i].move(0.5);
+        }
+    }
+
     var didCollide = function(obj1, obj2) {
         return ( 5 > Math.sqrt( (Math.abs(obj1.x - obj2.x) ** 2) + (Math.abs(obj1.y - obj2.y) ** 2)) );
     };
@@ -189,9 +200,11 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        ships = new Array(1);
-        ships[0] = new Ship(7, width / 2, height / 2);
-        hips[1] = new Pirate(7, width / 3, height / 3, ships[0]);
+        ships = new Array(4);
+        ships[0] = new Ship(7, width / 2, height / 10);
+        ships[1] = new Pirate(7, width / 7, height / 10);
+        ships[2] = new Pirate(7, width / 7, height / 8);
+        ships[3] = new Pirate(7, width / 7, height / 4);
 
     };
 
@@ -200,18 +213,20 @@ var output = function (input) {
         input.clear();
         var dot = new Dot(width / 2, height / 2);
         dot.draw();
+
         ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
         ships[0].drawBullets();
 
-        ships[1].point(ships[1].x, ships[1].y, ships[0].x, ships[0].y);
-        ships[1].drawBullets();
         frameCount++;
-        if (frameCount % 100 == 0) {
-            ships[1].fire();
-        }
-        ships[1].move(0.5);
+        animatePirates();
 
         if (checkCollisions(ships[0], ships[1].bullets)) {
+            alert("You lose");
+        }
+        if (checkCollisions(ships[0], ships[2].bullets)) {
+            alert("You lose");
+        }
+        if (checkCollisions(ships[0], ships[3].bullets)) {
             alert("You lose");
         }
 
