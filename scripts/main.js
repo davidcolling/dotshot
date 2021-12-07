@@ -220,14 +220,16 @@ var output = function (input) {
         frameCount++;
         animatePirates();
 
-        if (checkCollisions(ships[0], ships[1].bullets)) {
-            alert("You lose");
+        for (var i = 1; i < ships.length; i++) {
+            if (checkCollisions(ships[0], ships[i].bullets)) {
+                alert("You lose");
+            }
         }
-        if (checkCollisions(ships[0], ships[2].bullets)) {
-            alert("You lose");
-        }
-        if (checkCollisions(ships[0], ships[3].bullets)) {
-            alert("You lose");
+
+        for (var i = 1; i < ships.length; i++) {
+            if (checkCollisions(ships[i], ships[0].bullets)) {
+                ships.pop(i);
+            }
         }
 
         drawAll(ships);
