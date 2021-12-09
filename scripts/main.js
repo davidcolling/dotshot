@@ -1,8 +1,8 @@
 var output = function (input) {
     var height = window.innerHeight;
     var width = window.innerWidth;
-    var walls;
     var ships;
+    var map;
 
     class Shape {
         constructor(size, x, y) {
@@ -28,6 +28,41 @@ var output = function (input) {
                 this.x2, 
                 this.y2
             );
+        }
+    };
+
+    class Map {
+        constructor() {
+            this.walls = new Array();
+            this.blockedCoords = new Array();
+        }
+        addWall = function(wall) {
+            this.walls.push(wall);
+
+            // assumes no diagonals for now
+            var isVertical = false;
+            if (wall.x1 == wall.x2) {
+                isVertical = true;
+            }
+
+            if (isVertical) {
+                var startingCoord = wall.y1;
+                var endingCoord= wall.y2;
+            } else {
+                var startingCoord = wall.x1;
+                var endingCoord= wall.x2;
+            }
+            for (var i = startingCoord; i < endingCoord; i++) {
+                var coord = new Array(2);
+                coord[0] = [i]
+                if (isVertical) {
+                    coord[1] = wall.x1;
+                } else {
+                    coord[1] = wall.y1;
+                }
+                console.log(coord[0] + " " + coord[1]);
+                this.blockedCoords.push(coord);
+            }
         }
     };
 
@@ -218,8 +253,8 @@ var output = function (input) {
         ships[2] = new Pirate(7, width / 7, height / 8);
         ships[3] = new Pirate(7, width / 7, height / 4);
 
-        walls = new Array(1);
-        walls[0] = new Wall((width / 2), 1, (width / 2), (height / 2));
+        map = new Map();
+        map.addWall( new Wall((width / 2), 1, (width / 2), (height / 2)) );
     };
 
     var frameCount = 0;
@@ -235,7 +270,7 @@ var output = function (input) {
         animatePirates();
 
         drawAll(ships);
-        drawAll(walls);
+        drawAll(map.walls);
 
         for (var i = 1; i < ships.length; i++) {
             if (checkCollisions(ships[0], ships[i].bullets)) {
