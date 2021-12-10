@@ -291,8 +291,11 @@ var output = function (input) {
         map = new Map();
         map.addWall( new Wall((width / 2), (height / 2), width / 3, (height / 3)) );
 
-        ships = Array(1);
+        ships = Array(4);
         ships[0] = new Ship(5, width - 20, height - 20, map);
+        ships[1] = new Pirate(5, width * Math.random(), height * Math.random(), map);
+        ships[2] = new Pirate(5, width * Math.random(), height * Math.random(), map);
+        ships[3] = new Pirate(5, width * Math.random(), height * Math.random(), map);
     };
 
     var frameCount = 0;
@@ -307,7 +310,23 @@ var output = function (input) {
         drawAll(ships);
         drawAll(map.walls);
         ships[0].drawBullets()
+
+		animatePirates();
+
+		for (var i = 1; i < ships.length; i++) {
+             if (checkCollisions(ships[0], ships[i].bullets)) {
+                 document.getElementById("result").textContent = "You Lose.";
+                 input.noLoop();
+             }
+         }
+ 
+         for (var i = 1; i < ships.length; i++) {
+             if (checkCollisions(ships[i], ships[0].bullets)) {
+                 ships.pop(i);
+             }
+         }
     };
+
 };
 
 var display = new p5(output, "canvas");
