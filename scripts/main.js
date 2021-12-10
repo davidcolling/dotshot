@@ -254,7 +254,7 @@ var output = function (input) {
         for (var i = 1; i < ships.length; i++) {
             ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
             ships[i].drawBullets();
-            if (frameCount % 4 == i - 1) {
+            if (frameCount % 16 == i - 1) {
                 ships[i].fire();
             }
             ships[i].move(0.5);
