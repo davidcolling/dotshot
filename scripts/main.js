@@ -99,12 +99,10 @@ var output = function (input) {
             console.log("val1: ", val1);
             var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
             console.log("val2: ", val2);
-            if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) {
-                console.log("false");
-                return false
+            if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) { // if points have opposite signs,
+                return true // then they are opposite sides of the wall
             }
-            console.log("true");
-            return true
+            return false
         }
     };
 
