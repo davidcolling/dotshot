@@ -289,7 +289,9 @@ var output = function (input) {
         input.createCanvas(width, height);
 
         map = new Map();
-        map.addWall( new Wall((width / 2), (height / 2), width / 3, (height / 3)) );
+        for (var i = 0; i < 15; i ++) {
+            map.addWall( new Wall(Math.random() * width, Math.random() * height, Math.random() * width, Math.random() * height));
+        }
 
         ships = Array(4);
         ships[0] = new Ship(5, width - 20, height - 20, map);
