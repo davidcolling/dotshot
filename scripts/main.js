@@ -96,9 +96,7 @@ var output = function (input) {
         // returns true if x1, y1 are on opposite sides of wall
         pointsAreSplit = function(x1, y1, x2, y2, wall) {
             var val1 = (wall.x2 - wall.x1) * (y1 - wall.y2) - (wall.y2 - wall.y1) * (x1 - wall.x2);
-            console.log("val1: ", val1);
             var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
-            console.log("val2: ", val2);
             if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) { // if points have opposite signs,
                 return true // then they are opposite sides of the wall
             }
@@ -121,9 +119,10 @@ var output = function (input) {
     }
 
     class Moveable extends Shape {
-        constructor(size, x, y, direction) {
+        constructor(size, x, y, direction, map) {
             super(size, x, y);
             this.direction = direction;
+            this.map = map;
         }
         move = function (velocity) {
             var dx;
@@ -147,7 +146,9 @@ var output = function (input) {
                 10 < newX && 
                 newX < (width - 10) && 
                 10 < newY && 
-                newY< (height - 10)
+                newY< (height - 10) &&
+
+                this.map.isOpen(this.x, this.y, newX, newY)
             ) {
                 this.x = newX;
                 this.y = newY;
@@ -156,8 +157,8 @@ var output = function (input) {
     }
 
     class Bullet extends Moveable {
-        constructor(x, y, direction) {
-            super(3, x, y, direction);
+        constructor(x, y, direction, map) {
+            super(3, x, y, direction, map);
             this.age = 0;
         }
         draw = function () {
@@ -172,8 +173,8 @@ var output = function (input) {
     }
 
     class Steerable extends Moveable {
-        constructor(size, x, y) {
-            super(size, x, y);
+        constructor(size, x, y, map) {
+            super(size, x, y, 0, map);
             this.bullets = new Array(1);
             this.bullets[0] = new Bullet(x, y, 0);
         }
@@ -210,14 +211,14 @@ var output = function (input) {
             }
         }
         fire = function() {
-            var bullet = new Bullet(this.x, this.y, this.direction);
+            var bullet = new Bullet(this.x, this.y, this.direction, this.map);
             this.bullets.push(bullet);
         }
     }
 
     class Ship extends Steerable {
-        constructor(size, x, y) {
-            super(size, x, y);
+        constructor(size, x, y, map) {
+            super(size, x, y, map);
         }
         draw = function () {
             input.fill(0, 0, 0, 256);
@@ -230,8 +231,8 @@ var output = function (input) {
     }
 
     class Pirate extends Steerable {
-        constructor(size, x, y) {
-            super(size, x, y);
+        constructor(size, x, y, map) {
+            super(size, x, y, map);
         }
         draw = function () {
             input.fill(256, 0, 0, 256);
@@ -276,7 +277,7 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "w":
-                ships[0].move(2);
+                ships[0].move(5);
                 break;
             case "r":
                 ships[0].fire();
@@ -288,7 +289,10 @@ var output = function (input) {
         input.createCanvas(width, height);
 
         map = new Map();
-        map.addWall( new Wall((width / 2), (height / 2), (width / 3), (height / 3)) );
+        map.addWall( new Wall((width / 2), (height / 2), width / 3, (height / 3)) );
+
+        ships = Array(1);
+        ships[0] = new Ship(5, width - 20, height - 20, map);
     };
 
     var frameCount = 0;
@@ -299,15 +303,10 @@ var output = function (input) {
 
         frameCount++;
 
+        ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
+        drawAll(ships);
         drawAll(map.walls);
 
-        var test = new Wall( width / 3, height / 2, width / 2, height / 3 );
-
-        var tests = new Array();
-        tests.push(test);
-        drawAll(tests);
-
-        console.log("map is open " + map.isOpen(test.x1, test.y1, test.x2, test.y2));
     };
 };
 
