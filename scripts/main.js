@@ -290,7 +290,12 @@ var output = function (input) {
 
         map = new Map();
         for (var i = 0; i < 15; i ++) {
-            map.addWall( new Wall(Math.random() * width, Math.random() * height, Math.random() * width, Math.random() * height));
+            map.addWall( new Wall(
+                50 + (Math.random() * (width * 0.8)), 
+                50 + (Math.random() * (height * 0.8)), 
+                Math.random() * (width * 0.8), 
+                Math.random() * (height * 0.8)
+            ));
         }
 
         ships = Array(4);
