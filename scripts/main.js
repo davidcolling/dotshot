@@ -301,7 +301,7 @@ var output = function (input) {
 
         drawAll(map.walls);
 
-        var test = new Wall( (width / 2) + (width / 4), (height / 2) + (height / 4), (width / 2) + (width / 9), (height / 2) + (height / 9) );
+        var test = new Wall( width / 3, height / 2, width / 2, height / 3 );
 
         var tests = new Array();
         tests.push(test);
