@@ -176,7 +176,7 @@ var output = function (input) {
         constructor(size, x, y, map) {
             super(size, x, y, 0, map);
             this.bullets = new Array(1);
-            this.bullets[0] = new Bullet(x, y, 0);
+            this.bullets[0] = new Bullet(x, y, 0, map);
         }
         point = function (x1, y1, x2, y2) {
             var dx = x1 - x2;
@@ -306,7 +306,7 @@ var output = function (input) {
         ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
         drawAll(ships);
         drawAll(map.walls);
-
+        ships[0].drawBullets()
     };
 };
 
