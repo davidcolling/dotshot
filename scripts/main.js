@@ -46,12 +46,23 @@ var output = function (input) {
             }
 
             if (isVertical) {
-                var startingCoord = wall.y1;
-                var endingCoord= wall.y2;
+                if (wall.y1 < wall.y2) {
+                    var startingCoord = wall.y1;
+                    var endingCoord= wall.y2;
+                } else {
+                    var startingCoord = wall.y2;
+                    var endingCoord= wall.y1;
+                }
             } else {
-                var startingCoord = wall.x1;
-                var endingCoord= wall.x2;
+                if (wall.x1 < wall.x2) {
+                    var startingCoord = wall.x1;
+                    var endingCoord= wall.x2;
+                } else {
+                    var startingCoord = wall.x2;
+                    var endingCoord= wall.x1;
+                }
             }
+
             for (var i = startingCoord; i < endingCoord; i++) {
                 var coord = new Array(2);
                 coord[0] = [i]
@@ -254,7 +265,7 @@ var output = function (input) {
         ships[3] = new Pirate(7, width / 7, height / 4);
 
         map = new Map();
-        map.addWall( new Wall((width / 2), 1, (width / 2), (height / 2)) );
+        map.addWall( new Wall((height / 2), (width / 2), 1, (width / 2)) );
     };
 
     var frameCount = 0;
