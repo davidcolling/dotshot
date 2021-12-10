@@ -71,9 +71,38 @@ var output = function (input) {
                 } else {
                     coord[1] = wall.y1;
                 }
-                console.log(coord[0] + " " + coord[1]);
                 this.blockedCoords.push(coord);
             }
+        }
+        // returns true if there is no wall between points 1 and 2
+        isOpen = function(x1, y1, x2, y2) {
+            // https://stackoverflow.com/questions/7069420/check-if-two-line-segments-are-colliding-only-check-if-they-are-intersecting-n
+            // To spell it out: suppose you're looking at two line segments, [AB] and [CD]. The segments intersect if and only if ((A and B are of different sides of [CD]) and (C and D are on different sides of [AB])).
+            //                            1     2                                           [walls.1 walls.2]
+            // To see whether two points, P and Q, are on different sides of a line segment [E       F], compute two cross products, one for P and one for Q:
+            // (F[x] - E[x])(P[y] - F[y]) - (F[y] - E[y])(P[x] - F[x])
+            // (F[x] - E[x])(Q[y] - F[y]) - (F[y] - E[y])(Q[x] - F[x])
+            // If the results have the same sign (both positive or both negative) then forget it, the points are on the same side, the segments do not intersect. If one is positive and the other negative, then the points are on opposite sides.
+            for (var i = 0; i < this.walls.length; i++) {
+                if (
+                    this.pointsAreSplit(x1, y1, x2, y2, this.walls[i]) &&
+                    this.pointsAreSplit(this.walls[i].x1, this.walls[i].y1, this.walls[i].x2, this.walls[i].y2, new Wall(x1, y1, x2, y2))
+                ) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        // returns true if x1, y1 are on opposite sides of wall
+        pointsAreSplit = function(x1, y1, x2, y2, wall) {
+            var val1 = (wall.x2 - wall.x1) * (y1 - wall.y2) - (wall.y2 - wall.y1) * (x1 - wall.x2);
+            console.log("val1: ", val1);
+            var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
+            console.log("val2: ", val2);
+            if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) {
+                return false
+            }
+            return true
         }
     };
 
@@ -258,14 +287,8 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        ships = new Array(4);
-        ships[0] = new Ship(7, width / 2, height / 10);
-        ships[1] = new Pirate(7, width / 7, height / 10);
-        ships[2] = new Pirate(7, width / 7, height / 8);
-        ships[3] = new Pirate(7, width / 7, height / 4);
-
         map = new Map();
-        map.addWall( new Wall((height / 2), (width / 2), 1, (width / 2)) );
+        map.addWall( new Wall((width / 2), (height / 2), (width / 3), (height / 3)) );
     };
 
     var frameCount = 0;
@@ -274,27 +297,17 @@ var output = function (input) {
         var dot = new Dot(width / 2, height / 2);
         dot.draw();
 
-        ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
-        ships[0].drawBullets();
-
         frameCount++;
-        animatePirates();
 
-        drawAll(ships);
         drawAll(map.walls);
 
-        for (var i = 1; i < ships.length; i++) {
-            if (checkCollisions(ships[0], ships[i].bullets)) {
-                document.getElementById("result").textContent = "You Lose.";
-                input.noLoop();
-            }
-        }
+        var test = new Wall( (width / 2) + (width / 4), (height / 2) + (height / 4), (width / 2) + (width / 9), (height / 2) + (height / 9) );
 
-        for (var i = 1; i < ships.length; i++) {
-            if (checkCollisions(ships[i], ships[0].bullets)) {
-                ships.pop(i);
-            }
-        }
+        var tests = new Array();
+        tests.push(test);
+        drawAll(tests);
+
+        console.log("map is open " + map.isOpen(test.x1, test.y1, test.x2, test.y2));
     };
 };
 
