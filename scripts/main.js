@@ -277,7 +277,7 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "w":
-                ships[0].move(5);
+                ships[0].move(2);
                 break;
             case "r":
                 ships[0].fire();
@@ -294,7 +294,7 @@ var output = function (input) {
         }
 
         ships = Array(4);
-        ships[0] = new Ship(5, width - 20, height - 20, map);
+        ships[0] = new Ship(5, width - 20, height - 50, map);
         ships[1] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
         ships[2] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
         ships[3] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
