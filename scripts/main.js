@@ -295,9 +295,9 @@ var output = function (input) {
 
         ships = Array(4);
         ships[0] = new Ship(5, width - 20, height - 20, map);
-        ships[1] = new Pirate(5, width * Math.random(), height * Math.random(), map);
-        ships[2] = new Pirate(5, width * Math.random(), height * Math.random(), map);
-        ships[3] = new Pirate(5, width * Math.random(), height * Math.random(), map);
+        ships[1] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
+        ships[2] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
+        ships[3] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
     };
 
     var frameCount = 0;
