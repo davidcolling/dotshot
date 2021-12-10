@@ -100,8 +100,10 @@ var output = function (input) {
             var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
             console.log("val2: ", val2);
             if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) {
+                console.log("false");
                 return false
             }
+            console.log("true");
             return true
         }
     };
