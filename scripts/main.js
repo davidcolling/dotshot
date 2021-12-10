@@ -313,7 +313,7 @@ var output = function (input) {
 
         frameCount++;
 
-        ships[0].point(width / 2, height / 2, input.mouseX, input.mouseY);
+        ships[0].point(ships[0].x, ships[0].y, input.mouseX, input.mouseY);
         drawAll(ships);
         drawAll(map.walls);
         ships[0].drawBullets()
