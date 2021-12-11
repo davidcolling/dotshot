@@ -266,11 +266,6 @@ var output = function (input) {
         return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
     };
 
-    var animatePirates = function () {
-        for (var i = 1; i < ships.length; i++) {
-        }
-    }
-
     var didCollide = function(obj1, obj2) {
         return ( 5 > Math.sqrt( (Math.abs(obj1.x - obj2.x) ** 2) + (Math.abs(obj1.y - obj2.y) ** 2)) );
     };
