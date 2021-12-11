@@ -245,14 +245,13 @@ var output = function (input) {
             );
         }
         idle = function () {
-            if (this.idleAge < this.idleLife) {
-                this.idleAge++;
-                this.move(0.5);
-            } else {
+            if (!(this.idleAge < this.idleLife)) {
                 this.ideAge = 0;
-                this.idleLife = Math.random() * 1000;
+                this.idleLife = Math.random() * 2000;
                 this.direction = Math.random() * 360;
             }
+            this.idleAge++;
+            this.move(1);
         }
     };
 
@@ -327,7 +326,7 @@ var output = function (input) {
                     ships[i].draw();
                     if (
                         400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
-                        map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
+                        map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].y)
                     ) {
                         ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
                         ships[i].drawBullets();
