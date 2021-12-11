@@ -290,6 +290,7 @@ var output = function (input) {
                 return true
             }
         }
+        return false;
     };
 
     document.addEventListener('keydown', recordKey);
