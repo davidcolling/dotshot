@@ -317,35 +317,37 @@ var output = function (input) {
 
         frameCount++;
 
-        ships[0].point(ships[0].x, ships[0].y, input.mouseX, input.mouseY);
-        drawAll(ships);
         drawAll(map.walls);
-        ships[0].drawBullets()
 
-		for (var i = 1; i < ships.length; i++) {
-             if (
-                 400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
-                 map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
-             ) {
-                 ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
-                 ships[i].drawBullets();
-                 if (frameCount % 16 == i - 1) {
-                     ships[i].fire();
-                 }
-                 ships[i].move(0.5);
-             } else {
-                 ships[i].idle();
-             }
-
-             if (checkCollisions(ships[0], ships[i].bullets)) {
-                 document.getElementById("result").textContent = "You Lose.";
-                 input.noLoop();
-             }
-
-             if (checkCollisions(ships[i], ships[0].bullets)) {
-                 ships.pop(i);
-             }
-
+		for (var i = 0; i < ships.length; i++) {
+            ships[i].draw();
+            if ( i == 0 ) {
+                ships[i].drawBullets()
+                ships[i].point(ships[i].x, ships[i].y, input.mouseX, input.mouseY);
+            } else {
+                if (
+                    400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
+                    map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
+                ) {
+                    ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
+                    ships[i].drawBullets();
+                    if (frameCount % 16 == i - 1) {
+                        ships[i].fire();
+                   }
+                    ships[i].move(0.5);
+                } else {
+                    ships[i].idle();
+                }
+    
+                if (checkCollisions(ships[0], ships[i].bullets)) {
+                    document.getElementById("result").textContent = "You Lose.";
+                    input.noLoop();
+                }
+    
+                if (checkCollisions(ships[i], ships[0].bullets)) {
+                    ships.pop(i);
+                }
+            }
          }
  
     };
