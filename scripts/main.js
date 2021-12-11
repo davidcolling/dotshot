@@ -262,21 +262,12 @@ var output = function (input) {
         }
     };
 
+    var calculateDistance = function (x1, y1, x2, y2) {
+        return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
+    };
+
     var animatePirates = function () {
         for (var i = 1; i < ships.length; i++) {
-            if (
-                400 > Math.sqrt( Math.abs(ships[i].x - ships[0].x)**2 + Math.abs(ships[i].y - ships[0].y)**2 ) &&
-                map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
-            ) {
-                ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
-                ships[i].drawBullets();
-                if (frameCount % 16 == i - 1) {
-                    ships[i].fire();
-                }
-                ships[i].move(0.5);
-            } else {
-                ships[i].idle();
-            }
         }
     }
 
@@ -339,13 +330,29 @@ var output = function (input) {
 		animatePirates();
 
 		for (var i = 1; i < ships.length; i++) {
+             if (
+                 400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
+                 map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
+             ) {
+                 ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
+                 ships[i].drawBullets();
+                 if (frameCount % 16 == i - 1) {
+                     ships[i].fire();
+                 }
+                 ships[i].move(0.5);
+             } else {
+                 ships[i].idle();
+             }
+
              if (checkCollisions(ships[0], ships[i].bullets)) {
                  document.getElementById("result").textContent = "You Lose.";
                  input.noLoop();
              }
+
              if (checkCollisions(ships[i], ships[0].bullets)) {
                  ships.pop(i);
              }
+
          }
  
     };
