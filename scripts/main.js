@@ -128,6 +128,9 @@ var output = function (input) {
             var dx;
             var dy;
             var offsetDirection = this.direction + offset;
+            if (offsetDirection > 359) {
+                offsetDirection -= 360;
+            }
             if (offsetDirection >= 0 && offsetDirection < 90) {
                 dx = offsetDirection;
                 dy = -1 * (90 - offsetDirection);
