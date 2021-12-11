@@ -343,13 +343,11 @@ var output = function (input) {
                  document.getElementById("result").textContent = "You Lose.";
                  input.noLoop();
              }
-         }
- 
-         for (var i = 1; i < ships.length; i++) {
              if (checkCollisions(ships[i], ships[0].bullets)) {
                  ships.pop(i);
              }
          }
+ 
     };
 
 };
