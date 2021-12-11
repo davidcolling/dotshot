@@ -308,8 +308,6 @@ var output = function (input) {
     var frameCount = 0;
     input.draw = function () {
         input.clear();
-        var dot = new Dot(width / 2, height / 2);
-        dot.draw();
 
         frameCount++;
 
