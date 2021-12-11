@@ -322,8 +322,6 @@ var output = function (input) {
         drawAll(map.walls);
         ships[0].drawBullets()
 
-		animatePirates();
-
 		for (var i = 1; i < ships.length; i++) {
              if (
                  400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
