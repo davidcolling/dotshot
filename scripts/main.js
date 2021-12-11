@@ -233,7 +233,9 @@ var output = function (input) {
     class Pirate extends Steerable {
         constructor(size, x, y, map) {
             super(size, x, y, map);
-        }
+            this.idleAge = 0;
+            this.idleLife = Math.random() * 200;
+       }
         draw = function () {
             input.fill(256, 0, 0, 256);
             input.circle(
@@ -241,6 +243,16 @@ var output = function (input) {
                 this.y, 
                 this.size
             );
+        }
+        idle = function () {
+            if (this.idleAge < this.idleLife) {
+                this.idleAge++;
+                this.move(0.5);
+            } else {
+                this.ideAge = 0;
+                this.idleLife = Math.random() * 1000;
+                this.direction = Math.random() * 360;
+            }
         }
     };
 
@@ -252,12 +264,19 @@ var output = function (input) {
 
     var animatePirates = function () {
         for (var i = 1; i < ships.length; i++) {
-            ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
-            ships[i].drawBullets();
-            if (frameCount % 16 == i - 1) {
-                ships[i].fire();
+            if (
+                400 > Math.sqrt( Math.abs(ships[i].x - ships[0].x)**2 + Math.abs(ships[i].y - ships[0].y)**2 ) &&
+                map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].x)
+            ) {
+                ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
+                ships[i].drawBullets();
+                if (frameCount % 16 == i - 1) {
+                    ships[i].fire();
+                }
+                ships[i].move(0.5);
+            } else {
+                ships[i].idle();
             }
-            ships[i].move(0.5);
         }
     }
 
