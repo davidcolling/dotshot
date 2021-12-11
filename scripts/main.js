@@ -317,11 +317,11 @@ var output = function (input) {
             ));
         }
 
-        ships = Array(4);
+        ships = Array(1);
         ships[0] = new Ship(5, width - 20, height - 50, map);
-        ships[1] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
-        ships[2] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
-        ships[3] = new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map);
+        for (var i = 0; i < 10; i++ ) {
+            ships.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map));
+        }
     };
 
     var frameCount = 0;
