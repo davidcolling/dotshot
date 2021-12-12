@@ -319,13 +319,24 @@ var output = function (input) {
         input.createCanvas(width, height);
 
         map = new Map();
-        for (var i = 0; i < 15; i ++) {
-            map.addWall( new Wall(
-                50 + (Math.random() * (width * 0.8)), 
-                50 + (Math.random() * (height * 0.8)), 
-                Math.random() * (width * 0.8), 
-                Math.random() * (height * 0.8)
-            ));
+        if (Math.random() < 0.3) {
+            for (var i = 0; i < 60; i ++) {
+                map.addWall( new Wall(
+                    i * (width / 60),
+                    50 + (Math.random() * (height * 0.8)), 
+                    i * (width / 60),
+                    Math.random() * (height * 0.8)
+                ));
+            }
+        } else {
+            for (var i = 0; i < 15; i ++) {
+                map.addWall( new Wall(
+                    50 + (Math.random() * (height * 0.8)), 
+                    50 + (Math.random() * (width * 0.8)), 
+                    Math.random() * (width * 0.8),
+                    Math.random() * (height * 0.8)
+                ));
+            }
         }
 
         ships = Array(1);
