@@ -14,6 +14,13 @@ var output = function (input) {
         draw = function (){};
     }
 
+    class Coord {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
     class Wall {
         constructor(x1, y1, x2, y2) {
             this.x1 = x1;
@@ -322,8 +329,7 @@ var output = function (input) {
             super(size, x, y, world);
             this.idleAge = 0;
             this.idleLife = Math.random() * 200;
-            this.lastSeenPlayerX = null;
-            this.lastSeenPlayerY = null;
+            this.lastSeenPlayerCoord = new Coord();
        }
         draw = function () {
             this.drawBullets();
@@ -335,13 +341,13 @@ var output = function (input) {
             );
         }
         idle = function () {
-            if (this.lastSeenPlayerX != null) {
-                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerX, this.lastSeenPlayerY)) {
-                    this.point(this.x, this.y, this.lastSeenPlayerX, this.lastSeenPlayerY);
+            if (this.lastSeenPlayerCoord != null) {
+                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
                     this.move(1, 0);
                 } else {
-                    this.lastSeenPlayerX = null;
-                    this.lastSeenPlayerY = null;
+                    this.lastSeenPlayerCoord.x = null;
+                    this.lastSeenPlayerCoord.y = null;
                 }
             } else {
                 if (!(this.idleAge < this.idleLife)) {
@@ -451,8 +457,8 @@ var output = function (input) {
                         400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
                         world.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].y)
                     ) {
-                        ships[i].lastSeenPlayerX = ships[0].x;
-                        ships[i].lastSeenPlayerY = ships[0].y;
+                        ships[i].lastSeenPlayerCoord.x = ships[0].x;
+                        ships[i].lastSeenPlayerCoord.y = ships[0].y;
                         ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
                         if (frameCount % 16 == i - 1) {
                             ships[i].fire();
