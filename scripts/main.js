@@ -112,11 +112,6 @@ var output = function (input) {
                 y + (size / 8)
             ));
         }
-        draw = function() {
-            for (var i = 0; i < this.walls.length; i++) {
-                this.walls[i].draw();
-            }
-        }
     }
 
     class Map {
@@ -417,7 +412,7 @@ var output = function (input) {
                 ));
             }
         } else {
-            for (var i = 0; i < 15; i ++) {
+            for (var i = 0; i < 5; i ++) {
                 map.addWall( new Wall(
                     Math.random() * width, 
                     Math.random() * height, 
@@ -425,9 +420,17 @@ var output = function (input) {
                     Math.random() * height
                 ));
             }
+            for (var i = 0; i < 15; i ++) {
+                var castle = new Castle(
+                    Math.random() * (0.7 * width),
+                    Math.random() * (0.7 * height),
+                    Math.random() * 500
+                );
+                for (var j = 0; j < castle.walls.length; j++) {
+                    map.addWall(castle.walls[j]);
+                }
+            }
         }
-
-        castle = new Castle(width / 2, height / 2, 300);
 
         ships = Array(1);
         ships[0] = new Ship(5, width - 20, height - 50, map);
@@ -441,7 +444,6 @@ var output = function (input) {
         input.clear();
         frameCount++;
         drawAll(map.walls);
-        castle.draw();
 
         for (var i = 0; i < ships.length; i++) {
             if ( i == 0 ) {
