@@ -331,10 +331,10 @@ var output = function (input) {
         } else {
             for (var i = 0; i < 15; i ++) {
                 map.addWall( new Wall(
-                    50 + (Math.random() * (height * 0.8)), 
-                    50 + (Math.random() * (width * 0.8)), 
-                    Math.random() * (width * 0.8),
-                    Math.random() * (height * 0.8)
+                    Math.random() * width, 
+                    Math.random() * height, 
+                    Math.random() * width, 
+                    Math.random() * height
                 ));
             }
         }
