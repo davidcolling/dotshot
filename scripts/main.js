@@ -32,12 +32,24 @@ var output = function (input) {
         }
     };
 
-    class Castle {
+    // assumes multiple walls
+    class Structure {
+        constructor() {
+            this.walls = new Array();
+        }
+        draw = function() {
+            for (var i = 0; i < this.walls.length; i++) {
+                this.walls[i].draw();
+            }
+        }
+    }
+
+    class Castle extends Structure {
         // coord of center 
         constructor(x, y, size) {
+            super();
             this.x = x;
             this.y = y;
-            this.walls = new Array();
             this.walls.push( new Wall( //1
                 x - (size / 2),
                 y - (size / 2),
@@ -114,15 +126,11 @@ var output = function (input) {
         }
     }
 
-    class Map {
+    class Map extends Structure {
         constructor() {
+            super();
             this.walls = new Array();
             this.blockedCoords = new Array();
-        }
-        draw = function() {
-            for (var i = 0; i < this.walls.length; i++) {
-                this.walls[i].draw();
-            }
         }
         addWall = function(wall) {
             this.walls.push(wall);
