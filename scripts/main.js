@@ -1,5 +1,5 @@
 var output = function (input) {
-    var height = window.innerHeight;
+    var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
     var ships;
     var map;
