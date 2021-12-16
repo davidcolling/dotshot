@@ -187,20 +187,6 @@ var output = function (input) {
         }
     };
 
-    class Dot extends Shape {
-        constructor(x, y) {
-            super(2, x, y);
-        }
-        draw = function () {
-            input.fill(0, 0, 0, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size,
-            );
-        }
-    }
-
     class Moveable extends Shape {
         constructor(size, x, y, direction, map) {
             super(size, x, y);
