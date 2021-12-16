@@ -119,6 +119,11 @@ var output = function (input) {
             this.walls = new Array();
             this.blockedCoords = new Array();
         }
+        draw = function() {
+            for (var i = 0; i < this.walls.length; i++) {
+                this.walls[i].draw();
+            }
+        }
         addWall = function(wall) {
             this.walls.push(wall);
 
@@ -342,12 +347,6 @@ var output = function (input) {
         }
     };
 
-    var drawAll = function (shapes) {
-        for (var i = 0; i < shapes.length; i++) {
-            shapes[i].draw();
-        }
-    };
-
     var calculateDistance = function (x1, y1, x2, y2) {
         return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
     };
@@ -431,7 +430,7 @@ var output = function (input) {
     input.draw = function () {
         input.clear();
         frameCount++;
-        drawAll(map.walls);
+        map.draw();
 
         for (var i = 0; i < ships.length; i++) {
             if ( i == 0 ) {
