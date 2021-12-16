@@ -294,6 +294,7 @@ var output = function (input) {
             super(size, x, y, map);
         }
         draw = function () {
+            this.drawBullets();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -312,6 +313,7 @@ var output = function (input) {
             this.lastSeenPlayerY = null;
        }
         draw = function () {
+            this.drawBullets();
             input.fill(256, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -433,7 +435,6 @@ var output = function (input) {
 
         for (var i = 0; i < ships.length; i++) {
             if ( i == 0 ) {
-                ships[i].drawBullets()
                 ships[i].point(ships[i].x, ships[i].y, input.mouseX, input.mouseY);
                 ships[i].draw();
             } else {
@@ -446,7 +447,6 @@ var output = function (input) {
                         ships[i].lastSeenPlayerX = ships[0].x;
                         ships[i].lastSeenPlayerY = ships[0].y;
                         ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
-                        ships[i].drawBullets();
                         if (frameCount % 16 == i - 1) {
                             ships[i].fire();
                        }
