@@ -86,6 +86,31 @@ var output = function (input) {
                 x - (size / 2),
                 y - (size / 2)
             ));
+
+            this.walls.push( new Wall( //9
+                x - (size / 8),
+                y - (size / 4),
+                x + (size / 8),
+                y - (size / 4)
+            ));
+            this.walls.push( new Wall( //10
+                x + (size / 4),
+                y - (size / 8),
+                x + (size / 4),
+                y + (size / 8)
+            ));
+            this.walls.push( new Wall( //11
+                x - (size / 8),
+                y + (size / 4),
+                x + (size / 8),
+                y + (size / 4)
+            ));
+            this.walls.push( new Wall( //12
+                x - (size / 4),
+                y - (size / 8),
+                x - (size / 4),
+                y + (size / 8)
+            ));
         }
         draw = function() {
             for (var i = 0; i < this.walls.length; i++) {
