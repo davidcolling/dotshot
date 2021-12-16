@@ -2,7 +2,7 @@ var output = function (input) {
     var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
     var ships;
-    var map;
+    var world;
     var castle;
 
     class Shape {
@@ -201,10 +201,10 @@ var output = function (input) {
     };
 
     class Moveable extends Shape {
-        constructor(size, x, y, direction, map) {
+        constructor(size, x, y, direction, world) {
             super(size, x, y);
             this.direction = direction;
-            this.map = map;
+            this.world = world;
         }
         move = function (velocity, offset) {
             var dx;
@@ -234,7 +234,7 @@ var output = function (input) {
                 10 < newY && 
                 newY< (height - 10) &&
 
-                this.map.isOpen(this.x, this.y, newX, newY)
+                this.world.isOpen(this.x, this.y, newX, newY)
             ) {
                 this.x = newX;
                 this.y = newY;
@@ -243,8 +243,8 @@ var output = function (input) {
     }
 
     class Bullet extends Moveable {
-        constructor(x, y, direction, map) {
-            super(3, x, y, direction, map);
+        constructor(x, y, direction, world) {
+            super(3, x, y, direction, world);
             this.age = 0;
         }
         draw = function () {
@@ -259,10 +259,10 @@ var output = function (input) {
     }
 
     class Steerable extends Moveable {
-        constructor(size, x, y, map) {
-            super(size, x, y, 0, map);
+        constructor(size, x, y, world) {
+            super(size, x, y, 0, world);
             this.bullets = new Array(1);
-            this.bullets[0] = new Bullet(x, y, 0, map);
+            this.bullets[0] = new Bullet(x, y, 0, world);
         }
         point = function (x1, y1, x2, y2) {
             var dx = x1 - x2;
@@ -297,14 +297,14 @@ var output = function (input) {
             }
         }
         fire = function() {
-            var bullet = new Bullet(this.x, this.y, this.direction, this.map);
+            var bullet = new Bullet(this.x, this.y, this.direction, this.world);
             this.bullets.push(bullet);
         }
     }
 
     class Ship extends Steerable {
-        constructor(size, x, y, map) {
-            super(size, x, y, map);
+        constructor(size, x, y, world) {
+            super(size, x, y, world);
         }
         draw = function () {
             this.drawBullets();
@@ -318,8 +318,8 @@ var output = function (input) {
     }
 
     class Pirate extends Steerable {
-        constructor(size, x, y, map) {
-            super(size, x, y, map);
+        constructor(size, x, y, world) {
+            super(size, x, y, world);
             this.idleAge = 0;
             this.idleLife = Math.random() * 200;
             this.lastSeenPlayerX = null;
@@ -396,10 +396,10 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        map = new World();
+        world = new World();
         if (Math.random() < 0.3) {
             for (var i = 0; i < 60; i ++) {
-                map.addWall( new Wall(
+                world.addWall( new Wall(
                     i * (width / 60),
                     50 + (Math.random() * (height * 0.8)), 
                     i * (width / 60),
@@ -408,7 +408,7 @@ var output = function (input) {
             }
         } else {
             for (var i = 0; i < 5; i ++) {
-                map.addWall( new Wall(
+                world.addWall( new Wall(
                     Math.random() * width, 
                     Math.random() * height, 
                     Math.random() * width, 
@@ -422,15 +422,15 @@ var output = function (input) {
                     Math.random() * 500
                 );
                 for (var j = 0; j < castle.walls.length; j++) {
-                    map.addWall(castle.walls[j]);
+                    world.addWall(castle.walls[j]);
                 }
             }
         }
 
         ships = Array(1);
-        ships[0] = new Ship(5, width - 20, height - 50, map);
+        ships[0] = new Ship(5, width - 20, height - 50, world);
         for (var i = 0; i < 10; i++ ) {
-            ships.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), map));
+            ships.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
         }
     };
 
@@ -438,7 +438,7 @@ var output = function (input) {
     input.draw = function () {
         input.clear();
         frameCount++;
-        map.draw();
+        world.draw();
 
         for (var i = 0; i < ships.length; i++) {
             if ( i == 0 ) {
@@ -449,7 +449,7 @@ var output = function (input) {
                     ships[i].draw();
                     if (
                         400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
-                        map.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].y)
+                        world.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].y)
                     ) {
                         ships[i].lastSeenPlayerX = ships[0].x;
                         ships[i].lastSeenPlayerY = ships[0].y;
