@@ -126,7 +126,7 @@ var output = function (input) {
         }
     }
 
-    class Map extends Structure {
+    class World extends Structure {
         constructor() {
             super();
             this.walls = new Array();
@@ -396,7 +396,7 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        map = new Map();
+        map = new World();
         if (Math.random() < 0.3) {
             for (var i = 0; i < 60; i ++) {
                 map.addWall( new Wall(
