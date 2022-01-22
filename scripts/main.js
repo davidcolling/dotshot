@@ -347,7 +347,9 @@ var output = function (input) {
         incAge = function () {
             this.age += 1;
             if (this.age > this.life - 40) {
-                this.pulse();
+                if (this.age % 16 == 0) {
+                    this.pulse();
+                }
                 if (this.age == this.life) {
                     // this thing dies in a large fireball
                     console.log("boom")
