@@ -324,6 +324,76 @@ var output = function (input) {
         }
     }
 
+    class Bomb extends Steerable {
+        constructor(x, y, world) {
+            super(5, x, y, world);
+            this.age = 0;
+            this.life = 300;
+            this.idleAge = 0;
+            this.idleLife = Math.random() * 200;
+            this.lastSeenPlayerCoord = new Coord();
+            this.isGrowing = true;
+        }
+        draw = function () {
+            this.drawBullets();
+            this.incAge();
+            input.fill(0, 256, 0, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
+        incAge = function () {
+            this.age += 1;
+            if (this.age > this.life - 40) {
+                this.pulse();
+                if (this.age == this.life) {
+                    // this thing dies in a large fireball
+                    console.log("boom")
+                }
+            }
+        }
+        pulse = function () {
+            if (this.isGrowing) {
+                if (this.size < 9) {
+                    this.size += 1;
+                } else {
+                    this.isGrowing = false;
+                    this.size -= 1;
+                }
+            } else {
+                if (this.size > 5) {
+                    this.size -= 1;
+                } else {
+                    this.isGrowing = true;
+                    this.size += 1;
+                }
+            }
+        }
+        idle = function () {
+            if (this.lastSeenPlayerCoord != null) {
+                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                    this.move(1, 0);
+                } else {
+                    this.lastSeenPlayerCoord.x = null;
+                    this.lastSeenPlayerCoord.y = null;
+                }
+            } else {
+                if (!(this.idleAge < this.idleLife)) {
+                    this.ideAge = 0;
+                    this.idleLife = Math.random() * 2000;
+                    this.direction = Math.random() * 360;
+                }
+                this.idleAge++;
+                this.move(1, 0);
+            }
+        }
+    };
+
+
+
     class Pirate extends Steerable {
         constructor(size, x, y, world) {
             super(size, x, y, world);
@@ -438,6 +508,7 @@ var output = function (input) {
         for (var i = 0; i < 10; i++ ) {
             ships.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
         }
+        ships.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
     };
 
     var frameCount = 0;
