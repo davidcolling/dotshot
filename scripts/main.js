@@ -2,6 +2,9 @@ var output = function (input) {
     var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
     var ships;
+    var player;
+    var shooters;
+    var bombers;
     var world;
     var castle;
 
@@ -354,12 +357,10 @@ var output = function (input) {
                 if (this.age % 16 == 0) {
                     this.pulse();
                 }
-                if (this.age == this.life) {
-                    // this thing dies in a large fireball
-                    this.shockWave = new ShockWave(300, this.x, this.y);
-                    console.log("boom")
-                }
             }
+        }
+        explode = function () {
+            this.shockWave = new ShockWave(300, this.x, this.y);
         }
         pulse = function () {
             if (this.isGrowing) {
@@ -478,19 +479,19 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "r":
-                ships[0].fire();
+                player.fire();
                 break;
             case "w":
-                ships[0].move(2, 0);
+                player.move(2, 0);
                 break;
             case "d":
-                ships[0].move(2, 90);
+                player.move(2, 90);
                 break;
             case "s":
-                ships[0].move(2, 180);
+                player.move(2, 180);
                 break;
             case "a":
-                ships[0].move(2, 270);
+                player.move(2, 270);
                 break;
         }
     }
@@ -529,12 +530,16 @@ var output = function (input) {
             }
         }
 
-        ships = Array(1);
-        ships[0] = new Ship(5, width - 20, height - 50, world);
-        for (var i = 0; i < 10; i++ ) {
-            ships.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
+        shooters = new Array();
+        bombers = new Array();
+
+        player = new Ship(5, width - 20, height - 50, world);
+        for (var i = 0; i < 5; i++ ) {
+            shooters.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
         }
-        ships.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
+        for (var i = 0; i < 5; i++ ) {
+            bombers.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
+        }
     };
 
     var frameCount = 0;
@@ -543,40 +548,66 @@ var output = function (input) {
         frameCount++;
         world.draw();
 
-        for (var i = 0; i < ships.length; i++) {
-            if ( i == 0 ) {
-                ships[i].point(ships[i].x, ships[i].y, input.mouseX, input.mouseY);
-                ships[i].draw();
-            } else {
-                if (ships[i] != null) {
-                    ships[i].draw();
-                    if (
-                        400 > calculateDistance(ships[0].x, ships[0].y, ships[i].x, ships[i].y) &&
-                        world.isOpen(ships[0].x, ships[0].y, ships[i].x, ships[i].y)
-                    ) {
-                        ships[i].lastSeenPlayerCoord.x = ships[0].x;
-                        ships[i].lastSeenPlayerCoord.y = ships[0].y;
-                        ships[i].point(ships[i].x, ships[i].y, ships[0].x, ships[0].y);
-                        if (frameCount % 16 == i - 1) {
-                            ships[i].fire();
-                       }
-                        ships[i].move(0.5, 0);
-                    } else {
-                        ships[i].idle();
-                    }
-        
-                    if (checkCollisions(ships[0], ships[i].bullets)) {
-                        document.getElementById("result").textContent = "You Lose.";
-                        input.noLoop();
-                    }
-        
-                    if (checkCollisions(ships[i], ships[0].bullets)) {
-                        ships[i] = null;
-                    }
+        player.point(player.x, player.y, input.mouseX, input.mouseY);
+        player.draw();
+
+        for (var i = 0; i < shooters.length; i++) {
+            if (shooters[i] != null) {
+                shooters[i].draw();
+                if (
+                    400 > calculateDistance(player.x, player.y, shooters[i].x, shooters[i].y) &&
+                    world.isOpen(player.x, player.y, shooters[i].x, shooters[i].y)
+                ) {
+                    shooters[i].lastSeenPlayerCoord.x = player.x;
+                    shooters[i].lastSeenPlayerCoord.y = player.y;
+                    shooters[i].point(shooters[i].x, shooters[i].y, player.x, player.y);
+                    if (frameCount % 16 == i - 1) {
+                        shooters[i].fire();
+                   }
+                    shooters[i].move(0.5, 0);
+                } else {
+                    shooters[i].idle();
+                }
+    
+                if (checkCollisions(player, shooters[i].bullets)) {
+                    document.getElementById("result").textContent = "You Lose.";
+                    input.noLoop();
+                }
+    
+                if (checkCollisions(shooters[i], player.bullets)) {
+                    shooters[i] = null;
                 }
             }
-         }
- 
+        }
+
+        for (var i = 0; i < bombers.length; i++) {
+            if (bombers[i] != null) {
+                bombers[i].draw();
+                if (
+                    400 > calculateDistance(player.x, player.y, bombers[i].x, bombers[i].y) &&
+                    world.isOpen(player.x, player.y, bombers[i].x, bombers[i].y)
+                ) {
+                    bombers[i].lastSeenPlayerCoord.x = player.x;
+                    bombers[i].lastSeenPlayerCoord.y = player.y;
+                    bombers[i].point(bombers[i].x, bombers[i].y, player.x, player.y);
+                    if ( 300 > calculateDistance(player.x, player.y, bombers[i].x, bombers[i].y) ) {
+                        bombers[i].explode();
+                   }
+                    bombers[i].move(0.5, 0);
+                } else {
+                    bombers[i].idle();
+                }
+    
+                if (checkCollisions(player, bombers[i].bullets)) {
+                    document.getElementById("result").textContent = "You Lose.";
+                    input.noLoop();
+                }
+    
+                if (checkCollisions(bombers[i], player.bullets)) {
+                    bombers[i] = null;
+                }
+            }
+        }
     };
 
 };
