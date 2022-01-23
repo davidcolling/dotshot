@@ -356,7 +356,7 @@ var output = function (input) {
                 }
                 if (this.age == this.life) {
                     // this thing dies in a large fireball
-                    this.shockWave = new ShockWave(17, this.x, this.y);
+                    this.shockWave = new ShockWave(300, this.x, this.y);
                     console.log("boom")
                 }
             }
@@ -411,6 +411,7 @@ var output = function (input) {
         }
         draw = function () {
             this.incAge();
+            input.noFill(256, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
