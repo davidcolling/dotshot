@@ -333,10 +333,14 @@ var output = function (input) {
             this.idleLife = Math.random() * 200;
             this.lastSeenPlayerCoord = new Coord();
             this.isGrowing = true;
+            this.shockWave = null;
         }
         draw = function () {
             this.drawBullets();
             this.incAge();
+            if (this.shockWave != null) {
+                this.shockWave.draw();
+            }
             input.fill(0, 256, 0, 256);
             input.circle(
                 this.x, 
@@ -352,6 +356,7 @@ var output = function (input) {
                 }
                 if (this.age == this.life) {
                     // this thing dies in a large fireball
+                    this.shockWave = new ShockWave(17, this.x, this.y);
                     console.log("boom")
                 }
             }
@@ -394,7 +399,25 @@ var output = function (input) {
         }
     };
 
-
+    class ShockWave extends Shape {
+        constructor(size, x, y) {
+            super(size, x, y);
+            this.age = 0;
+        }
+        incAge = function() {
+            if (this.age < this.size) {
+                this.age += 1;
+            }
+        }
+        draw = function () {
+            this.incAge();
+            input.circle(
+                this.x, 
+                this.y, 
+                this.age
+            );
+        }
+    }
 
     class Pirate extends Steerable {
         constructor(size, x, y, world) {
@@ -402,7 +425,7 @@ var output = function (input) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 200;
             this.lastSeenPlayerCoord = new Coord();
-       }
+        }
         draw = function () {
             this.drawBullets();
             input.fill(256, 0, 0, 256);
