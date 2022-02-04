@@ -268,7 +268,7 @@ var output = function (input) {
         }
     }
 
-    class Steerable extends Moveable {
+    class Character extends Moveable {
         constructor(size, x, y, world) {
             super(size, x, y, 0, world);
             this.bullets = new Array(1);
@@ -312,7 +312,7 @@ var output = function (input) {
         }
     }
 
-    class Ship extends Steerable {
+    class Ship extends Character {
         constructor(size, x, y, world) {
             super(size, x, y, world);
         }
@@ -327,7 +327,7 @@ var output = function (input) {
         }
     }
 
-    class Bomb extends Steerable {
+    class Bomb extends Character {
         constructor(x, y, world) {
             super(5, x, y, world);
             this.age = 0;
@@ -421,7 +421,7 @@ var output = function (input) {
         }
     }
 
-    class Pirate extends Steerable {
+    class Pirate extends Character {
         constructor(size, x, y, world) {
             super(size, x, y, world);
             this.idleAge = 0;
