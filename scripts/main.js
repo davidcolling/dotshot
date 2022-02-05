@@ -1,7 +1,7 @@
 var output = function (input) {
     var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
-    var ships;
+    var Players;
     var player;
     var shooters;
     var bombers;
@@ -312,7 +312,7 @@ var output = function (input) {
         }
     }
 
-    class Ship extends Character {
+    class Player extends Character {
         constructor(size, x, y, world) {
             super(size, x, y, world);
         }
@@ -533,7 +533,7 @@ var output = function (input) {
         shooters = new Array();
         bombers = new Array();
 
-        player = new Ship(5, width - 20, height - 50, world);
+        player = new Player(5, width - 20, height - 50, world);
         for (var i = 0; i < 5; i++ ) {
             shooters.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
         }
