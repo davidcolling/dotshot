@@ -302,8 +302,13 @@ var output = function (input) {
                 }
             }
         }
-        fire = function() {
-            var bullet = new Bullet(this.x, this.y, this.direction, this.world);
+        fire = function(direction) {
+            if (direction == null) {
+                var bulletDirection = this.direction;
+            } else {
+                var bulletDirection = direction;
+            }
+            var bullet = new Bullet(this.x, this.y, bulletDirection, this.world);
             this.bullets.push(bullet);
         }
     }
@@ -411,7 +416,22 @@ var output = function (input) {
             }
         }
         attack = function () {
-            this.explode()
+            this.fire(this.direction);
+
+            this.fire(this.direction + 1);
+            this.fire(this.direction - 1);
+
+            this.fire(this.direction + 3);
+            this.fire(this.direction - 3);
+
+            this.fire(this.direction + 10);
+            this.fire(this.direction - 10);
+
+            this.fire(this.direction + 20);
+            this.fire(this.direction - 20);
+
+            this.fire(this.direction + 30);
+            this.fire(this.direction - 30);
         }
     };
 
