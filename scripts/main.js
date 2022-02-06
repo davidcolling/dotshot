@@ -416,22 +416,27 @@ var output = function (input) {
             }
         }
         attack = function () {
-            this.fire(this.direction);
+            if (frameCount % 16 == 1) {
+                this.fire(this.direction);
+    
+                this.fire(this.direction + 1);
+                this.fire(this.direction - 1);
+    
+                this.fire(this.direction + 3);
+                this.fire(this.direction - 3);
+    
+                this.fire(this.direction + 10);
+                this.fire(this.direction - 10);
+    
+                this.fire(this.direction + 20);
+                this.fire(this.direction - 20);
+    
+                this.fire(this.direction + 30);
+                this.fire(this.direction - 30);
+            }
 
-            this.fire(this.direction + 1);
-            this.fire(this.direction - 1);
-
-            this.fire(this.direction + 3);
-            this.fire(this.direction - 3);
-
-            this.fire(this.direction + 10);
-            this.fire(this.direction - 10);
-
-            this.fire(this.direction + 20);
-            this.fire(this.direction - 20);
-
-            this.fire(this.direction + 30);
-            this.fire(this.direction - 30);
+            this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            this.move(0.5, 0);
         }
     };
 
@@ -470,7 +475,11 @@ var output = function (input) {
             );
         }
         attack = function () {
-            this.fire();
+            if (frameCount % 16 == 1) {
+                this.fire();
+            }
+            this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            this.move(0.5, 0);
         }
     };
 
@@ -573,11 +582,7 @@ var output = function (input) {
                 ) {
                     enemies[i].lastSeenPlayerCoord.x = player.x;
                     enemies[i].lastSeenPlayerCoord.y = player.y;
-                    enemies[i].point(enemies[i].x, enemies[i].y, player.x, player.y);
-                    if (frameCount % 16 == i - 1) {
-                        enemies[i].attack();
-                   }
-                    enemies[i].move(0.5, 0);
+                    enemies[i].attack();
                 } else {
                     enemies[i].idle();
                 }
