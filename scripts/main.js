@@ -435,7 +435,9 @@ var output = function (input) {
                     this.fire(this.direction - 30);
                 }
             } else if (distance < 200) {
-                this.pulse();
+                if (this.world.frameCount % 8 == 0) {
+                    this.pulse();
+                }
             }
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
