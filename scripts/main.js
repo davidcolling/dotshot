@@ -327,14 +327,29 @@ var output = function (input) {
         }
     }
 
-    class Bomb extends Character {
-        constructor(x, y, world) {
-            super(5, x, y, world);
+    class NPC extends Character {
+       constructor(size, x, y, world, life, idleAge, idleLife) {
+            super(size, x, y, world);
             this.age = 0;
-            this.life = 300;
-            this.idleAge = 0;
-            this.idleLife = Math.random() * 200;
+            this.life = life;
+            this.idleAge = idleAge;
+            this.idleLife = idleLife;
             this.lastSeenPlayerCoord = new Coord();
+        }
+        draw = function () {
+            this.drawBullets();
+            input.fill(0, 0, 0, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
+   }
+
+    class Bomb extends NPC {
+        constructor(x, y, world) {
+            super(5, x, y, world, 1000, 0, 200);
             this.isGrowing = true;
             this.shockWave = null;
         }
@@ -421,12 +436,11 @@ var output = function (input) {
         }
     }
 
-    class Pirate extends Character {
+    class Pirate extends NPC {
         constructor(size, x, y, world) {
             super(size, x, y, world);
             this.idleAge = 0;
             this.idleLife = Math.random() * 200;
-            this.lastSeenPlayerCoord = new Coord();
         }
         draw = function () {
             this.drawBullets();
