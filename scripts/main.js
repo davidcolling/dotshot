@@ -133,7 +133,7 @@ var output = function (input) {
         }
     }
 
-    class World extends Structure {
+    class Map extends Structure {
         constructor(width, height) {
             super();
             this.walls = new Array();
@@ -211,6 +211,13 @@ var output = function (input) {
         }
     };
 
+    class World {
+        constructor(width, height) {
+            this.frameCount = 0;
+            this.map = new Map(width, height);
+        }
+    }
+
     class Moveable extends CenteredShape {
         constructor(size, x, y, direction, world) {
             super(size, x, y);
@@ -240,7 +247,7 @@ var output = function (input) {
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
             if (
-                this.world.isOpen(this.x, this.y, newX, newY)
+                this.world.map.isOpen(this.x, this.y, newX, newY)
             ) {
                 this.x = newX;
                 this.y = newY;
@@ -376,7 +383,6 @@ var output = function (input) {
         }
         draw = function () {
             this.drawBullets();
-            this.incAge();
             if (this.shockWave != null) {
                 this.shockWave.draw();
             }
@@ -386,14 +392,6 @@ var output = function (input) {
                 this.y, 
                 this.size
             );
-        }
-        incAge = function () {
-            this.age += 1;
-            if (this.age > this.life - 40) {
-                if (this.age % 16 == 0) {
-                    this.pulse();
-                }
-            }
         }
         explode = function () {
             this.shockWave = new ShockWave(300, this.x, this.y);
@@ -416,23 +414,28 @@ var output = function (input) {
             }
         }
         attack = function () {
-            if (frameCount % 16 == 1) {
-                this.fire(this.direction);
-    
-                this.fire(this.direction + 1);
-                this.fire(this.direction - 1);
-    
-                this.fire(this.direction + 3);
-                this.fire(this.direction - 3);
-    
-                this.fire(this.direction + 10);
-                this.fire(this.direction - 10);
-    
-                this.fire(this.direction + 20);
-                this.fire(this.direction - 20);
-    
-                this.fire(this.direction + 30);
-                this.fire(this.direction - 30);
+            var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            if ( distance < 100 ) {
+                if (this.world.frameCount % 16 == 1) {
+                    this.fire(this.direction);
+        
+                    this.fire(this.direction + 1);
+                    this.fire(this.direction - 1);
+        
+                    this.fire(this.direction + 3);
+                    this.fire(this.direction - 3);
+        
+                    this.fire(this.direction + 10);
+                    this.fire(this.direction - 10);
+        
+                    this.fire(this.direction + 20);
+                    this.fire(this.direction - 20);
+        
+                    this.fire(this.direction + 30);
+                    this.fire(this.direction - 30);
+                }
+            } else if (distance < 200) {
+                this.pulse();
             }
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -475,7 +478,7 @@ var output = function (input) {
             );
         }
         attack = function () {
-            if (frameCount % 16 == 1) {
+            if (this.world.frameCount % 16 == 5) {
                 this.fire();
             }
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -527,7 +530,7 @@ var output = function (input) {
         world = new World(width, height);
         if (Math.random() < 0.3) {
             for (var i = 0; i < 60; i ++) {
-                world.addWall( new Wall(
+                world.map.addWall( new Wall(
                     i * (width / 60),
                     50 + (Math.random() * (height * 0.8)), 
                     i * (width / 60),
@@ -536,7 +539,7 @@ var output = function (input) {
             }
         } else {
             for (var i = 0; i < 2; i ++) {
-                world.addWall( new Wall(
+                world.map.addWall( new Wall(
                     Math.random() * width, 
                     Math.random() * height, 
                     Math.random() * width, 
@@ -550,7 +553,7 @@ var output = function (input) {
                     Math.random() * 500
                 );
                 for (var j = 0; j < castle.walls.length; j++) {
-                    world.addWall(castle.walls[j]);
+                    world.map.addWall(castle.walls[j]);
                 }
             }
         }
@@ -564,11 +567,10 @@ var output = function (input) {
         }
     };
 
-    var frameCount = 0;
     input.draw = function () {
         input.clear();
-        frameCount++;
-        world.draw();
+        world.frameCount++;
+        world.map.draw();
 
         player.point(player.x, player.y, input.mouseX, input.mouseY);
         player.draw();
@@ -578,7 +580,7 @@ var output = function (input) {
                 enemies[i].draw();
                 if (
                     400 > calculateDistance(player.x, player.y, enemies[i].x, enemies[i].y) &&
-                    world.isOpen(player.x, player.y, enemies[i].x, enemies[i].y)
+                    world.map.isOpen(player.x, player.y, enemies[i].x, enemies[i].y)
                 ) {
                     enemies[i].lastSeenPlayerCoord.x = player.x;
                     enemies[i].lastSeenPlayerCoord.y = player.y;
