@@ -2,8 +2,7 @@ var output = function (input) {
     var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
     var player;
-    var shooters;
-    var bombers;
+    var enemies;
     var world;
 
     class Shape {
@@ -343,6 +342,26 @@ var output = function (input) {
                 this.size
             );
         }
+        idle = function () {
+            if (this.lastSeenPlayerCoord != null) {
+                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                    this.move(1, 0);
+                } else {
+                    this.lastSeenPlayerCoord.x = null;
+                    this.lastSeenPlayerCoord.y = null;
+                }
+            } else {
+                if (!(this.idleAge < this.idleLife)) {
+                    this.ideAge = 0;
+                    this.idleLife = Math.random() * 2000;
+                    this.direction = Math.random() * 360;
+                }
+                this.idleAge++;
+                this.move(1, 0);
+            }
+        }
+        attack = function () {}
    }
 
     class Bomb extends NPC {
@@ -392,24 +411,8 @@ var output = function (input) {
                 }
             }
         }
-        idle = function () {
-            if (this.lastSeenPlayerCoord != null) {
-                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
-                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                    this.move(1, 0);
-                } else {
-                    this.lastSeenPlayerCoord.x = null;
-                    this.lastSeenPlayerCoord.y = null;
-                }
-            } else {
-                if (!(this.idleAge < this.idleLife)) {
-                    this.ideAge = 0;
-                    this.idleLife = Math.random() * 2000;
-                    this.direction = Math.random() * 360;
-                }
-                this.idleAge++;
-                this.move(1, 0);
-            }
+        attack = function () {
+            this.explode()
         }
     };
 
@@ -436,9 +439,7 @@ var output = function (input) {
 
     class Pirate extends NPC {
         constructor(size, x, y, world) {
-            super(size, x, y, world);
-            this.idleAge = 0;
-            this.idleLife = Math.random() * 200;
+            super(size, x, y, world, 1000, 0, 200);
         }
         draw = function () {
             this.drawBullets();
@@ -449,24 +450,8 @@ var output = function (input) {
                 this.size
             );
         }
-        idle = function () {
-            if (this.lastSeenPlayerCoord != null) {
-                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
-                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                    this.move(1, 0);
-                } else {
-                    this.lastSeenPlayerCoord.x = null;
-                    this.lastSeenPlayerCoord.y = null;
-                }
-            } else {
-                if (!(this.idleAge < this.idleLife)) {
-                    this.ideAge = 0;
-                    this.idleLife = Math.random() * 2000;
-                    this.direction = Math.random() * 360;
-                }
-                this.idleAge++;
-                this.move(1, 0);
-            }
+        attack = function () {
+            this.fire();
         }
     };
 
@@ -542,15 +527,12 @@ var output = function (input) {
             }
         }
 
-        shooters = new Array();
-        bombers = new Array();
+        enemies = new Array();
 
         player = new Player(5, width - 20, height - 50, world);
         for (var i = 0; i < 5; i++ ) {
-            shooters.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
-        }
-        for (var i = 0; i < 5; i++ ) {
-            bombers.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
+            enemies.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
+            enemies.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
         }
     };
 
@@ -563,65 +545,35 @@ var output = function (input) {
         player.point(player.x, player.y, input.mouseX, input.mouseY);
         player.draw();
 
-        for (var i = 0; i < shooters.length; i++) {
-            if (shooters[i] != null) {
-                shooters[i].draw();
+        for (var i = 0; i < enemies.length; i++) {
+            if (enemies[i] != null) {
+                enemies[i].draw();
                 if (
-                    400 > calculateDistance(player.x, player.y, shooters[i].x, shooters[i].y) &&
-                    world.isOpen(player.x, player.y, shooters[i].x, shooters[i].y)
+                    400 > calculateDistance(player.x, player.y, enemies[i].x, enemies[i].y) &&
+                    world.isOpen(player.x, player.y, enemies[i].x, enemies[i].y)
                 ) {
-                    shooters[i].lastSeenPlayerCoord.x = player.x;
-                    shooters[i].lastSeenPlayerCoord.y = player.y;
-                    shooters[i].point(shooters[i].x, shooters[i].y, player.x, player.y);
+                    enemies[i].lastSeenPlayerCoord.x = player.x;
+                    enemies[i].lastSeenPlayerCoord.y = player.y;
+                    enemies[i].point(enemies[i].x, enemies[i].y, player.x, player.y);
                     if (frameCount % 16 == i - 1) {
-                        shooters[i].fire();
+                        enemies[i].attack();
                    }
-                    shooters[i].move(0.5, 0);
+                    enemies[i].move(0.5, 0);
                 } else {
-                    shooters[i].idle();
+                    enemies[i].idle();
                 }
     
-                if (checkCollisions(player, shooters[i].bullets)) {
+                if (checkCollisions(player, enemies[i].bullets)) {
                     document.getElementById("result").textContent = "You Lose.";
                     input.noLoop();
                 }
     
-                if (checkCollisions(shooters[i], player.bullets)) {
-                    shooters[i] = null;
-                }
-            }
-        }
-
-        for (var i = 0; i < bombers.length; i++) {
-            if (bombers[i] != null) {
-                bombers[i].draw();
-                if (
-                    400 > calculateDistance(player.x, player.y, bombers[i].x, bombers[i].y) &&
-                    world.isOpen(player.x, player.y, bombers[i].x, bombers[i].y)
-                ) {
-                    bombers[i].lastSeenPlayerCoord.x = player.x;
-                    bombers[i].lastSeenPlayerCoord.y = player.y;
-                    bombers[i].point(bombers[i].x, bombers[i].y, player.x, player.y);
-                    if ( 300 > calculateDistance(player.x, player.y, bombers[i].x, bombers[i].y) ) {
-                        bombers[i].explode();
-                   }
-                    bombers[i].move(0.5, 0);
-                } else {
-                    bombers[i].idle();
-                }
-    
-                if (checkCollisions(player, bombers[i].bullets)) {
-                    document.getElementById("result").textContent = "You Lose.";
-                    input.noLoop();
-                }
-    
-                if (checkCollisions(bombers[i], player.bullets)) {
-                    bombers[i] = null;
+                if (checkCollisions(enemies[i], player.bullets)) {
+                    enemies[i] = null;
                 }
             }
         }
     };
-
 };
 
 var display = new p5(output, "canvas");
