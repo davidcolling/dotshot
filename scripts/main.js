@@ -5,7 +5,7 @@ var output = function (input) {
     var enemies;
     var world;
 
-    class Shape {
+    class CenteredShape {
         constructor(size, x, y) {
             this.size = size;
             this.x = x;
@@ -207,7 +207,7 @@ var output = function (input) {
         }
     };
 
-    class Moveable extends Shape {
+    class Moveable extends CenteredShape {
         constructor(size, x, y, direction, world) {
             super(size, x, y);
             this.direction = direction;
@@ -416,7 +416,7 @@ var output = function (input) {
         }
     };
 
-    class ShockWave extends Shape {
+    class ShockWave extends CenteredShape {
         constructor(size, x, y) {
             super(size, x, y);
             this.age = 0;
