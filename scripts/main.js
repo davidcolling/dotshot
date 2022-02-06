@@ -1,7 +1,6 @@
 var output = function (input) {
     var height = window.innerHeight * 0.9;
     var width = window.innerWidth;
-    var Players;
     var player;
     var shooters;
     var bombers;
