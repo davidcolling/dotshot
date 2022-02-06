@@ -6,7 +6,6 @@ var output = function (input) {
     var shooters;
     var bombers;
     var world;
-    var castle;
 
     class Shape {
         constructor(size, x, y) {
