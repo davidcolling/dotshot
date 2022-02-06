@@ -247,7 +247,11 @@ var output = function (input) {
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
             if (
-                this.world.map.isOpen(this.x, this.y, newX, newY)
+                this.world.map.isOpen(this.x, this.y, newX, newY) &&
+                0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
+                newX < width &&
+                0 < newY &&
+                newY < height
             ) {
                 this.x = newX;
                 this.y = newY;
