@@ -1,6 +1,6 @@
 var output = function (input) {
     var height = window.innerHeight * 0.9;
-    var width = window.innerWidth;
+    var width = window.innerWidth * 0.9;
     var player;
     var enemies;
     var world;
@@ -134,10 +134,14 @@ var output = function (input) {
     }
 
     class World extends Structure {
-        constructor() {
+        constructor(width, height) {
             super();
             this.walls = new Array();
             this.blockedCoords = new Array();
+            this.walls.push(new Wall(0, 0, width, 0));
+            this.walls.push(new Wall(width, 0, width, height));
+            this.walls.push(new Wall(0, height, width, height));
+            this.walls.push(new Wall(0, height, 0, 0));
         }
         addWall = function(wall) {
             this.walls.push(wall);
@@ -236,11 +240,6 @@ var output = function (input) {
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
             if (
-                10 < newX && 
-                newX < (width - 10) && 
-                10 < newY && 
-                newY< (height - 10) &&
-
                 this.world.isOpen(this.x, this.y, newX, newY)
             ) {
                 this.x = newX;
@@ -496,7 +495,7 @@ var output = function (input) {
     input.setup = function () {
         input.createCanvas(width, height);
 
-        world = new World();
+        world = new World(width, height);
         if (Math.random() < 0.3) {
             for (var i = 0; i < 60; i ++) {
                 world.addWall( new Wall(
