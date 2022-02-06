@@ -346,7 +346,7 @@ var output = function (input) {
             this.life = life;
             this.idleAge = idleAge;
             this.idleLife = idleLife;
-            this.lastSeenPlayerCoord = new Coord();
+            this.lastSeenPlayerCoord = null;
         }
         draw = function () {
             this.drawBullets();
@@ -588,8 +588,7 @@ var output = function (input) {
                     400 > calculateDistance(player.x, player.y, enemies[i].x, enemies[i].y) &&
                     world.map.isOpen(player.x, player.y, enemies[i].x, enemies[i].y)
                 ) {
-                    enemies[i].lastSeenPlayerCoord.x = player.x;
-                    enemies[i].lastSeenPlayerCoord.y = player.y;
+                    enemies[i].lastSeenPlayerCoord = new Coord(player.x, player.y);
                     enemies[i].attack();
                 } else {
                     enemies[i].idle();
