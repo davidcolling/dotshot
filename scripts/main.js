@@ -507,7 +507,7 @@ var output = function (input) {
                 ));
             }
         } else {
-            for (var i = 0; i < 5; i ++) {
+            for (var i = 0; i < 2; i ++) {
                 world.addWall( new Wall(
                     Math.random() * width, 
                     Math.random() * height, 
