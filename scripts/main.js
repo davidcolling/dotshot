@@ -215,6 +215,7 @@ var output = function (input) {
         constructor(width, height) {
             this.frameCount = 0;
             this.map = new Map(width, height);
+            this.bullets = new Array();
         }
     }
 
@@ -278,40 +279,9 @@ var output = function (input) {
     class Character extends Moveable {
         constructor(size, x, y, world) {
             super(size, x, y, 0, world);
-            this.bullets = new Array(1);
-            this.bullets[0] = new Bullet(x, y, 0, world);
         }
         point = function (x1, y1, x2, y2) {
-            var dx = x1 - x2;
-            var dy = y1 - y2;
-
-            var directionTo2;
-
-            if (dx != 0 && dy != 0) {
-                if (dx < 0 && dy > 0) { // target is in quadrant 1
-                    directionTo2 = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                } else if (dx < 0 && dy < 0) { // target is in q2
-                    directionTo2 = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                    directionTo2 += 90;
-                } else if (dx > 0 && dy < 0) { // q3
-                    directionTo2 = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                    directionTo2 += 180;
-                } else if (dx > 0 && dy > 0) { // q4
-                    directionTo2 = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                    directionTo2 += 270;
-                }
-                this.direction = directionTo2;
-            }
-        }
-        drawBullets = function () {
-            for (var i = 0; i < this.bullets.length; i++) {
-                if (this.bullets[i].age < 30) {
-                    this.bullets[i].move(15, 0);
-                    this.bullets[i].draw();
-                } else {
-                    this.bullets.pop(i)
-                }
-            }
+            this.direction = calculateDirection(x1, y1, x2, y2);
         }
         fire = function(direction) {
             if (direction == null) {
@@ -320,7 +290,7 @@ var output = function (input) {
                 var bulletDirection = direction;
             }
             var bullet = new Bullet(this.x, this.y, bulletDirection, this.world);
-            this.bullets.push(bullet);
+            this.world.bullets.push(bullet);
         }
     }
 
@@ -329,7 +299,6 @@ var output = function (input) {
             super(size, x, y, world);
         }
         draw = function () {
-            this.drawBullets();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -349,7 +318,6 @@ var output = function (input) {
             this.lastSeenPlayerCoord = null;
         }
         draw = function () {
-            this.drawBullets();
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -386,7 +354,6 @@ var output = function (input) {
             this.shockWave = null;
         }
         draw = function () {
-            this.drawBullets();
             if (this.shockWave != null) {
                 this.shockWave.draw();
             }
@@ -475,7 +442,6 @@ var output = function (input) {
             super(size, x, y, world, 1000, 0, 200);
         }
         draw = function () {
-            this.drawBullets();
             input.fill(256, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -496,13 +462,52 @@ var output = function (input) {
         return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
     };
 
-    var didCollide = function(obj1, obj2) {
-        return ( 5 > calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) );
+    // obj2 is the projectile
+    var isShot= function(obj1, obj2) {
+        return ( 5 > calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
+                isInFrontOf(obj1, obj2) );
     };
 
-    var checkCollisions = function(obj, arr) {
+    var calculateDirection = function (x1, y1, x2, y2) {
+        var dx = x1 - x2;
+        var dy = y1 - y2;
+
+        var direction;
+
+        if (dx != 0 && dy != 0) {
+            if (dx < 0 && dy > 0) { // target is in quadrant 1
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+            } else if (dx < 0 && dy < 0) { // target is in q2
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                direction += 90;
+            } else if (dx > 0 && dy < 0) { // q3
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                direction += 180;
+            } else if (dx > 0 && dy > 0) { // q4
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                direction += 270;
+            }
+            return direction
+        }
+    }
+
+    var isInFrontOf = function(obj1, obj2) {
+        return 90 >= Math.abs(calculateDifference(obj1.direction, calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+    }
+
+    var calculateDifference = function(direction1, direction2) {
+        difference = direction1 - direction2;
+
+        if (difference > 180) {
+            difference = 360 - difference;
+        }
+
+        return difference
+    }
+
+    var checkIsShot = function(obj, arr) {
         for (var i = 0; i < arr.length; i++) {
-            if (didCollide(obj, arr[i])) {
+            if (isShot(obj, arr[i])) {
                 return true
             }
         }
@@ -578,6 +583,18 @@ var output = function (input) {
         world.frameCount++;
         world.map.draw();
 
+        if (world.bullets.length > 0) {
+            for (var i = 0; i < world.bullets.length; i++) {
+                if (world.bullets[i].age < 30) {
+                    world.bullets[i].move(15, 0);
+                    world.bullets[i].draw();
+                } else {
+                    world.bullets.pop(i)
+                }
+    
+            }
+        }
+
         player.point(player.x, player.y, input.mouseX, input.mouseY);
         player.draw();
 
@@ -594,12 +611,12 @@ var output = function (input) {
                     enemies[i].idle();
                 }
     
-                if (checkCollisions(player, enemies[i].bullets)) {
+                if (checkIsShot(player, world.bullets)) {
                     document.getElementById("result").textContent = "You Lose.";
                     input.noLoop();
                 }
     
-                if (checkCollisions(enemies[i], player.bullets)) {
+                if (checkIsShot(enemies[i], world.bullets)) {
                     enemies[i] = null;
                 }
             }
