@@ -220,10 +220,10 @@ var output = function (input) {
     }
 
     class Moveable extends CenteredShape {
-        constructor(size, x, y, direction, world) {
+        constructor(size, x, y, direction, map) {
             super(size, x, y);
             this.direction = direction;
-            this.world = world;
+            this.map = map;
         }
         move = function (velocity, offset) {
             var dx;
@@ -248,7 +248,7 @@ var output = function (input) {
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
             if (
-                this.world.map.isOpen(this.x, this.y, newX, newY) &&
+                this.map.isOpen(this.x, this.y, newX, newY) &&
                 0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
                 newX < width &&
                 0 < newY &&
@@ -261,8 +261,8 @@ var output = function (input) {
     }
 
     class Bullet extends Moveable {
-        constructor(x, y, direction, world) {
-            super(3, x, y, direction, world);
+        constructor(x, y, direction, map) {
+            super(3, x, y, direction, map);
             this.age = 0;
         }
         draw = function () {
@@ -277,8 +277,8 @@ var output = function (input) {
     }
 
     class Character extends Moveable {
-        constructor(size, x, y, world) {
-            super(size, x, y, 0, world);
+        constructor(size, x, y, map) {
+            super(size, x, y, 0, map);
         }
         point = function (x1, y1, x2, y2) {
             this.direction = calculateDirection(x1, y1, x2, y2);
@@ -289,14 +289,14 @@ var output = function (input) {
             } else {
                 var bulletDirection = direction;
             }
-            var bullet = new Bullet(this.x, this.y, bulletDirection, this.world);
-            this.world.bullets.push(bullet);
+            var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
+            // this.world.bullets.push(bullet);
         }
     }
 
     class Player extends Character {
-        constructor(size, x, y, world) {
-            super(size, x, y, world);
+        constructor(size, x, y, map) {
+            super(size, x, y, map);
         }
         draw = function () {
             input.fill(0, 0, 0, 256);
@@ -309,8 +309,8 @@ var output = function (input) {
     }
 
     class NPC extends Character {
-       constructor(size, x, y, world, life, idleAge, idleLife) {
-            super(size, x, y, world);
+       constructor(size, x, y, map, life, idleAge, idleLife) {
+            super(size, x, y, map);
             this.age = 0;
             this.life = life;
             this.idleAge = idleAge;
@@ -348,8 +348,8 @@ var output = function (input) {
    }
 
     class Bomb extends NPC {
-        constructor(x, y, world) {
-            super(5, x, y, world, 1000, 0, 200);
+        constructor(x, y, map) {
+            super(5, x, y, map, 1000, 0, 200);
             this.isGrowing = true;
             this.shockWave = null;
         }
@@ -387,7 +387,6 @@ var output = function (input) {
         attack = function () {
             var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             if ( distance < 100 ) {
-                if (this.world.frameCount % 16 == 1) {
                     this.fire(this.direction);
         
                     this.fire(this.direction + 1);
@@ -404,11 +403,8 @@ var output = function (input) {
         
                     this.fire(this.direction + 30);
                     this.fire(this.direction - 30);
-                }
             } else if (distance < 200) {
-                if (this.world.frameCount % 8 == 0) {
                     this.pulse();
-                }
             }
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -438,8 +434,8 @@ var output = function (input) {
     }
 
     class Pirate extends NPC {
-        constructor(size, x, y, world) {
-            super(size, x, y, world, 1000, 0, 200);
+        constructor(size, x, y, map) {
+            super(size, x, y, map, 1000, 0, 200);
         }
         draw = function () {
             input.fill(256, 0, 0, 256);
@@ -450,9 +446,7 @@ var output = function (input) {
             );
         }
         attack = function () {
-            if (this.world.frameCount % 16 == 5) {
                 this.fire();
-            }
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
         }
@@ -571,16 +565,15 @@ var output = function (input) {
 
         enemies = new Array();
 
-        player = new Player(5, width - 20, height - 50, world);
+        player = new Player(5, width - 20, height - 50, world.map);
         for (var i = 0; i < 5; i++ ) {
-            enemies.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world));
-            enemies.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world));
+            enemies.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world.map));
+            enemies.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world.map));
         }
     };
 
     input.draw = function () {
         input.clear();
-        world.frameCount++;
         world.map.draw();
 
         if (world.bullets.length > 0) {
