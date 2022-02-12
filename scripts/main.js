@@ -254,6 +254,37 @@ var output = function (input) {
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
         }
+
+        draw = function () {
+            this.player.draw();
+            this.map.draw();
+    
+            for (var i = 0; i < this.enemies.length; i++) {
+                if (this.enemies[i] != null) {
+                    this.enemies[i].draw();
+                    if (
+                        400 > calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) &&
+                        this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y)
+                    ) {
+                        this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                        this.enemies[i].attack();
+                    } else {
+                        this.enemies[i].idle();
+                    }
+        
+                    if (checkIsShot(this.player, this.bullets)) {
+                        document.getElementById("result").textContent = "You Lose.";
+                        input.noLoop();
+                    }
+        
+                    if (checkIsShot(this.enemies[i], this.bullets)) {
+                        this.enemies[i] = null;
+                    }
+                }
+            }
+
+        };
+
     }
 
     class Moveable extends CenteredShape {
@@ -577,7 +608,6 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-        world.map.draw();
 
         if (world.bullets.length > 0) {
             for (var i = 0; i < world.bullets.length; i++) {
@@ -592,32 +622,8 @@ var output = function (input) {
         }
 
         world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
-        world.player.draw();
-
-        for (var i = 0; i < world.enemies.length; i++) {
-            if (world.enemies[i] != null) {
-                world.enemies[i].draw();
-                if (
-                    400 > calculateDistance(world.player.x, world.player.y, world.enemies[i].x, world.enemies[i].y) &&
-                    world.map.isOpen(world.player.x, world.player.y, world.enemies[i].x, world.enemies[i].y)
-                ) {
-                    world.enemies[i].lastSeenPlayerCoord = new Coord(world.player.x, world.player.y);
-                    world.enemies[i].attack();
-                } else {
-                    world.enemies[i].idle();
-                }
-    
-                if (checkIsShot(world.player, world.bullets)) {
-                    document.getElementById("result").textContent = "You Lose.";
-                    input.noLoop();
-                }
-    
-                if (checkIsShot(world.enemies[i], world.bullets)) {
-                    world.enemies[i] = null;
-                }
-            }
-        }
-    };
+        world.draw();
+    }
 };
 
 var display = new p5(output, "canvas");
