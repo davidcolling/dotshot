@@ -1,6 +1,4 @@
 var output = function (input) {
-    var player;
-    var enemies;
     var world;
 
     class CenteredShape {
@@ -217,6 +215,7 @@ var output = function (input) {
             this.map = new Map(width, height);
             this.bullets = new Array();
 
+            // put stuff on the map
             if (Math.random() < 0.3) {
                 for (var i = 0; i < 60; i ++) {
                     this.map.addWall( new Wall(
@@ -245,6 +244,14 @@ var output = function (input) {
                         this.map.addWall(castle.walls[j]);
                     }
                 }
+            }
+
+            // make characters
+            this.enemies = new Array();
+            this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
+            for (var i = 0; i < 5; i++ ) {
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
+                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
         }
     }
@@ -542,19 +549,19 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "r":
-                player.fire();
+                world.player.fire();
                 break;
             case "w":
-                player.move(2, 0);
+                world.player.move(2, 0);
                 break;
             case "d":
-                player.move(2, 90);
+                world.player.move(2, 90);
                 break;
             case "s":
-                player.move(2, 180);
+                world.player.move(2, 180);
                 break;
             case "a":
-                player.move(2, 270);
+                world.player.move(2, 270);
                 break;
         }
     }
@@ -566,13 +573,6 @@ var output = function (input) {
         input.createCanvas(width, height);
 
         world = new World(width, height);
-        enemies = new Array();
-
-        player = new Player(5, width - 20, height - 50, world.map);
-        for (var i = 0; i < 5; i++ ) {
-            enemies.push(new Pirate(5, width * Math.random(), (height / 2) * Math.random(), world.map));
-            enemies.push(new Bomb(width * Math.random(), (height / 2) * Math.random(), world.map));
-        }
     };
 
     input.draw = function () {
@@ -591,29 +591,29 @@ var output = function (input) {
             }
         }
 
-        player.point(player.x, player.y, input.mouseX, input.mouseY);
-        player.draw();
+        world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
+        world.player.draw();
 
-        for (var i = 0; i < enemies.length; i++) {
-            if (enemies[i] != null) {
-                enemies[i].draw();
+        for (var i = 0; i < world.enemies.length; i++) {
+            if (world.enemies[i] != null) {
+                world.enemies[i].draw();
                 if (
-                    400 > calculateDistance(player.x, player.y, enemies[i].x, enemies[i].y) &&
-                    world.map.isOpen(player.x, player.y, enemies[i].x, enemies[i].y)
+                    400 > calculateDistance(world.player.x, world.player.y, world.enemies[i].x, world.enemies[i].y) &&
+                    world.map.isOpen(world.player.x, world.player.y, world.enemies[i].x, world.enemies[i].y)
                 ) {
-                    enemies[i].lastSeenPlayerCoord = new Coord(player.x, player.y);
-                    enemies[i].attack();
+                    world.enemies[i].lastSeenPlayerCoord = new Coord(world.player.x, world.player.y);
+                    world.enemies[i].attack();
                 } else {
-                    enemies[i].idle();
+                    world.enemies[i].idle();
                 }
     
-                if (checkIsShot(player, world.bullets)) {
+                if (checkIsShot(world.player, world.bullets)) {
                     document.getElementById("result").textContent = "You Lose.";
                     input.noLoop();
                 }
     
-                if (checkIsShot(enemies[i], world.bullets)) {
-                    enemies[i] = null;
+                if (checkIsShot(world.enemies[i], world.bullets)) {
+                    world.enemies[i] = null;
                 }
             }
         }
