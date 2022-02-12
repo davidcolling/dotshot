@@ -1,6 +1,4 @@
 var output = function (input) {
-    var height = window.innerHeight * 0.9;
-    var width = window.innerWidth * 0.9;
     var player;
     var enemies;
     var world;
@@ -136,6 +134,8 @@ var output = function (input) {
     class Map extends Structure {
         constructor(width, height) {
             super();
+            this.width = width;
+            this.height = height;
             this.walls = new Array();
             this.blockedCoords = new Array();
             this.walls.push(new Wall(0, 0, width, 0));
@@ -220,25 +220,25 @@ var output = function (input) {
             if (Math.random() < 0.3) {
                 for (var i = 0; i < 60; i ++) {
                     this.map.addWall( new Wall(
-                        i * (width / 60),
-                        50 + (Math.random() * (height * 0.8)), 
-                        i * (width / 60),
-                        Math.random() * (height * 0.8)
+                        i * (this.map.width / 60),
+                        50 + (Math.random() * (this.map.height * 0.8)), 
+                        i * (this.map.width / 60),
+                        Math.random() * (this.map.height * 0.8)
                     ));
                 }
             } else {
                 for (var i = 0; i < 2; i ++) {
                     this.map.addWall( new Wall(
-                        Math.random() * width, 
-                        Math.random() * height, 
-                        Math.random() * width, 
-                        Math.random() * height
+                        Math.random() * this.map.width, 
+                        Math.random() * this.map.height, 
+                        Math.random() * this.map.width, 
+                        Math.random() * this.map.height
                     ));
                 }
                 for (var i = 0; i < 15; i ++) {
                     var castle = new Castle(
-                        Math.random() * (0.7 * width),
-                        Math.random() * (0.7 * height),
+                        Math.random() * (0.7 * this.map.width),
+                        Math.random() * (0.7 * this.map.height),
                         Math.random() * 500
                     );
                     for (var j = 0; j < castle.walls.length; j++) {
@@ -280,9 +280,9 @@ var output = function (input) {
             if (
                 this.map.isOpen(this.x, this.y, newX, newY) &&
                 0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
-                newX < width &&
+                newX < this.map.width &&
                 0 < newY &&
-                newY < height
+                newY < this.map.height
             ) {
                 this.x = newX;
                 this.y = newY;
@@ -560,6 +560,9 @@ var output = function (input) {
     }
 
     input.setup = function () {
+        var height = window.innerHeight * 0.9;
+        var width = window.innerWidth * 0.9;
+
         input.createCanvas(width, height);
 
         world = new World(width, height);
