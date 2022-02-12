@@ -216,6 +216,36 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
+
+            if (Math.random() < 0.3) {
+                for (var i = 0; i < 60; i ++) {
+                    this.map.addWall( new Wall(
+                        i * (width / 60),
+                        50 + (Math.random() * (height * 0.8)), 
+                        i * (width / 60),
+                        Math.random() * (height * 0.8)
+                    ));
+                }
+            } else {
+                for (var i = 0; i < 2; i ++) {
+                    this.map.addWall( new Wall(
+                        Math.random() * width, 
+                        Math.random() * height, 
+                        Math.random() * width, 
+                        Math.random() * height
+                    ));
+                }
+                for (var i = 0; i < 15; i ++) {
+                    var castle = new Castle(
+                        Math.random() * (0.7 * width),
+                        Math.random() * (0.7 * height),
+                        Math.random() * 500
+                    );
+                    for (var j = 0; j < castle.walls.length; j++) {
+                        this.map.addWall(castle.walls[j]);
+                    }
+                }
+            }
         }
     }
 
@@ -533,36 +563,6 @@ var output = function (input) {
         input.createCanvas(width, height);
 
         world = new World(width, height);
-        if (Math.random() < 0.3) {
-            for (var i = 0; i < 60; i ++) {
-                world.map.addWall( new Wall(
-                    i * (width / 60),
-                    50 + (Math.random() * (height * 0.8)), 
-                    i * (width / 60),
-                    Math.random() * (height * 0.8)
-                ));
-            }
-        } else {
-            for (var i = 0; i < 2; i ++) {
-                world.map.addWall( new Wall(
-                    Math.random() * width, 
-                    Math.random() * height, 
-                    Math.random() * width, 
-                    Math.random() * height
-                ));
-            }
-            for (var i = 0; i < 15; i ++) {
-                var castle = new Castle(
-                    Math.random() * (0.7 * width),
-                    Math.random() * (0.7 * height),
-                    Math.random() * 500
-                );
-                for (var j = 0; j < castle.walls.length; j++) {
-                    world.map.addWall(castle.walls[j]);
-                }
-            }
-        }
-
         enemies = new Array();
 
         player = new Player(5, width - 20, height - 50, world.map);
