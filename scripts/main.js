@@ -258,6 +258,18 @@ var output = function (input) {
         draw = function () {
             this.player.draw();
             this.map.draw();
+
+            if (this.bullets.length > 0) {
+                for (var i = 0; i < this.bullets.length; i++) {
+                    if (this.bullets[i].age < 30) {
+                        this.bullets[i].move(15, 0);
+                        this.bullets[i].draw();
+                    } else {
+                        this.bullets.pop(i)
+                    }
+        
+                }
+            }
     
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
@@ -608,18 +620,6 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-
-        if (world.bullets.length > 0) {
-            for (var i = 0; i < world.bullets.length; i++) {
-                if (world.bullets[i].age < 30) {
-                    world.bullets[i].move(15, 0);
-                    world.bullets[i].draw();
-                } else {
-                    world.bullets.pop(i)
-                }
-    
-            }
-        }
 
         world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
         world.draw();
