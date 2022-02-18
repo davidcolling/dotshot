@@ -468,6 +468,13 @@ var output = function (input) {
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
+            if (!this.isHunting) {
+                this.isHunting = true;
+            } else {
+                if (distance < 2) {
+                    this.isHunting = false;
+                }
+            }
         }
     };
 
