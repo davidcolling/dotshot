@@ -401,12 +401,20 @@ var output = function (input) {
     class Bomb extends NPC {
         constructor(x, y, map) {
             super(5, x, y, map, 1000, 0, 200);
+            this.didIgnite = false;
+            this.igniteAge = 0
             this.isGrowing = true;
             this.shockWave = null;
         }
         draw = function () {
             if (this.shockWave != null) {
                 this.shockWave.draw();
+            }
+            if (this.didIgnite) {
+                this.igniteAge++;
+                if (this.igniteAge > 500) {
+                    this.explode();
+                }
             }
             input.fill(0, 256, 0, 256);
             input.circle(
@@ -416,7 +424,22 @@ var output = function (input) {
             );
         }
         explode = function () {
-            this.shockWave = new ShockWave(300, this.x, this.y);
+            this.fire(this.direction);
+
+            this.fire(this.direction + 1);
+            this.fire(this.direction - 1);
+
+            this.fire(this.direction + 3);
+            this.fire(this.direction - 3);
+
+            this.fire(this.direction + 10);
+            this.fire(this.direction - 10);
+
+            this.fire(this.direction + 20);
+            this.fire(this.direction - 20);
+
+            this.fire(this.direction + 30);
+            this.fire(this.direction - 30);
         }
         pulse = function () {
             if (this.isGrowing) {
@@ -437,27 +460,13 @@ var output = function (input) {
         }
         attack = function (seesPlayer) {
             var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-            if ( distance < 100 ) {
-                if (seesPlayer) {
-                    this.fire(this.direction);
-        
-                    this.fire(this.direction + 1);
-                    this.fire(this.direction - 1);
-        
-                    this.fire(this.direction + 3);
-                    this.fire(this.direction - 3);
-        
-                    this.fire(this.direction + 10);
-                    this.fire(this.direction - 10);
-        
-                    this.fire(this.direction + 20);
-                    this.fire(this.direction - 20);
-        
-                    this.fire(this.direction + 30);
-                    this.fire(this.direction - 30);
+            if (seesPlayer) {
+                if ( distance < 300 ) {
+                    this.pulse();
+                    if ( distance < 200 ) {
+                        this.didIgnite = true;
+                    }
                 }
-            } else if (distance < 200) {
-                this.pulse();
             }
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -465,7 +474,7 @@ var output = function (input) {
             if (!this.isHunting) {
                 this.isHunting = true;
             } else {
-                if (distance < 2) {
+                if (distance < 2 && !this.didIgnite) {
                     this.isHunting = false;
                 }
             }
