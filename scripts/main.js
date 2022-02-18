@@ -221,6 +221,7 @@ var output = function (input) {
             this.player.draw();
             this.map.draw();
         
+            // draw bullets
             for (var i = 0; i < this.bullets.length; i++) {
                 if (this.bullets[i] != null) {
                     if (this.bullets[i].age < 30) {
@@ -232,6 +233,7 @@ var output = function (input) {
                 }
             }
 
+            // get player's bullets
             for (var i = 0; i < this.player.bullets.length; i++) {
                 this.bullets.push(this.player.bullets[i]);
             }
@@ -239,25 +241,39 @@ var output = function (input) {
 
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
+                    // get enemy's bullets
                     for (var j = 0; j < this.enemies[i].bullets.length; j++) {
                         this.bullets.push(this.enemies[i].bullets[j]);
                     }
                     this.enemies[i].bullets = new Array();
                     this.enemies[i].draw();
-                    if (
-                        400 > calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) &&
-                        this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y)
-                    ) {
-                        this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-                        if (this.frameCount % 16 == 0) {
-                            this.enemies[i].attack(true);
+
+                    // calculate npc behavior
+                    var seesPlayer = (
+                        400 > calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
+                        this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
+                    );
+                    if ( this.enemies[i].isHunting || seesPlayer) {
+                        if (seesPlayer) {
+                            this.enemies[i].isHunting = true;
+                            this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                            if (this.frameCount % 16 == 0) {
+                                this.enemies[i].attack(true);
+                            } else {
+                                this.enemies[i].attack(false);
+                            }
                         } else {
-                            this.enemies[i].attack(false);
+                            if (1 < calculateDistance(this.enemies[i].x, this.enemies[i].y, this.enemies[i].lastSeenPlayerCoord.x, this.enemies[i].lastSeenPlayerCoord.y)) {
+                                this.enemies[i].isHunting = false;
+                            } else {
+                                this.enemies[i].attack(false);
+                            }
                         }
                     } else {
                         this.enemies[i].idle();
                     }
 
+                    //check for shots
                     if (checkIsShot(this.player, this.bullets)) {
                         document.getElementById("result").textContent = "You Lose.";
                         input.noLoop();
@@ -366,6 +382,7 @@ var output = function (input) {
     class NPC extends Character {
        constructor(size, x, y, map, life, idleAge, idleLife) {
             super(size, x, y, map);
+            this.isHunting = false;
             this.age = 0;
             this.life = life;
             this.idleAge = idleAge;
@@ -381,23 +398,13 @@ var output = function (input) {
             );
         }
         idle = function () {
-            if (this.lastSeenPlayerCoord != null) {
-                if (5 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
-                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                    this.move(1, 0);
-                } else {
-                    this.lastSeenPlayerCoord.x = null;
-                    this.lastSeenPlayerCoord.y = null;
-                }
-            } else {
-                if (!(this.idleAge < this.idleLife)) {
-                    this.ideAge = 0;
-                    this.idleLife = Math.random() * 2000;
-                    this.direction = Math.random() * 360;
-                }
-                this.idleAge++;
-                this.move(1, 0);
+            if (!(this.idleAge < this.idleLife)) {
+                this.idleAge = 0;
+                this.idleLife = Math.random() * 2000;
+                this.direction = Math.random() * 360;
             }
+            this.idleAge++;
+            this.move(1, 0);
         }
         attack = function () {}
    }
