@@ -256,14 +256,8 @@ var output = function (input) {
                     if ( this.enemies[i].isHunting || seesPlayer) {
                         if (seesPlayer) {
                             this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-                            if (this.frameCount % 16 == 0) {
-                                this.enemies[i].attack(true);
-                            } else {
-                                this.enemies[i].attack(false);
-                            }
-                        } else {
-                            this.enemies[i].attack(false);
                         }
+                        this.enemies[i].attack(seesPlayer);
                     } else {
                         this.enemies[i].idle();
                     }
@@ -441,10 +435,10 @@ var output = function (input) {
                 }
             }
         }
-        attack = function (fire) {
+        attack = function (seesPlayer) {
             var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             if ( distance < 100 ) {
-                if (fire) {
+                if (seesPlayer) {
                     this.fire(this.direction);
         
                     this.fire(this.direction + 1);
@@ -511,12 +505,12 @@ var output = function (input) {
                 this.size
             );
         }
-        attack = function (fire) {
-            if (fire) {
-                this.fire(null);
-            }
+        attack = function (seesPlayer) {
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
+            if (seesPlayer) {
+                this.fire(null);
+            }
             if (this.isHunting) {
                 if (1 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
                     this.isHunting = false;
