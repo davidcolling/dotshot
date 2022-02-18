@@ -258,21 +258,30 @@ var output = function (input) {
         draw = function () {
             this.player.draw();
             this.map.draw();
-
-            if (this.bullets.length > 0) {
-                for (var i = 0; i < this.bullets.length; i++) {
+        
+            for (var i = 0; i < this.bullets.length; i++) {
+                console.log("bang");
+                if (this.bullets[i] != null) {
                     if (this.bullets[i].age < 30) {
                         this.bullets[i].move(15, 0);
                         this.bullets[i].draw();
                     } else {
-                        this.bullets.pop(i)
+                        this.bullets[i] = null;
                     }
-        
                 }
             }
-    
+
+            for (var i = 0; i < this.player.bullets.length; i++) {
+                this.bullets.push(this.player.bullets[i]);
+            }
+            this.player.bullets = new Array();
+
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
+                    for (var j = 0; j < this.enemies[i].bullets.length; j++) {
+                        this.bullets.push(this.enemies[i].bullets[j]);
+                    }
+                    this.enemies[i].bullets = new Array();
                     this.enemies[i].draw();
                     if (
                         400 > calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) &&
@@ -283,7 +292,7 @@ var output = function (input) {
                     } else {
                         this.enemies[i].idle();
                     }
-        
+
                     if (checkIsShot(this.player, this.bullets)) {
                         document.getElementById("result").textContent = "You Lose.";
                         input.noLoop();
@@ -359,6 +368,7 @@ var output = function (input) {
     class Character extends Moveable {
         constructor(size, x, y, map) {
             super(size, x, y, 0, map);
+            this.bullets = new Array();
         }
         point = function (x1, y1, x2, y2) {
             this.direction = calculateDirection(x1, y1, x2, y2);
@@ -370,7 +380,7 @@ var output = function (input) {
                 var bulletDirection = direction;
             }
             var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
-            // this.world.bullets.push(bullet);
+            this.bullets.push(bullet);
         }
     }
 
@@ -526,7 +536,7 @@ var output = function (input) {
             );
         }
         attack = function () {
-                this.fire();
+                this.fire(null);
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
         }
@@ -581,8 +591,10 @@ var output = function (input) {
 
     var checkIsShot = function(obj, arr) {
         for (var i = 0; i < arr.length; i++) {
-            if (isShot(obj, arr[i])) {
-                return true
+            if (arr[i] != null) {
+                if (isShot(obj, arr[i])) {
+                    return true
+                }
             }
         }
         return false;
@@ -592,7 +604,7 @@ var output = function (input) {
     function recordKey(e) {
         switch (e.key) {
             case "r":
-                world.player.fire();
+                world.player.fire(null);
                 break;
             case "w":
                 world.player.move(2, 0);
