@@ -438,24 +438,24 @@ var output = function (input) {
         attack = function () {
             var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             if ( distance < 100 ) {
-                this.fire(this.direction);
-    
-                this.fire(this.direction + 1);
-                this.fire(this.direction - 1);
-    
-                this.fire(this.direction + 3);
-                this.fire(this.direction - 3);
-    
-                this.fire(this.direction + 10);
-                this.fire(this.direction - 10);
-    
-                this.fire(this.direction + 20);
-                this.fire(this.direction - 20);
-    
-                this.fire(this.direction + 30);
-                this.fire(this.direction - 30);
+                    this.fire(this.direction);
+        
+                    this.fire(this.direction + 1);
+                    this.fire(this.direction - 1);
+        
+                    this.fire(this.direction + 3);
+                    this.fire(this.direction - 3);
+        
+                    this.fire(this.direction + 10);
+                    this.fire(this.direction - 10);
+        
+                    this.fire(this.direction + 20);
+                    this.fire(this.direction - 20);
+        
+                    this.fire(this.direction + 30);
+                    this.fire(this.direction - 30);
             } else if (distance < 200) {
-                this.pulse();
+                    this.pulse();
             }
 
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -497,7 +497,7 @@ var output = function (input) {
             );
         }
         attack = function () {
-            this.fire(null);
+                this.fire(null);
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
         }
