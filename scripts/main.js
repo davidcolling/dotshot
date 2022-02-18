@@ -255,7 +255,6 @@ var output = function (input) {
                     );
                     if ( this.enemies[i].isHunting || seesPlayer) {
                         if (seesPlayer) {
-                            this.enemies[i].isHunting = true;
                             this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
                             if (this.frameCount % 16 == 0) {
                                 this.enemies[i].attack(true);
@@ -263,11 +262,7 @@ var output = function (input) {
                                 this.enemies[i].attack(false);
                             }
                         } else {
-                            if (1 < calculateDistance(this.enemies[i].x, this.enemies[i].y, this.enemies[i].lastSeenPlayerCoord.x, this.enemies[i].lastSeenPlayerCoord.y)) {
-                                this.enemies[i].isHunting = false;
-                            } else {
-                                this.enemies[i].attack(false);
-                            }
+                            this.enemies[i].attack(false);
                         }
                     } else {
                         this.enemies[i].idle();
@@ -515,6 +510,13 @@ var output = function (input) {
             }
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
+            if (this.isHunting) {
+                if (1 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                    this.isHunting = false;
+                }
+            } else {
+                this.isHunting = true;
+            }
         }
     };
 
