@@ -505,8 +505,10 @@ var output = function (input) {
     class Pirate extends NPC {
         constructor(size, x, y, map) {
             super(size, x, y, map, 1000, 0, 200);
+            this.weaponCooldownCounter = 0
         }
         draw = function () {
+            this.weaponCooldownCounter++;
             input.fill(256, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -518,7 +520,9 @@ var output = function (input) {
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
             if (seesPlayer) {
-                this.fire(null);
+                if (this.weaponCooldownCounter % 16 == 0) {
+                    this.fire(null);
+                }
             }
             if (this.isHunting) {
                 if (1 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
