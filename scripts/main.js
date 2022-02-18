@@ -239,13 +239,13 @@ var output = function (input) {
             }
             this.player.bullets = new Array();
 
+            if (checkIsShot(this.player, this.bullets)) {
+                document.getElementById("result").textContent = "You Lose.";
+                input.noLoop();
+            }
+        
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
-                    // get enemy's bullets
-                    for (var j = 0; j < this.enemies[i].bullets.length; j++) {
-                        this.bullets.push(this.enemies[i].bullets[j]);
-                    }
-                    this.enemies[i].bullets = new Array();
                     this.enemies[i].draw();
 
                     // calculate npc behavior
@@ -262,14 +262,21 @@ var output = function (input) {
                         this.enemies[i].idle();
                     }
 
-                    //check for shots
-                    if (checkIsShot(this.player, this.bullets)) {
-                        document.getElementById("result").textContent = "You Lose.";
-                        input.noLoop();
+                    // get enemy's bullets
+                    for (var j = 0; j < this.enemies[i].bullets.length; j++) {
+                        this.bullets.push(this.enemies[i].bullets[j]);
                     }
-        
+                    this.enemies[i].bullets = new Array();
+
+                    //check for shots
                     if (checkIsShot(this.enemies[i], this.bullets)) {
                         this.enemies[i] = null;
+                    }
+    
+                    if (this.enemies[i] != null) {
+                        if (this.enemies[i].didExplode) {
+                            this.enemies[i] = null;
+                        }
                     }
                 }
             }
@@ -371,6 +378,7 @@ var output = function (input) {
     class NPC extends Character {
        constructor(size, x, y, map, life, idleAge, idleLife) {
             super(size, x, y, map);
+            this.didExplode = false;
             this.isHunting = false;
             this.age = 0;
             this.life = life;
@@ -413,6 +421,7 @@ var output = function (input) {
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 500) {
+                    this.didExplode = true;
                     this.explode();
                 }
             }
