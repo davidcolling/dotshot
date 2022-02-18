@@ -217,11 +217,11 @@ var output = function (input) {
         }
 
         draw = function () {
+            this.frameCount++;
             this.player.draw();
             this.map.draw();
         
             for (var i = 0; i < this.bullets.length; i++) {
-                console.log("bang");
                 if (this.bullets[i] != null) {
                     if (this.bullets[i].age < 30) {
                         this.bullets[i].move(15, 0);
@@ -249,7 +249,11 @@ var output = function (input) {
                         this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y)
                     ) {
                         this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-                        this.enemies[i].attack();
+                        if (this.frameCount % 16 == 0) {
+                            this.enemies[i].attack(true);
+                        } else {
+                            this.enemies[i].attack(false);
+                        }
                     } else {
                         this.enemies[i].idle();
                     }
@@ -435,25 +439,27 @@ var output = function (input) {
                 }
             }
         }
-        attack = function () {
+        attack = function (fire) {
             var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             if ( distance < 100 ) {
-                this.fire(this.direction);
-    
-                this.fire(this.direction + 1);
-                this.fire(this.direction - 1);
-    
-                this.fire(this.direction + 3);
-                this.fire(this.direction - 3);
-    
-                this.fire(this.direction + 10);
-                this.fire(this.direction - 10);
-    
-                this.fire(this.direction + 20);
-                this.fire(this.direction - 20);
-    
-                this.fire(this.direction + 30);
-                this.fire(this.direction - 30);
+                if (fire) {
+                    this.fire(this.direction);
+        
+                    this.fire(this.direction + 1);
+                    this.fire(this.direction - 1);
+        
+                    this.fire(this.direction + 3);
+                    this.fire(this.direction - 3);
+        
+                    this.fire(this.direction + 10);
+                    this.fire(this.direction - 10);
+        
+                    this.fire(this.direction + 20);
+                    this.fire(this.direction - 20);
+        
+                    this.fire(this.direction + 30);
+                    this.fire(this.direction - 30);
+                }
             } else if (distance < 200) {
                 this.pulse();
             }
@@ -496,8 +502,10 @@ var output = function (input) {
                 this.size
             );
         }
-        attack = function () {
-            this.fire(null);
+        attack = function (fire) {
+            if (fire) {
+                this.fire(null);
+            }
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5, 0);
         }
