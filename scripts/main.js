@@ -364,8 +364,16 @@ var output = function (input) {
     class Player extends Character {
         constructor(size, x, y, map) {
             super(size, x, y, map);
+            this.isFiring = false;
+            this.isMoving = false;
         }
         draw = function () {
+            if (this.isFiring) {
+                this.fire(null);
+            }
+            if (this.isMoving) {
+                this.move(2, 0);
+            }
             input.fill(0, 0, 0, 256);
             input.circle(
                 this.x, 
@@ -602,22 +610,25 @@ var output = function (input) {
     };
 
     document.addEventListener('keydown', recordKey);
+    document.addEventListener('keyup', stopKey);
     function recordKey(e) {
         switch (e.key) {
             case "r":
-                world.player.fire(null);
+                world.player.isFiring = true;
                 break;
             case "w":
-                world.player.move(2, 0);
+                world.player.isMoving = true;
                 break;
-            case "d":
-                world.player.move(2, 90);
+        }
+    }
+
+    function stopKey(e) {
+        switch (e.key) {
+            case "r":
+                world.player.isFiring = false;
                 break;
-            case "s":
-                world.player.move(2, 180);
-                break;
-            case "a":
-                world.player.move(2, 270);
+            case "w":
+                world.player.isMoving = false;
                 break;
         }
     }
@@ -638,6 +649,7 @@ var output = function (input) {
         world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
         world.draw();
     }
+
 };
 
 var display = new p5(output, "canvas");
