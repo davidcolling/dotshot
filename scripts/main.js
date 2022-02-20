@@ -33,7 +33,7 @@ var output = function (input) {
         }
     };
 
-    // assumes multiple walls
+    // composite of walls
     class Structure {
         constructor() {
             this.walls = new Array();
@@ -170,8 +170,11 @@ var output = function (input) {
         }
     };
 
-    // composite of all game objects: bullets, map, characters (player and npc)
-    // this is where npc behaviour is calculated, bullets are collected from characters, and deaths are calculated
+    // facade and factory of all game objects: bullets, map, characters (player and npc)
+    // an unenforced singleton
+    // on observer of when bullets should be collected from characters
+    // an observer of when objects need to become null, eg old bullets and dead npc
+    // an observer of when npc should idle or attack
     class World {
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
