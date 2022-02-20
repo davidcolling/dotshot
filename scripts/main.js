@@ -171,7 +171,7 @@ var output = function (input) {
     };
 
     // composite of all game objects: bullets, map, characters (player and npc)
-    // this is were npc behaviour is calculated, bullets are collected from characters, and deaths are calculated
+    // this is where npc behaviour is calculated, bullets are collected from characters, and deaths are calculated
     class World {
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
