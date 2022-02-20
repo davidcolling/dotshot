@@ -171,7 +171,7 @@ var output = function (input) {
     };
 
     class World {
-        constructor(width, height) {
+        constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
@@ -210,7 +210,7 @@ var output = function (input) {
             // make characters
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
-            for (var i = 0; i < 5; i++ ) {
+            for (var i = 0; i < numberOfEnemies; i++ ) {
                 this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
@@ -616,7 +616,7 @@ var output = function (input) {
 
         input.createCanvas(width, height);
 
-        world = new World(width, height);
+        world = new World(width, height, 10)
     };
 
     input.draw = function () {
