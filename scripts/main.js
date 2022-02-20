@@ -423,9 +423,6 @@ var output = function (input) {
             this.shockWave = null;
         }
         draw = function () {
-            if (this.shockWave != null) {
-                this.shockWave.draw();
-            }
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 500) {
@@ -497,27 +494,6 @@ var output = function (input) {
             }
         }
     };
-
-    class ShockWave extends CenteredShape {
-        constructor(size, x, y) {
-            super(size, x, y);
-            this.age = 0;
-        }
-        incAge = function() {
-            if (this.age < this.size) {
-                this.age += 1;
-            }
-        }
-        draw = function () {
-            this.incAge();
-            input.noFill(256, 0, 0, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.age
-            );
-        }
-    }
 
     class Pirate extends NPC {
         constructor(size, x, y, map) {
@@ -610,7 +586,6 @@ var output = function (input) {
     };
 
     document.addEventListener('keydown', recordKey);
-    document.addEventListener('keyup', stopKey);
     function recordKey(e) {
         switch (e.key) {
             case "r":
@@ -622,6 +597,7 @@ var output = function (input) {
         }
     }
 
+    document.addEventListener('keyup', stopKey);
     function stopKey(e) {
         switch (e.key) {
             case "r":
