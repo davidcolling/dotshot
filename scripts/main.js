@@ -170,6 +170,8 @@ var output = function (input) {
         }
     };
 
+    // composite of all game objects: bullets, map, characters (player and npc)
+    // this is were npc behaviour is calculated, bullets are collected from characters, and deaths are calculated
     class World {
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
@@ -292,6 +294,8 @@ var output = function (input) {
             this.map = map;
         }
         move = function (velocity, offset) {
+            // this function can be understood in two basic parts
+            // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
             var dx;
             var dy;
             var offsetDirection = this.direction + offset;
@@ -313,6 +317,7 @@ var output = function (input) {
             }
             var newX = this.x + (velocity * (dx / 90));
             var newY = this.y + (velocity * (dy / 90));
+            // part two determines if the coordinates are somewhere the character can actually go
             if (
                 this.map.isOpen(this.x, this.y, newX, newY) &&
                 0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
@@ -364,7 +369,7 @@ var output = function (input) {
     class Player extends Character {
         constructor(size, x, y, map) {
             super(size, x, y, map);
-            this.isFiring = false;
+            this.isFiring = false; 
             this.isMoving = false;
         }
         draw = function () {
@@ -389,7 +394,6 @@ var output = function (input) {
             this.didExplode = false;
             this.isHunting = false;
             this.age = 0;
-            this.life = life;
             this.idleAge = idleAge;
             this.idleLife = idleLife;
             this.lastSeenPlayerCoord = null;
@@ -412,7 +416,7 @@ var output = function (input) {
             this.move(1, 0);
         }
         attack = function () {}
-   }
+    }
 
     class Bomb extends NPC {
         constructor(x, y, map) {
@@ -420,7 +424,6 @@ var output = function (input) {
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
-            this.shockWave = null;
         }
         draw = function () {
             if (this.didIgnite) {
@@ -455,6 +458,7 @@ var output = function (input) {
             this.fire(this.direction + 30);
             this.fire(this.direction - 30);
         }
+        // animation for when its about to explode
         pulse = function () {
             if (this.isGrowing) {
                 if (this.size < 9) {
