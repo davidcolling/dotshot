@@ -226,6 +226,7 @@ var output = function (input) {
             world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
             this.player.draw();
             this.map.draw();
+            var playerWasShot = false
         
             // draw bullets
             for (var i = 0; i < this.bullets.length; i++) {
@@ -247,7 +248,7 @@ var output = function (input) {
 
             if (World.checkIsShot(this.player, this.bullets)) {
                 document.getElementById("result").textContent = "You Lose.";
-                return 0;
+                playerWasShot = true;
             }
         
             for (var i = 0; i < this.enemies.length; i++) {
@@ -287,7 +288,11 @@ var output = function (input) {
                 }
             }
 
-            return 1;
+            if (playerWasShot) {
+                return false;
+            } else {
+                return true;
+            }
 
         };
 
