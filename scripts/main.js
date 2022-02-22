@@ -247,7 +247,7 @@ var output = function (input) {
 
             if (checkIsShot(this.player, this.bullets)) {
                 document.getElementById("result").textContent = "You Lose.";
-                input.noLoop();
+                return 0;
             }
         
             for (var i = 0; i < this.enemies.length; i++) {
@@ -286,6 +286,8 @@ var output = function (input) {
                     }
                 }
             }
+
+            return 1;
 
         };
 
@@ -629,7 +631,10 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-        world.draw();
+        var playerDidNotLose = world.draw();
+        if (!playerDidNotLose) {
+            input.noLoop();
+        }
     }
 
 };
