@@ -223,6 +223,7 @@ var output = function (input) {
 
         draw = function () {
             this.frameCount++;
+            world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
             this.player.draw();
             this.map.draw();
         
@@ -628,8 +629,6 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-
-        world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
         world.draw();
     }
 
