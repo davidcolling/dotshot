@@ -302,7 +302,7 @@ var output = function (input) {
         };
 
         static isInFrontOf = function(obj1, obj2) {
-            return 90 >= Math.abs(calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+            return 90 >= Math.abs(World.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
         }
 
         static calculateDirection = function (x1, y1, x2, y2) {
@@ -326,6 +326,16 @@ var output = function (input) {
                 }
                 return direction
             }
+        }
+
+        static calculateDifference = function(direction1, direction2) {
+            var difference = direction1 - direction2;
+    
+            if (difference > 180) {
+                difference = 360 - difference;
+            }
+    
+            return difference
         }
 
     }
@@ -573,16 +583,6 @@ var output = function (input) {
             }
         }
     };
-
-    var calculateDifference = function(direction1, direction2) {
-        difference = direction1 - direction2;
-
-        if (difference > 180) {
-            difference = 360 - difference;
-        }
-
-        return difference
-    }
 
     var checkIsShot = function(obj, arr) {
         for (var i = 0; i < arr.length; i++) {
