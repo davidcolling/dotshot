@@ -591,7 +591,7 @@ var output = function (input) {
                 }
             }
             if (this.isHunting) {
-                if (1 < World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                if (0 != World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
                     this.isHunting = false;
                 }
             } else {
