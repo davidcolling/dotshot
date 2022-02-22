@@ -302,7 +302,30 @@ var output = function (input) {
         };
 
         static isInFrontOf = function(obj1, obj2) {
-            return 90 >= Math.abs(calculateDifference(obj1.direction, calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+            return 90 >= Math.abs(calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+        }
+
+        static calculateDirection = function (x1, y1, x2, y2) {
+            var dx = x1 - x2;
+            var dy = y1 - y2;
+    
+            var direction;
+    
+            if (dx != 0 && dy != 0) {
+                if (dx < 0 && dy > 0) { // target is in quadrant 1
+                    direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                } else if (dx < 0 && dy < 0) { // target is in q2
+                    direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                    direction += 90;
+                } else if (dx > 0 && dy < 0) { // q3
+                    direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                    direction += 180;
+                } else if (dx > 0 && dy > 0) { // q4
+                    direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                    direction += 270;
+                }
+                return direction
+            }
         }
 
     }
@@ -373,7 +396,7 @@ var output = function (input) {
             this.bullets = new Array();
         }
         point = function (x1, y1, x2, y2) {
-            this.direction = calculateDirection(x1, y1, x2, y2);
+            this.direction = World.calculateDirection(x1, y1, x2, y2);
         }
         fire = function(direction) {
             if (direction == null) {
@@ -550,29 +573,6 @@ var output = function (input) {
             }
         }
     };
-
-    var calculateDirection = function (x1, y1, x2, y2) {
-        var dx = x1 - x2;
-        var dy = y1 - y2;
-
-        var direction;
-
-        if (dx != 0 && dy != 0) {
-            if (dx < 0 && dy > 0) { // target is in quadrant 1
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-            } else if (dx < 0 && dy < 0) { // target is in q2
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 90;
-            } else if (dx > 0 && dy < 0) { // q3
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                direction += 180;
-            } else if (dx > 0 && dy > 0) { // q4
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 270;
-            }
-            return direction
-        }
-    }
 
     var calculateDifference = function(direction1, direction2) {
         difference = direction1 - direction2;
