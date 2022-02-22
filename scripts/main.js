@@ -298,8 +298,12 @@ var output = function (input) {
         // obj2 is the projectile
         static isShot= function(obj1, obj2) {
             return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
-                    isInFrontOf(obj1, obj2) );
+                    World.isInFrontOf(obj1, obj2) );
         };
+
+        static isInFrontOf = function(obj1, obj2) {
+            return 90 >= Math.abs(calculateDifference(obj1.direction, calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+        }
 
     }
 
@@ -568,10 +572,6 @@ var output = function (input) {
             }
             return direction
         }
-    }
-
-    var isInFrontOf = function(obj1, obj2) {
-        return 90 >= Math.abs(calculateDifference(obj1.direction, calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
     }
 
     var calculateDifference = function(direction1, direction2) {
