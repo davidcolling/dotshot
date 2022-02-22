@@ -245,7 +245,7 @@ var output = function (input) {
             }
             this.player.bullets = new Array();
 
-            if (checkIsShot(this.player, this.bullets)) {
+            if (World.checkIsShot(this.player, this.bullets)) {
                 document.getElementById("result").textContent = "You Lose.";
                 return 0;
             }
@@ -275,7 +275,7 @@ var output = function (input) {
                     this.enemies[i].bullets = new Array();
 
                     //check for shots
-                    if (checkIsShot(this.enemies[i], this.bullets)) {
+                    if (World.checkIsShot(this.enemies[i], this.bullets)) {
                         this.enemies[i] = null;
                     }
     
@@ -337,6 +337,17 @@ var output = function (input) {
     
             return difference
         }
+
+        static checkIsShot = function(obj, arr) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] != null) {
+                    if (World.isShot(obj, arr[i])) {
+                        return true
+                    }
+                }
+            }
+            return false;
+        };
 
     }
 
@@ -582,17 +593,6 @@ var output = function (input) {
                 this.isHunting = true;
             }
         }
-    };
-
-    var checkIsShot = function(obj, arr) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] != null) {
-                if (World.isShot(obj, arr[i])) {
-                    return true
-                }
-            }
-        }
-        return false;
     };
 
     document.addEventListener('keydown', recordKey);
