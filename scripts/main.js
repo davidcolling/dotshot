@@ -295,6 +295,12 @@ var output = function (input) {
             return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
         };
 
+        // obj2 is the projectile
+        static isShot= function(obj1, obj2) {
+            return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
+                    isInFrontOf(obj1, obj2) );
+        };
+
     }
 
     class Moveable extends CenteredShape {
@@ -541,12 +547,6 @@ var output = function (input) {
         }
     };
 
-    // obj2 is the projectile
-    var isShot= function(obj1, obj2) {
-        return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
-                isInFrontOf(obj1, obj2) );
-    };
-
     var calculateDirection = function (x1, y1, x2, y2) {
         var dx = x1 - x2;
         var dy = y1 - y2;
@@ -587,7 +587,7 @@ var output = function (input) {
     var checkIsShot = function(obj, arr) {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
-                if (isShot(obj, arr[i])) {
+                if (World.isShot(obj, arr[i])) {
                     return true
                 }
             }
