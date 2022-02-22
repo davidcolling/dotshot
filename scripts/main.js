@@ -256,7 +256,7 @@ var output = function (input) {
 
                     // calculate npc behavior
                     var seesPlayer = (
-                        400 > calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
+                        400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
                         this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
                     );
                     if ( this.enemies[i].isHunting || seesPlayer) {
@@ -289,6 +289,10 @@ var output = function (input) {
 
             return 1;
 
+        };
+
+        static calculateDistance = function (x1, y1, x2, y2) {
+            return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
         };
 
     }
@@ -483,7 +487,7 @@ var output = function (input) {
             }
         }
         attack = function (seesPlayer) {
-            var distance = calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             if (seesPlayer) {
                 if ( distance < 300 ) {
                     this.pulse();
@@ -528,7 +532,7 @@ var output = function (input) {
                 }
             }
             if (this.isHunting) {
-                if (1 < calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                if (1 < World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
                     this.isHunting = false;
                 }
             } else {
@@ -537,13 +541,9 @@ var output = function (input) {
         }
     };
 
-    var calculateDistance = function (x1, y1, x2, y2) {
-        return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
-    };
-
     // obj2 is the projectile
     var isShot= function(obj1, obj2) {
-        return ( 5 > calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
+        return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
                 isInFrontOf(obj1, obj2) );
     };
 
