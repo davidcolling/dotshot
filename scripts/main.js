@@ -1,4 +1,41 @@
 var output = function (input) {
+
+    class RGBA {
+        constructor(r, g, b, a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
+
+    class HealthBar {
+        constructor(max, map) {
+            this.max = max;
+            this.map = map
+            this.hp = this.max;
+        }
+
+        draw  = function() {
+            if (this.hp != 0) {
+                input.stroke(256, 0, 0, 256);
+                input.fill(256, 0, 0, 256);
+                input.line(
+                    0, 
+                    this.map.height - 1, 
+                    this.map.width * (this.hp / this.max), 
+                    this.map.height - 1
+                );
+                input.stroke(
+                    defaultStrokeColor.r, 
+                    defaultStrokeColor.g, 
+                    defaultStrokeColor.b, 
+                    defaultStrokeColor.a, 
+                );            
+            }
+        }
+    }
+
     class CenteredShape {
         constructor(size, x, y) {
             this.size = size;
@@ -181,6 +218,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
+            this.healthBar = new HealthBar(8, this.map);
 
             // put stuff on the map
             if (Math.random() < 0.3) {
@@ -249,12 +287,15 @@ var output = function (input) {
 
             if (World.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
+                this.healthBar.hp = this.player.hp;
                 console.log("player hp: " + this.player.hp);
                 if (this.player.hp == 0) {
                     document.getElementById("message").textContent = "You Lose.";
                     playerIsDead = true;
                 }
             }
+
+            this.healthBar.draw();
         
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
@@ -634,12 +675,18 @@ var output = function (input) {
     }
 
     var world;
+    var defaultStrokeColor = new RGBA(256, 256, 256, 256);
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
 
         input.createCanvas(width, height);
-        input.stroke(256, 256, 256, 256)
+        input.stroke(
+            defaultStrokeColor.r, 
+            defaultStrokeColor.g, 
+            defaultStrokeColor.b, 
+            defaultStrokeColor.a, 
+        );
 
         world = new World(width, height, 10)
     };
