@@ -497,7 +497,7 @@ var output = function (input) {
         draw = function () {
             if (this.didIgnite) {
                 this.igniteAge++;
-                if (this.igniteAge > 500) {
+                if (this.igniteAge > 100) {
                     this.didExplode = true;
                     this.explode();
                 }
