@@ -23,7 +23,7 @@ var output = function (input) {
             this.y2 = y2;
         }
         draw = function () {
-            input.fill(256, 256, 256, 256);
+            input.fill(256, 256);
             input.line(
                 this.x1, 
                 this.y1, 
@@ -247,7 +247,7 @@ var output = function (input) {
             this.player.bullets = new Array();
 
             if (World.checkIsShot(this.player, this.bullets)) {
-                document.getElementById("result").textContent = "You Lose.";
+                document.getElementById("message").textContent = "You Lose.";
                 playerWasShot = true;
             }
         
@@ -406,7 +406,7 @@ var output = function (input) {
             this.age = 0;
         }
         draw = function () {
-            input.fill(0, 0, 0, 256);
+            input.fill(256, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -448,7 +448,7 @@ var output = function (input) {
             if (this.isMoving) {
                 this.move(2, 0);
             }
-            input.fill(0, 0, 0, 256);
+            input.fill(256, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -468,7 +468,7 @@ var output = function (input) {
             this.lastSeenPlayerCoord = null;
         }
         draw = function () {
-            input.fill(0, 0, 0, 256);
+            input.fill(256, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -627,9 +627,10 @@ var output = function (input) {
     var world;
     input.setup = function () {
         var height = window.innerHeight * 0.9;
-        var width = window.innerWidth * 0.9;
+        var width = window.innerWidth * 0.98;
 
         input.createCanvas(width, height);
+        input.stroke(256, 256, 256, 256)
 
         world = new World(width, height, 10)
     };
