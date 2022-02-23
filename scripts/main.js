@@ -174,6 +174,7 @@ var output = function (input) {
     // an unenforced singleton
     // on observer of when bullets should be collected from characters
     // an observer of when objects need to become null, eg old bullets and dead npc
+    // an observer of when characters lose hp
     // an observer of when npc should idle or attack
     class World {
         constructor(width, height, numberOfEnemies) {
@@ -226,7 +227,7 @@ var output = function (input) {
             world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
             this.player.draw();
             this.map.draw();
-            var playerWasShot = false
+            var playerIsDead = false
         
             // draw bullets
             for (var i = 0; i < this.bullets.length; i++) {
@@ -247,8 +248,12 @@ var output = function (input) {
             this.player.bullets = new Array();
 
             if (World.checkIsShot(this.player, this.bullets)) {
-                document.getElementById("message").textContent = "You Lose.";
-                playerWasShot = true;
+                this.player.hp -= 1;
+                console.log("player hp: " + this.player.hp);
+                if (this.player.hp == 0) {
+                    document.getElementById("message").textContent = "You Lose.";
+                    playerIsDead = true;
+                }
             }
         
             for (var i = 0; i < this.enemies.length; i++) {
@@ -277,7 +282,10 @@ var output = function (input) {
 
                     //check for shots
                     if (World.checkIsShot(this.enemies[i], this.bullets)) {
-                        this.enemies[i] = null;
+                        this.enemies[i].hp -= 1;
+                        if (this.enemies[i].hp == 0) {
+                            this.enemies[i] = null;
+                        }
                     }
     
                     if (this.enemies[i] != null) {
@@ -288,7 +296,7 @@ var output = function (input) {
                 }
             }
 
-            if (playerWasShot) {
+            if (playerIsDead) {
                 return false;
             } else {
                 return true;
@@ -419,6 +427,7 @@ var output = function (input) {
     class Character extends Moveable {
         constructor(size, x, y, map) {
             super(size, x, y, 0, map);
+            this.hp = 8;
             this.bullets = new Array();
         }
         point = function (x1, y1, x2, y2) {
