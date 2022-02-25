@@ -565,8 +565,17 @@ var output = function (input) {
             this.fire(this.direction + 1);
             this.fire(this.direction - 1);
 
+            this.fire(this.direction + 2);
+            this.fire(this.direction - 2);
+
             this.fire(this.direction + 3);
             this.fire(this.direction - 3);
+
+            this.fire(this.direction + 4);
+            this.fire(this.direction - 4);
+
+            this.fire(this.direction + 5);
+            this.fire(this.direction - 5);
 
             this.fire(this.direction + 10);
             this.fire(this.direction - 10);
