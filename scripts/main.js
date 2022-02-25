@@ -606,17 +606,24 @@ var output = function (input) {
         }
         attack = function (seesPlayer) {
             var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            var willMove = true;
             if (seesPlayer) {
                 if ( distance < 300 ) {
                     this.pulse();
                     if ( distance < 200 ) {
                         this.didIgnite = true;
+                        if (distance < 100) {
+                            willMove = false;
+                        }
                     }
                 }
             }
 
-            this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-            this.move(0.5, 0);
+            if (willMove) {
+                this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                this.move(2, 0);
+            }
+
             if (!this.isHunting) {
                 this.isHunting = true;
             } else {
