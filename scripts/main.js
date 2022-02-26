@@ -621,7 +621,7 @@ var output = function (input) {
 
             if (willMove) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                this.move(2, 0);
+                this.move(1.6, 0);
             }
 
             if (!this.isHunting) {
