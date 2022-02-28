@@ -258,6 +258,11 @@ var output = function (input) {
                 this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
+
+            this.mines = new Array();
+            for (var i = 0; i < 20; i++ ) {
+                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
+            }
         }
 
         draw = function () {
@@ -333,6 +338,21 @@ var output = function (input) {
                         if (this.enemies[i].didExplode) {
                             this.enemies[i] = null;
                         }
+                    }
+                }
+            }
+
+            for ( var i = 0; i < this.mines.length; i++) {
+                if (this.mines[i] != null) {
+                    this.mines[i].draw();
+                    if (World.checkIsShot(this.mines[i], this.bullets)) {
+                        this.mines[i].didIgnite = true;
+                    }
+                    if (this.mines[i].didExplode) {
+                        for (var j = 0; j < this.mines[i].bullets.length; j++) {
+                            this.bullets.push(this.mines[i].bullets[j]);
+                        }
+                        this.mines[i] = null;
                     }
                 }
             }
@@ -665,6 +685,62 @@ var output = function (input) {
             }
         }
     };
+
+    class Mine extends NPC {
+        constructor(x, y, map) {
+            super(5, x, y, map, 1000, 0, 200);
+            this.didIgnite = false;
+            this.didExplode = false;
+        }
+        draw = function () {
+            if (this.didIgnite) {
+                this.explode();
+            }
+            input.fill(0, 0, 256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
+        explode = function () {
+            for (var i = 0; i < 3; i++) {
+                var perpendicular = 90 * i;
+
+                this.fire(perpendicular);
+    
+                this.fire(perpendicular + 1);
+                this.fire(perpendicular - 1);
+    
+                this.fire(perpendicular + 2);
+                this.fire(perpendicular - 2);
+    
+                this.fire(perpendicular + 3);
+                this.fire(perpendicular - 3);
+    
+                this.fire(perpendicular + 4);
+                this.fire(perpendicular - 4);
+    
+                this.fire(perpendicular + 5);
+                this.fire(perpendicular - 5);
+    
+                this.fire(perpendicular + 10);
+                this.fire(perpendicular - 10);
+    
+                this.fire(perpendicular + 20);
+                this.fire(perpendicular - 20);
+    
+                this.fire(perpendicular + 30);
+                this.fire(perpendicular - 30);
+            }
+
+            this.didExplode = true;
+        }
+        move = function () { }
+        idle = function () { }
+        attack = function () { }
+    };
+
 
     document.addEventListener('keydown', recordKey);
     function recordKey(e) {
