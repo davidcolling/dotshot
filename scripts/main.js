@@ -487,7 +487,7 @@ var output = function (input) {
 
     class Character extends Moveable {
         constructor(size, x, y, map) {
-            super(size, x, y, 0, map);
+            super(size, x, y, Math.random() * 360, map);
             this.hp = 8;
             this.bullets = new Array();
         }
