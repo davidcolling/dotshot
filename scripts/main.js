@@ -270,7 +270,7 @@ var output = function (input) {
             world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
             this.player.draw();
             this.map.draw();
-            var playerIsDead = false
+            var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
         
             // draw bullets
             for (var i = 0; i < this.bullets.length; i++) {
@@ -284,11 +284,8 @@ var output = function (input) {
                 }
             }
 
-            // get player's bullets
-            for (var i = 0; i < this.player.bullets.length; i++) {
-                this.bullets.push(this.player.bullets[i]);
-            }
-            this.player.bullets = new Array();
+            this.getCharacterBullets(this.player);
+
 
             if (World.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
@@ -320,11 +317,7 @@ var output = function (input) {
                         this.enemies[i].idle();
                     }
 
-                    // get enemy's bullets
-                    for (var j = 0; j < this.enemies[i].bullets.length; j++) {
-                        this.bullets.push(this.enemies[i].bullets[j]);
-                    }
-                    this.enemies[i].bullets = new Array();
+                    getCharacterBullets(this.enemies[i]);
 
                     //check for shots
                     if (World.checkIsShot(this.enemies[i], this.bullets)) {
@@ -364,6 +357,13 @@ var output = function (input) {
             }
 
         };
+
+        getCharacterBullets = function(character) {
+            for (var i = 0; i < character.bullets.length; i++) {
+                this.bullets.push(character.bullets[i]);
+            }
+            character.bullets = new Array();
+        }
 
         static calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
