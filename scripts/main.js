@@ -290,7 +290,6 @@ var output = function (input) {
             if (World.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
-                console.log("player hp: " + this.player.hp);
                 if (this.player.hp == 0) {
                     document.getElementById("message").textContent = "You Lose.";
                     playerIsDead = true;
@@ -317,7 +316,7 @@ var output = function (input) {
                         this.enemies[i].idle();
                     }
 
-                    getCharacterBullets(this.enemies[i]);
+                    this.getCharacterBullets(this.enemies[i]);
 
                     //check for shots
                     if (World.checkIsShot(this.enemies[i], this.bullets)) {
@@ -785,8 +784,7 @@ var output = function (input) {
 
     input.draw = function () {
         input.clear();
-        var playerDidNotLose = world.draw();
-        if (!playerDidNotLose) {
+        if (!world.draw()) {
             input.noLoop();
         }
     }
