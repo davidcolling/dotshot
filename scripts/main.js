@@ -266,13 +266,13 @@ var output = function (input) {
         }
 
         draw = function () {
-            this.frameCount++;
-            world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
-            this.player.draw();
-            this.map.draw();
             var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
+
+            // 
+            this.frameCount++;
+            this.map.draw();
         
-            // draw bullets
+            // bullets
             for (var i = 0; i < this.bullets.length; i++) {
                 if (this.bullets[i] != null) {
                     if (this.bullets[i].age < 30) {
@@ -284,9 +284,10 @@ var output = function (input) {
                 }
             }
 
+            // player
+            world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
+            this.player.draw();
             this.getCharacterBullets(this.player);
-
-
             if (World.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
@@ -295,9 +296,9 @@ var output = function (input) {
                     playerIsDead = true;
                 }
             }
-
             this.healthBar.draw();
         
+            // npc
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
                     this.enemies[i].draw();
@@ -334,16 +335,17 @@ var output = function (input) {
                 }
             }
 
+            // mines
             for ( var i = 0; i < this.mines.length; i++) {
                 if (this.mines[i] != null) {
                     this.mines[i].draw();
+                    // check for collisions
                     if (World.checkIsShot(this.mines[i], this.bullets)) {
                         this.mines[i].didIgnite = true;
                     }
+                    // see if it gave up it bullets yet
                     if (this.mines[i].didExplode) {
-                        for (var j = 0; j < this.mines[i].bullets.length; j++) {
-                            this.bullets.push(this.mines[i].bullets[j]);
-                        }
+                        this.getCharacterBullets(this.mines[i]);
                         this.mines[i] = null;
                     }
                 }
