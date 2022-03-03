@@ -189,7 +189,7 @@ var output = function (input) {
                 world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
                 this.player.draw();
                 this.getCharacterBullets(this.player);
-                if (World.checkIsShot(this.player, this.bullets)) {
+                if (this.checkIsShot(this.player, this.bullets)) {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
                     if (this.player.hp == 0) {
@@ -216,7 +216,7 @@ var output = function (input) {
                         }
                         this.getCharacterBullets(this.enemies[i]);
                         //check for shots
-                        if (World.checkIsShot(this.enemies[i], this.bullets)) {
+                        if (this.checkIsShot(this.enemies[i], this.bullets)) {
                             this.enemies[i].hp -= 1;
                             if (this.enemies[i].hp == 0) {
                                 this.enemies[i] = null;
@@ -234,7 +234,7 @@ var output = function (input) {
                     if (this.mines[i] != null) {
                         this.mines[i].draw();
                         // check for collisions
-                        if (World.checkIsShot(this.mines[i], this.bullets)) {
+                        if (this.checkIsShot(this.mines[i], this.bullets)) {
                             this.mines[i].didIgnite = true;
                         }
                         // see if it gave up it bullets yet
@@ -256,6 +256,21 @@ var output = function (input) {
                     this.bullets.push(character.bullets[i]);
                 }
                 character.bullets = new Array();
+            };
+            // obj2 is the projectile
+            this.isShot = function (obj1, obj2) {
+                return (5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
+                    World.isInFrontOf(obj1, obj2));
+            };
+            this.checkIsShot = function (obj, arr) {
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] != null) {
+                        if (this.isShot(obj, arr[i])) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             };
             this.frameCount = 0;
             this.map = new Map(width, height);
@@ -293,11 +308,6 @@ var output = function (input) {
         World.calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
         };
-        // obj2 is the projectile
-        World.isShot = function (obj1, obj2) {
-            return (5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
-                World.isInFrontOf(obj1, obj2));
-        };
         World.isInFrontOf = function (obj1, obj2) {
             return 90 >= Math.abs(World.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
         };
@@ -330,16 +340,6 @@ var output = function (input) {
                 difference = 360 - difference;
             }
             return difference;
-        };
-        World.checkIsShot = function (obj, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] != null) {
-                    if (World.isShot(obj, arr[i])) {
-                        return true;
-                    }
-                }
-            }
-            return false;
         };
         return World;
     }());

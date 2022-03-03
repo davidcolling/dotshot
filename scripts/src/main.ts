@@ -325,7 +325,7 @@ var output = function (input) {
             world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
             this.player.draw();
             this.getCharacterBullets(this.player);
-            if (World.checkIsShot(this.player, this.bullets)) {
+            if (this.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
                 if (this.player.hp == 0) {
@@ -357,7 +357,7 @@ var output = function (input) {
                     this.getCharacterBullets(this.enemies[i]);
 
                     //check for shots
-                    if (World.checkIsShot(this.enemies[i], this.bullets)) {
+                    if (this.checkIsShot(this.enemies[i], this.bullets)) {
                         this.enemies[i].hp -= 1;
                         if (this.enemies[i].hp == 0) {
                             this.enemies[i] = null;
@@ -377,7 +377,7 @@ var output = function (input) {
                 if (this.mines[i] != null) {
                     this.mines[i].draw();
                     // check for collisions
-                    if (World.checkIsShot(this.mines[i], this.bullets)) {
+                    if (this.checkIsShot(this.mines[i], this.bullets)) {
                         this.mines[i].didIgnite = true;
                     }
                     // see if it gave up it bullets yet
@@ -408,7 +408,7 @@ var output = function (input) {
         };
 
         // obj2 is the projectile
-        static isShot= function(obj1, obj2) {
+        isShot= function(obj1, obj2) {
             return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
                     World.isInFrontOf(obj1, obj2) );
         };
@@ -450,10 +450,10 @@ var output = function (input) {
             return difference
         }
 
-        static checkIsShot = function(obj, arr) {
+        checkIsShot = function(obj, arr) {
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i] != null) {
-                    if (World.isShot(obj, arr[i])) {
+                    if (this.isShot(obj, arr[i])) {
                         return true
                     }
                 }
