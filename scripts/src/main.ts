@@ -470,7 +470,7 @@ var output = function (input) {
         };
 
         isInFrontOf = function(obj1, obj2) {
-            return 90 >= Math.abs(World.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+            return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
         }
 
         static calculateDirection = function (x1, y1, x2, y2) {
@@ -496,7 +496,7 @@ var output = function (input) {
             }
         }
 
-        static calculateDifference = function(direction1, direction2) {
+        calculateDifference = function(direction1, direction2) {
             var difference = direction1 - direction2;
     
             if (difference > 180) {
