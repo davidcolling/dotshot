@@ -1,748 +1,646 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var output = function (input) {
-
-    class RGBA {
-        constructor(r, g, b, a) {
+    var RGBA = /** @class */ (function () {
+        function RGBA(r, g, b, a) {
             this.r = r;
             this.g = g;
             this.b = b;
             this.a = a;
         }
-    }
-
-    class HealthBar {
-        constructor(max, map) {
+        return RGBA;
+    }());
+    var HealthBar = /** @class */ (function () {
+        function HealthBar(max, map) {
+            this.draw = function () {
+                if (this.hp != 0) {
+                    input.stroke(256, 0, 0, 256);
+                    input.fill(256, 0, 0, 256);
+                    input.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
+                    input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                }
+            };
             this.max = max;
-            this.map = map
+            this.map = map;
             this.hp = this.max;
         }
-
-        draw  = function() {
-            if (this.hp != 0) {
-                input.stroke(256, 0, 0, 256);
-                input.fill(256, 0, 0, 256);
-                input.line(
-                    0, 
-                    this.map.height - 1, 
-                    this.map.width * (this.hp / this.max), 
-                    this.map.height - 1
-                );
-                input.stroke(
-                    defaultStrokeColor.r, 
-                    defaultStrokeColor.g, 
-                    defaultStrokeColor.b, 
-                    defaultStrokeColor.a, 
-                );            
-            }
-        }
-    }
-
-    class CenteredShape {
-        constructor(size, x, y) {
+        return HealthBar;
+    }());
+    var CenteredShape = /** @class */ (function () {
+        function CenteredShape(size, x, y) {
+            this.draw = function () { };
             this.size = size;
             this.x = x;
             this.y = y;
         }
-        draw = function (){};
-    }
-
-    class Coord {
-        constructor(x, y) {
+        return CenteredShape;
+    }());
+    var Coord = /** @class */ (function () {
+        function Coord(x, y) {
             this.x = x;
             this.y = y;
         }
-    }
-
-    class Wall {
-        constructor(x1, y1, x2, y2) {
+        return Coord;
+    }());
+    var Wall = /** @class */ (function () {
+        function Wall(x1, y1, x2, y2) {
+            this.draw = function () {
+                input.fill(256, 256);
+                input.line(this.x1, this.y1, this.x2, this.y2);
+            };
             this.x1 = x1;
             this.y1 = y1;
             this.x2 = x2;
             this.y2 = y2;
         }
-        draw = function () {
-            input.fill(256, 256);
-            input.line(
-                this.x1, 
-                this.y1, 
-                this.x2, 
-                this.y2
-            );
-        }
-    };
-
+        return Wall;
+    }());
+    ;
     // composite of walls
-    class Structure {
-        constructor() {
+    var Structure = /** @class */ (function () {
+        function Structure() {
+            this.draw = function () {
+                for (var i = 0; i < this.walls.length; i++) {
+                    this.walls[i].draw();
+                }
+            };
             this.walls = new Array();
         }
-        draw = function() {
-            for (var i = 0; i < this.walls.length; i++) {
-                this.walls[i].draw();
-            }
-        }
-    }
-
-    class Castle extends Structure {
+        return Structure;
+    }());
+    var Castle = /** @class */ (function (_super) {
+        __extends(Castle, _super);
         // coord of center 
-        constructor(x, y, size) {
-            super();
-            this.x = x;
-            this.y = y;
-            this.walls.push( new Wall( //1
-                x - (size / 2),
-                y - (size / 2),
-                x - (size / 8),
-                y - (size / 2)
-            ));
-            this.walls.push( new Wall( //2
-                x + (size / 8),
-                y - (size / 2),
-                x + (size / 2),
-                y - (size / 2)
-            ));
-            this.walls.push( new Wall( //3
-                x + (size / 2),
-                y - (size / 2),
-                x + (size / 2),
-                y - (size / 8)
-            ));
-            this.walls.push( new Wall( //4
-                x + (size / 2),
-                y + (size / 8),
-                x + (size / 2),
-                y + (size / 2)
-            ));
-            this.walls.push( new Wall( //5
-                x + (size / 2),
-                y + (size / 2),
-                x + (size / 8),
-                y + (size / 2)
-            ));
-            this.walls.push( new Wall( //6
-                x - (size / 8),
-                y + (size / 2),
-                x - (size / 2),
-                y + (size / 2)
-            ));
-            this.walls.push( new Wall( //7
-                x - (size / 2),
-                y + (size / 2),
-                x - (size / 2),
-                y + (size / 8)
-            ));
-            this.walls.push( new Wall( //8
-                x - (size / 2),
-                y - (size / 8),
-                x - (size / 2),
-                y - (size / 2)
-            ));
-
-            this.walls.push( new Wall( //9
-                x - (size / 8),
-                y - (size / 4),
-                x + (size / 8),
-                y - (size / 4)
-            ));
-            this.walls.push( new Wall( //10
-                x + (size / 4),
-                y - (size / 8),
-                x + (size / 4),
-                y + (size / 8)
-            ));
-            this.walls.push( new Wall( //11
-                x - (size / 8),
-                y + (size / 4),
-                x + (size / 8),
-                y + (size / 4)
-            ));
-            this.walls.push( new Wall( //12
-                x - (size / 4),
-                y - (size / 8),
-                x - (size / 4),
-                y + (size / 8)
-            ));
+        function Castle(x, y, size) {
+            var _this = _super.call(this) || this;
+            _this.x = x;
+            _this.y = y;
+            _this.walls.push(new Wall(//1
+            x - (size / 2), y - (size / 2), x - (size / 8), y - (size / 2)));
+            _this.walls.push(new Wall(//2
+            x + (size / 8), y - (size / 2), x + (size / 2), y - (size / 2)));
+            _this.walls.push(new Wall(//3
+            x + (size / 2), y - (size / 2), x + (size / 2), y - (size / 8)));
+            _this.walls.push(new Wall(//4
+            x + (size / 2), y + (size / 8), x + (size / 2), y + (size / 2)));
+            _this.walls.push(new Wall(//5
+            x + (size / 2), y + (size / 2), x + (size / 8), y + (size / 2)));
+            _this.walls.push(new Wall(//6
+            x - (size / 8), y + (size / 2), x - (size / 2), y + (size / 2)));
+            _this.walls.push(new Wall(//7
+            x - (size / 2), y + (size / 2), x - (size / 2), y + (size / 8)));
+            _this.walls.push(new Wall(//8
+            x - (size / 2), y - (size / 8), x - (size / 2), y - (size / 2)));
+            _this.walls.push(new Wall(//9
+            x - (size / 8), y - (size / 4), x + (size / 8), y - (size / 4)));
+            _this.walls.push(new Wall(//10
+            x + (size / 4), y - (size / 8), x + (size / 4), y + (size / 8)));
+            _this.walls.push(new Wall(//11
+            x - (size / 8), y + (size / 4), x + (size / 8), y + (size / 4)));
+            _this.walls.push(new Wall(//12
+            x - (size / 4), y - (size / 8), x - (size / 4), y + (size / 8)));
+            return _this;
         }
-    }
-
-    class Map extends Structure {
-        constructor(width, height) {
-            super();
-            this.width = width;
-            this.height = height;
-            this.walls.push(new Wall(0, 0, width, 0));
-            this.walls.push(new Wall(width, 0, width, height));
-            this.walls.push(new Wall(0, height, width, height));
-            this.walls.push(new Wall(0, height, 0, 0));
-        }
-        addWall = function(wall) {
-            this.walls.push(wall);
-        }
-        // returns true if there is no wall between points 1 and 2
-        isOpen = function(x1, y1, x2, y2) {
-            // https://stackoverflow.com/questions/7069420/check-if-two-line-segments-are-colliding-only-check-if-they-are-intersecting-n
-            // To spell it out: suppose you're looking at two line segments, [AB] and [CD]. The segments intersect if and only if ((A and B are of different sides of [CD]) and (C and D are on different sides of [AB])).
-            //                            1     2                                           [walls.1 walls.2]
-            // To see whether two points, P and Q, are on different sides of a line segment [E       F], compute two cross products, one for P and one for Q:
-            // (F[x] - E[x])(P[y] - F[y]) - (F[y] - E[y])(P[x] - F[x])
-            // (F[x] - E[x])(Q[y] - F[y]) - (F[y] - E[y])(Q[x] - F[x])
-            // If the results have the same sign (both positive or both negative) then forget it, the points are on the same side, the segments do not intersect. If one is positive and the other negative, then the points are on opposite sides.
-            for (var i = 0; i < this.walls.length; i++) {
-                if (
-                    this.pointsAreSplit(x1, y1, x2, y2, this.walls[i]) &&
-                    this.pointsAreSplit(this.walls[i].x1, this.walls[i].y1, this.walls[i].x2, this.walls[i].y2, new Wall(x1, y1, x2, y2))
-                ) {
-                    return false;
+        return Castle;
+    }(Structure));
+    var Map = /** @class */ (function (_super) {
+        __extends(Map, _super);
+        function Map(width, height) {
+            var _this = _super.call(this) || this;
+            _this.addWall = function (wall) {
+                this.walls.push(wall);
+            };
+            // returns true if there is no wall between points 1 and 2
+            _this.isOpen = function (x1, y1, x2, y2) {
+                // https://stackoverflow.com/questions/7069420/check-if-two-line-segments-are-colliding-only-check-if-they-are-intersecting-n
+                // To spell it out: suppose you're looking at two line segments, [AB] and [CD]. The segments intersect if and only if ((A and B are of different sides of [CD]) and (C and D are on different sides of [AB])).
+                //                            1     2                                           [walls.1 walls.2]
+                // To see whether two points, P and Q, are on different sides of a line segment [E       F], compute two cross products, one for P and one for Q:
+                // (F[x] - E[x])(P[y] - F[y]) - (F[y] - E[y])(P[x] - F[x])
+                // (F[x] - E[x])(Q[y] - F[y]) - (F[y] - E[y])(Q[x] - F[x])
+                // If the results have the same sign (both positive or both negative) then forget it, the points are on the same side, the segments do not intersect. If one is positive and the other negative, then the points are on opposite sides.
+                for (var i = 0; i < this.walls.length; i++) {
+                    if (this.pointsAreSplit(x1, y1, x2, y2, this.walls[i]) &&
+                        this.pointsAreSplit(this.walls[i].x1, this.walls[i].y1, this.walls[i].x2, this.walls[i].y2, new Wall(x1, y1, x2, y2))) {
+                        return false;
+                    }
                 }
-            }
-            return true;
+                return true;
+            };
+            // returns true if x1, y1 are on opposite sides of wall
+            _this.pointsAreSplit = function (x1, y1, x2, y2, wall) {
+                var val1 = (wall.x2 - wall.x1) * (y1 - wall.y2) - (wall.y2 - wall.y1) * (x1 - wall.x2);
+                var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
+                if ((val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0)) { // if points have opposite signs,
+                    return true; // then they are opposite sides of the wall
+                }
+                return false;
+            };
+            _this.width = width;
+            _this.height = height;
+            _this.walls.push(new Wall(0, 0, width, 0));
+            _this.walls.push(new Wall(width, 0, width, height));
+            _this.walls.push(new Wall(0, height, width, height));
+            _this.walls.push(new Wall(0, height, 0, 0));
+            return _this;
         }
-        // returns true if x1, y1 are on opposite sides of wall
-        pointsAreSplit = function(x1, y1, x2, y2, wall) {
-            var val1 = (wall.x2 - wall.x1) * (y1 - wall.y2) - (wall.y2 - wall.y1) * (x1 - wall.x2);
-            var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
-            if ( (val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0) ) { // if points have opposite signs,
-                return true // then they are opposite sides of the wall
-            }
-            return false
-        }
-    };
-
+        return Map;
+    }(Structure));
+    ;
     // facade and factory of all game objects: bullets, map, characters (player and npc)
     // an unenforced singleton
     // on observer of when bullets should be collected from characters
     // an observer of when objects need to become null, eg old bullets and dead npc
     // an observer of when characters lose hp
     // an observer of when npc should idle or attack
-    class World {
-        constructor(width, height, numberOfEnemies) {
+    var World = /** @class */ (function () {
+        function World(width, height, numberOfEnemies) {
+            this.draw = function () {
+                var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
+                // 
+                this.frameCount++;
+                this.map.draw();
+                // bullets
+                for (var i = 0; i < this.bullets.length; i++) {
+                    if (this.bullets[i] != null) {
+                        if (this.bullets[i].age < 30) {
+                            this.bullets[i].move(15, 0);
+                            this.bullets[i].draw();
+                        }
+                        else {
+                            this.bullets[i] = null;
+                        }
+                    }
+                }
+                // player
+                world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
+                this.player.draw();
+                this.getCharacterBullets(this.player);
+                if (World.checkIsShot(this.player, this.bullets)) {
+                    this.player.hp -= 1;
+                    this.healthBar.hp = this.player.hp;
+                    if (this.player.hp == 0) {
+                        document.getElementById("message").textContent = "You Lose.";
+                        playerIsDead = true;
+                    }
+                }
+                this.healthBar.draw();
+                // npc
+                for (var i = 0; i < this.enemies.length; i++) {
+                    if (this.enemies[i] != null) {
+                        this.enemies[i].draw();
+                        // calculate npc behavior
+                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) &&
+                            this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y));
+                        if (this.enemies[i].isHunting || seesPlayer) {
+                            if (seesPlayer) {
+                                this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                            }
+                            this.enemies[i].attack(seesPlayer);
+                        }
+                        else {
+                            this.enemies[i].idle();
+                        }
+                        this.getCharacterBullets(this.enemies[i]);
+                        //check for shots
+                        if (World.checkIsShot(this.enemies[i], this.bullets)) {
+                            this.enemies[i].hp -= 1;
+                            if (this.enemies[i].hp == 0) {
+                                this.enemies[i] = null;
+                            }
+                        }
+                        if (this.enemies[i] != null) {
+                            if (this.enemies[i].didExplode) {
+                                this.enemies[i] = null;
+                            }
+                        }
+                    }
+                }
+                // mines
+                for (var i = 0; i < this.mines.length; i++) {
+                    if (this.mines[i] != null) {
+                        this.mines[i].draw();
+                        // check for collisions
+                        if (World.checkIsShot(this.mines[i], this.bullets)) {
+                            this.mines[i].didIgnite = true;
+                        }
+                        // see if it gave up it bullets yet
+                        if (this.mines[i].didExplode) {
+                            this.getCharacterBullets(this.mines[i]);
+                            this.mines[i] = null;
+                        }
+                    }
+                }
+                if (playerIsDead) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            };
+            this.getCharacterBullets = function (character) {
+                for (var i = 0; i < character.bullets.length; i++) {
+                    this.bullets.push(character.bullets[i]);
+                }
+                character.bullets = new Array();
+            };
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
             this.healthBar = new HealthBar(8, this.map);
-
             // put stuff on the map
             if (Math.random() < 0.3) {
-                for (var i = 0; i < 60; i ++) {
-                    this.map.addWall( new Wall(
-                        i * (this.map.width / 60),
-                        50 + (Math.random() * (this.map.height * 0.8)), 
-                        i * (this.map.width / 60),
-                        Math.random() * (this.map.height * 0.8)
-                    ));
+                for (var i = 0; i < 60; i++) {
+                    this.map.addWall(new Wall(i * (this.map.width / 60), 50 + (Math.random() * (this.map.height * 0.8)), i * (this.map.width / 60), Math.random() * (this.map.height * 0.8)));
                 }
-            } else {
-                for (var i = 0; i < 2; i ++) {
-                    this.map.addWall( new Wall(
-                        Math.random() * this.map.width, 
-                        Math.random() * this.map.height, 
-                        Math.random() * this.map.width, 
-                        Math.random() * this.map.height
-                    ));
+            }
+            else {
+                for (var i = 0; i < 2; i++) {
+                    this.map.addWall(new Wall(Math.random() * this.map.width, Math.random() * this.map.height, Math.random() * this.map.width, Math.random() * this.map.height));
                 }
-                for (var i = 0; i < 15; i ++) {
-                    var castle = new Castle(
-                        Math.random() * (0.7 * this.map.width),
-                        Math.random() * (0.7 * this.map.height),
-                        Math.random() * 500
-                    );
+                for (var i = 0; i < 15; i++) {
+                    var castle = new Castle(Math.random() * (0.7 * this.map.width), Math.random() * (0.7 * this.map.height), Math.random() * 500);
                     for (var j = 0; j < castle.walls.length; j++) {
                         this.map.addWall(castle.walls[j]);
                     }
                 }
             }
-
             // make characters
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
-            for (var i = 0; i < numberOfEnemies; i++ ) {
+            for (var i = 0; i < numberOfEnemies; i++) {
                 this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
-
             this.mines = new Array();
-            for (var i = 0; i < 20; i++ ) {
+            for (var i = 0; i < 20; i++) {
                 this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
             }
         }
-
-        draw = function () {
-            var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
-
-            // 
-            this.frameCount++;
-            this.map.draw();
-        
-            // bullets
-            for (var i = 0; i < this.bullets.length; i++) {
-                if (this.bullets[i] != null) {
-                    if (this.bullets[i].age < 30) {
-                        this.bullets[i].move(15, 0);
-                        this.bullets[i].draw();
-                    } else {
-                        this.bullets[i] = null;
-                    }
-                }
-            }
-
-            // player
-            world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
-            this.player.draw();
-            this.getCharacterBullets(this.player);
-            if (World.checkIsShot(this.player, this.bullets)) {
-                this.player.hp -= 1;
-                this.healthBar.hp = this.player.hp;
-                if (this.player.hp == 0) {
-                    document.getElementById("message").textContent = "You Lose.";
-                    playerIsDead = true;
-                }
-            }
-            this.healthBar.draw();
-        
-            // npc
-            for (var i = 0; i < this.enemies.length; i++) {
-                if (this.enemies[i] != null) {
-                    this.enemies[i].draw();
-
-                    // calculate npc behavior
-                    var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
-                        this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
-                    );
-                    if ( this.enemies[i].isHunting || seesPlayer) {
-                        if (seesPlayer) {
-                            this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-                        }
-                        this.enemies[i].attack(seesPlayer);
-                    } else {
-                        this.enemies[i].idle();
-                    }
-
-                    this.getCharacterBullets(this.enemies[i]);
-
-                    //check for shots
-                    if (World.checkIsShot(this.enemies[i], this.bullets)) {
-                        this.enemies[i].hp -= 1;
-                        if (this.enemies[i].hp == 0) {
-                            this.enemies[i] = null;
-                        }
-                    }
-    
-                    if (this.enemies[i] != null) {
-                        if (this.enemies[i].didExplode) {
-                            this.enemies[i] = null;
-                        }
-                    }
-                }
-            }
-
-            // mines
-            for ( var i = 0; i < this.mines.length; i++) {
-                if (this.mines[i] != null) {
-                    this.mines[i].draw();
-                    // check for collisions
-                    if (World.checkIsShot(this.mines[i], this.bullets)) {
-                        this.mines[i].didIgnite = true;
-                    }
-                    // see if it gave up it bullets yet
-                    if (this.mines[i].didExplode) {
-                        this.getCharacterBullets(this.mines[i]);
-                        this.mines[i] = null;
-                    }
-                }
-            }
-
-            if (playerIsDead) {
-                return false;
-            } else {
-                return true;
-            }
-
+        World.calculateDistance = function (x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
         };
-
-        getCharacterBullets = function(character) {
-            for (var i = 0; i < character.bullets.length; i++) {
-                this.bullets.push(character.bullets[i]);
-            }
-            character.bullets = new Array();
-        }
-
-        static calculateDistance = function (x1, y1, x2, y2) {
-            return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
-        };
-
         // obj2 is the projectile
-        static isShot= function(obj1, obj2) {
-            return ( 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
-                    World.isInFrontOf(obj1, obj2) );
+        World.isShot = function (obj1, obj2) {
+            return (5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
+                World.isInFrontOf(obj1, obj2));
         };
-
-        static isInFrontOf = function(obj1, obj2) {
+        World.isInFrontOf = function (obj1, obj2) {
             return 90 >= Math.abs(World.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
-        }
-
-        static calculateDirection = function (x1, y1, x2, y2) {
+        };
+        World.calculateDirection = function (x1, y1, x2, y2) {
             var dx = x1 - x2;
             var dy = y1 - y2;
-    
             var direction;
-    
             if (dx != 0 && dy != 0) {
                 if (dx < 0 && dy > 0) { // target is in quadrant 1
                     direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                } else if (dx < 0 && dy < 0) { // target is in q2
+                }
+                else if (dx < 0 && dy < 0) { // target is in q2
                     direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
                     direction += 90;
-                } else if (dx > 0 && dy < 0) { // q3
+                }
+                else if (dx > 0 && dy < 0) { // q3
                     direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
                     direction += 180;
-                } else if (dx > 0 && dy > 0) { // q4
+                }
+                else if (dx > 0 && dy > 0) { // q4
                     direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
                     direction += 270;
                 }
-                return direction
+                return direction;
             }
-        }
-
-        static calculateDifference = function(direction1, direction2) {
+        };
+        World.calculateDifference = function (direction1, direction2) {
             var difference = direction1 - direction2;
-    
             if (difference > 180) {
                 difference = 360 - difference;
             }
-    
-            return difference
-        }
-
-        static checkIsShot = function(obj, arr) {
+            return difference;
+        };
+        World.checkIsShot = function (obj, arr) {
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i] != null) {
                     if (World.isShot(obj, arr[i])) {
-                        return true
+                        return true;
                     }
                 }
             }
             return false;
         };
-
-    }
-
-    class Moveable extends CenteredShape {
-        constructor(size, x, y, direction, map) {
-            super(size, x, y);
-            this.direction = direction;
-            this.map = map;
-        }
-        move = function (velocity, offset) {
-            // this function can be understood in two basic parts
-            // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-            var dx;
-            var dy;
-            var offsetDirection = this.direction + offset;
-            if (offsetDirection > 359) {
-                offsetDirection -= 360;
-            }
-            if (offsetDirection >= 0 && offsetDirection < 90) {
-                dx = offsetDirection;
-                dy = -1 * (90 - offsetDirection);
-            } else if (offsetDirection >= 90 && offsetDirection < 180) {
-                dx = 180 - offsetDirection;
-                dy = offsetDirection - 90;
-            } else if (offsetDirection >= 180 && offsetDirection < 270) {
-                dx = -1 * (offsetDirection - 180);
-                dy = 270 - offsetDirection;
-            } else if (offsetDirection >= 270 && offsetDirection < 360) {
-                dx = offsetDirection - 360;
-                dy = -1 * (offsetDirection - 270);
-            }
-            var newX = this.x + (velocity * (dx / 90));
-            var newY = this.y + (velocity * (dy / 90));
-            // part two determines if the coordinates are somewhere the character can actually go
-            if (
-                this.map.isOpen(this.x, this.y, newX, newY) &&
-                0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
-                newX < this.map.width &&
-                0 < newY &&
-                newY < this.map.height
-            ) {
-                this.x = newX;
-                this.y = newY;
-            }
-        };
-    }
-
-    class Bullet extends Moveable {
-        constructor(x, y, direction, map) {
-            super(3, x, y, direction, map);
-            this.age = 0;
-        }
-        draw = function () {
-            input.fill(256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size,
-            );
-            this.age++;
-        }
-    }
-
-    class Character extends Moveable {
-        constructor(size, x, y, map) {
-            super(size, x, y, Math.random() * 360, map);
-            this.hp = 8;
-            this.bullets = new Array();
-        }
-        point = function (x1, y1, x2, y2) {
-            this.direction = World.calculateDirection(x1, y1, x2, y2);
-        }
-        fire = function(direction) {
-            if (direction == null) {
-                var bulletDirection = this.direction;
-            } else {
-                var bulletDirection = direction;
-            }
-            var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
-            this.bullets.push(bullet);
-        }
-    }
-
-    class Player extends Character {
-        constructor(size, x, y, map) {
-            super(size, x, y, map);
-            this.isFiring = false; 
-            this.isMoving = false;
-        }
-        draw = function () {
-            if (this.isFiring) {
-                this.fire(null);
-            }
-            if (this.isMoving) {
-                this.move(2, 0);
-            }
-            input.fill(256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
-    }
-
-    class NPC extends Character {
-       constructor(size, x, y, map, life, idleAge, idleLife) {
-            super(size, x, y, map);
-            this.didExplode = false;
-            this.isHunting = false;
-            this.age = 0;
-            this.idleAge = idleAge;
-            this.idleLife = idleLife;
-            this.lastSeenPlayerCoord = null;
-        }
-        draw = function () {
-            input.fill(256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
-        idle = function () {
-            if (!(this.idleAge < this.idleLife)) {
-                this.idleAge = 0;
-                this.idleLife = Math.random() * 2000;
-                this.direction = Math.random() * 360;
-            }
-            this.idleAge++;
-            this.move(1, 0);
-        }
-        attack = function () {}
-    }
-
-    class Bomb extends NPC {
-        constructor(x, y, map) {
-            super(5, x, y, map, 1000, 0, 200);
-            this.didIgnite = false;
-            this.igniteAge = 0
-            this.isGrowing = true;
-        }
-        draw = function () {
-            if (this.didIgnite) {
-                this.igniteAge++;
-                if (this.igniteAge > 100) {
-                    this.didExplode = true;
-                    this.explode();
+        return World;
+    }());
+    var Moveable = /** @class */ (function (_super) {
+        __extends(Moveable, _super);
+        function Moveable(size, x, y, direction, map) {
+            var _this = _super.call(this, size, x, y) || this;
+            _this.move = function (velocity, offset) {
+                // this function can be understood in two basic parts
+                // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
+                var dx;
+                var dy;
+                var offsetDirection = this.direction + offset;
+                if (offsetDirection > 359) {
+                    offsetDirection -= 360;
                 }
-            }
-            input.fill(0, 256, 0, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
-        explode = function () {
-            this.fire(this.direction);
-
-            this.fire(this.direction + 1);
-            this.fire(this.direction - 1);
-
-            this.fire(this.direction + 2);
-            this.fire(this.direction - 2);
-
-            this.fire(this.direction + 3);
-            this.fire(this.direction - 3);
-
-            this.fire(this.direction + 4);
-            this.fire(this.direction - 4);
-
-            this.fire(this.direction + 5);
-            this.fire(this.direction - 5);
-
-            this.fire(this.direction + 10);
-            this.fire(this.direction - 10);
-
-            this.fire(this.direction + 20);
-            this.fire(this.direction - 20);
-
-            this.fire(this.direction + 30);
-            this.fire(this.direction - 30);
-        }
-        // animation for when its about to explode
-        pulse = function () {
-            if (this.isGrowing) {
-                if (this.size < 9) {
-                    this.size += 1;
-                } else {
-                    this.isGrowing = false;
-                    this.size -= 1;
+                if (offsetDirection >= 0 && offsetDirection < 90) {
+                    dx = offsetDirection;
+                    dy = -1 * (90 - offsetDirection);
                 }
-            } else {
-                if (this.size > 5) {
-                    this.size -= 1;
-                } else {
-                    this.isGrowing = true;
-                    this.size += 1;
+                else if (offsetDirection >= 90 && offsetDirection < 180) {
+                    dx = 180 - offsetDirection;
+                    dy = offsetDirection - 90;
                 }
-            }
+                else if (offsetDirection >= 180 && offsetDirection < 270) {
+                    dx = -1 * (offsetDirection - 180);
+                    dy = 270 - offsetDirection;
+                }
+                else if (offsetDirection >= 270 && offsetDirection < 360) {
+                    dx = offsetDirection - 360;
+                    dy = -1 * (offsetDirection - 270);
+                }
+                var newX = this.x + (velocity * (dx / 90));
+                var newY = this.y + (velocity * (dy / 90));
+                // part two determines if the coordinates are somewhere the character can actually go
+                if (this.map.isOpen(this.x, this.y, newX, newY) &&
+                    0 < newX && // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
+                    newX < this.map.width &&
+                    0 < newY &&
+                    newY < this.map.height) {
+                    this.x = newX;
+                    this.y = newY;
+                }
+            };
+            _this.direction = direction;
+            _this.map = map;
+            return _this;
         }
-        attack = function (seesPlayer) {
-            var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-            var willMove = true;
-            if (seesPlayer) {
-                if ( distance < 300 ) {
-                    this.pulse();
-                    if ( distance < 200 ) {
-                        this.didIgnite = true;
-                        if (distance < 100) {
-                            willMove = false;
+        return Moveable;
+    }(CenteredShape));
+    var Bullet = /** @class */ (function (_super) {
+        __extends(Bullet, _super);
+        function Bullet(x, y, direction, map) {
+            var _this = _super.call(this, 3, x, y, direction, map) || this;
+            _this.draw = function () {
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
+                this.age++;
+            };
+            _this.age = 0;
+            return _this;
+        }
+        return Bullet;
+    }(Moveable));
+    var Character = /** @class */ (function (_super) {
+        __extends(Character, _super);
+        function Character(size, x, y, map) {
+            var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
+            _this.point = function (x1, y1, x2, y2) {
+                this.direction = World.calculateDirection(x1, y1, x2, y2);
+            };
+            _this.fire = function (direction) {
+                if (direction == null) {
+                    var bulletDirection = this.direction;
+                }
+                else {
+                    var bulletDirection = direction;
+                }
+                var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
+                this.bullets.push(bullet);
+            };
+            _this.hp = 8;
+            _this.bullets = new Array();
+            return _this;
+        }
+        return Character;
+    }(Moveable));
+    var Player = /** @class */ (function (_super) {
+        __extends(Player, _super);
+        function Player(size, x, y, map) {
+            var _this = _super.call(this, size, x, y, map) || this;
+            _this.draw = function () {
+                if (this.isFiring) {
+                    this.fire(null);
+                }
+                if (this.isMoving) {
+                    this.move(2, 0);
+                }
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.isFiring = false;
+            _this.isMoving = false;
+            return _this;
+        }
+        return Player;
+    }(Character));
+    var NPC = /** @class */ (function (_super) {
+        __extends(NPC, _super);
+        function NPC(size, x, y, map, life, idleAge, idleLife) {
+            var _this = _super.call(this, size, x, y, map) || this;
+            _this.draw = function () {
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.idle = function () {
+                if (!(this.idleAge < this.idleLife)) {
+                    this.idleAge = 0;
+                    this.idleLife = Math.random() * 2000;
+                    this.direction = Math.random() * 360;
+                }
+                this.idleAge++;
+                this.move(1, 0);
+            };
+            _this.attack = function (seesPlayer) { };
+            _this.didExplode = false;
+            _this.isHunting = false;
+            _this.age = 0;
+            _this.idleAge = idleAge;
+            _this.idleLife = idleLife;
+            _this.lastSeenPlayerCoord = null;
+            return _this;
+        }
+        return NPC;
+    }(Character));
+    var Bomb = /** @class */ (function (_super) {
+        __extends(Bomb, _super);
+        function Bomb(x, y, map) {
+            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+            _this.draw = function () {
+                if (this.didIgnite) {
+                    this.igniteAge++;
+                    if (this.igniteAge > 100) {
+                        this.didExplode = true;
+                        this.explode();
+                    }
+                }
+                input.fill(0, 256, 0, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.explode = function () {
+                this.fire(this.direction);
+                this.fire(this.direction + 1);
+                this.fire(this.direction - 1);
+                this.fire(this.direction + 2);
+                this.fire(this.direction - 2);
+                this.fire(this.direction + 3);
+                this.fire(this.direction - 3);
+                this.fire(this.direction + 4);
+                this.fire(this.direction - 4);
+                this.fire(this.direction + 5);
+                this.fire(this.direction - 5);
+                this.fire(this.direction + 10);
+                this.fire(this.direction - 10);
+                this.fire(this.direction + 20);
+                this.fire(this.direction - 20);
+                this.fire(this.direction + 30);
+                this.fire(this.direction - 30);
+            };
+            // animation for when its about to explode
+            _this.pulse = function () {
+                if (this.isGrowing) {
+                    if (this.size < 9) {
+                        this.size += 1;
+                    }
+                    else {
+                        this.isGrowing = false;
+                        this.size -= 1;
+                    }
+                }
+                else {
+                    if (this.size > 5) {
+                        this.size -= 1;
+                    }
+                    else {
+                        this.isGrowing = true;
+                        this.size += 1;
+                    }
+                }
+            };
+            _this.attack = function (seesPlayer) {
+                var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                var willMove = true;
+                if (seesPlayer) {
+                    if (distance < 300) {
+                        this.pulse();
+                        if (distance < 200) {
+                            this.didIgnite = true;
+                            if (distance < 100) {
+                                willMove = false;
+                            }
                         }
                     }
                 }
-            }
-
-            if (willMove) {
+                if (willMove) {
+                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                    this.move(1.6, 0);
+                }
+                if (!this.isHunting) {
+                    this.isHunting = true;
+                }
+                else {
+                    if (distance < 2 && !this.didIgnite) {
+                        this.isHunting = false;
+                    }
+                }
+            };
+            _this.didIgnite = false;
+            _this.igniteAge = 0;
+            _this.isGrowing = true;
+            return _this;
+        }
+        return Bomb;
+    }(NPC));
+    ;
+    var Pirate = /** @class */ (function (_super) {
+        __extends(Pirate, _super);
+        function Pirate(size, x, y, map) {
+            var _this = _super.call(this, size, x, y, map, 1000, 0, 200) || this;
+            _this.draw = function () {
+                this.weaponCooldownCounter++;
+                input.fill(256, 0, 0, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.attack = function (seesPlayer) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                this.move(1.6, 0);
-            }
-
-            if (!this.isHunting) {
-                this.isHunting = true;
-            } else {
-                if (distance < 2 && !this.didIgnite) {
-                    this.isHunting = false;
+                this.move(0.5, 0);
+                if (seesPlayer) {
+                    if (this.weaponCooldownCounter % 16 == 0) {
+                        this.fire(null);
+                    }
                 }
-            }
-        }
-    };
-
-    class Pirate extends NPC {
-        constructor(size, x, y, map) {
-            super(size, x, y, map, 1000, 0, 200);
-            this.weaponCooldownCounter = 0
-        }
-        draw = function () {
-            this.weaponCooldownCounter++;
-            input.fill(256, 0, 0, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
-        attack = function (seesPlayer) {
-            this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-            this.move(0.5, 0);
-            if (seesPlayer) {
-                if (this.weaponCooldownCounter % 16 == 0) {
-                    this.fire(null);
+                if (this.isHunting) {
+                    if (0 != World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                        this.isHunting = false;
+                    }
                 }
-            }
-            if (this.isHunting) {
-                if (0 != World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
-                    this.isHunting = false;
+                else {
+                    this.isHunting = true;
                 }
-            } else {
-                this.isHunting = true;
-            }
+            };
+            _this.weaponCooldownCounter = 0;
+            return _this;
         }
-    };
-
-    class Mine extends NPC {
-        constructor(x, y, map) {
-            super(5, x, y, map, 1000, 0, 200);
-            this.didIgnite = false;
-            this.didExplode = false;
+        return Pirate;
+    }(NPC));
+    ;
+    var Mine = /** @class */ (function (_super) {
+        __extends(Mine, _super);
+        function Mine(x, y, map) {
+            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+            _this.draw = function () {
+                if (this.didIgnite) {
+                    this.explode();
+                }
+                input.fill(0, 0, 256, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.explode = function () {
+                for (var i = 0; i < 3; i++) {
+                    var perpendicular = 90 * i;
+                    this.fire(perpendicular);
+                    this.fire(perpendicular + 1);
+                    this.fire(perpendicular - 1);
+                    this.fire(perpendicular + 2);
+                    this.fire(perpendicular - 2);
+                    this.fire(perpendicular + 3);
+                    this.fire(perpendicular - 3);
+                    this.fire(perpendicular + 4);
+                    this.fire(perpendicular - 4);
+                    this.fire(perpendicular + 5);
+                    this.fire(perpendicular - 5);
+                    this.fire(perpendicular + 10);
+                    this.fire(perpendicular - 10);
+                    this.fire(perpendicular + 20);
+                    this.fire(perpendicular - 20);
+                    this.fire(perpendicular + 30);
+                    this.fire(perpendicular - 30);
+                }
+                this.didExplode = true;
+            };
+            _this.move = function () { };
+            _this.idle = function () { };
+            _this.attack = function () { };
+            _this.didIgnite = false;
+            _this.didExplode = false;
+            return _this;
         }
-        draw = function () {
-            if (this.didIgnite) {
-                this.explode();
-            }
-            input.fill(0, 0, 256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
-        explode = function () {
-            for (var i = 0; i < 3; i++) {
-                var perpendicular = 90 * i;
-
-                this.fire(perpendicular);
-    
-                this.fire(perpendicular + 1);
-                this.fire(perpendicular - 1);
-    
-                this.fire(perpendicular + 2);
-                this.fire(perpendicular - 2);
-    
-                this.fire(perpendicular + 3);
-                this.fire(perpendicular - 3);
-    
-                this.fire(perpendicular + 4);
-                this.fire(perpendicular - 4);
-    
-                this.fire(perpendicular + 5);
-                this.fire(perpendicular - 5);
-    
-                this.fire(perpendicular + 10);
-                this.fire(perpendicular - 10);
-    
-                this.fire(perpendicular + 20);
-                this.fire(perpendicular - 20);
-    
-                this.fire(perpendicular + 30);
-                this.fire(perpendicular - 30);
-            }
-
-            this.didExplode = true;
-        }
-        move = function () { }
-        idle = function () { }
-        attack = function () { }
-    };
-
-
+        return Mine;
+    }(NPC));
+    ;
     document.addEventListener('keydown', recordKey);
     function recordKey(e) {
         switch (e.key) {
@@ -754,7 +652,6 @@ var output = function (input) {
                 break;
         }
     }
-
     document.addEventListener('keyup', stopKey);
     function stopKey(e) {
         switch (e.key) {
@@ -766,32 +663,20 @@ var output = function (input) {
                 break;
         }
     }
-
     var world;
     var defaultStrokeColor = new RGBA(256, 256, 256, 256);
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
-
         input.createCanvas(width, height);
-        input.stroke(
-            defaultStrokeColor.r, 
-            defaultStrokeColor.g, 
-            defaultStrokeColor.b, 
-            defaultStrokeColor.a, 
-        );
-
-        world = new World(width, height, 10)
+        input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+        world = new World(width, height, 10);
     };
-
     input.draw = function () {
         input.clear();
         if (!world.draw()) {
             input.noLoop();
         }
-    }
-
+    };
 };
-
 var display = new p5(output, "canvas");
-
