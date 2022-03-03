@@ -56,15 +56,13 @@ var output = function (input) {
         return Coord;
     }());
     var Wall = /** @class */ (function () {
-        function Wall(x1, y1, x2, y2) {
+        function Wall(end1, end2) {
             this.draw = function () {
                 input.fill(256, 256);
-                input.line(this.x1, this.y1, this.x2, this.y2);
+                input.line(this.end1.x, this.end1.y, this.end2.x, this.end2.y);
             };
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
+            this.end1 = end1;
+            this.end2 = end2;
         }
         return Wall;
     }());
@@ -84,34 +82,33 @@ var output = function (input) {
     var Castle = /** @class */ (function (_super) {
         __extends(Castle, _super);
         // coord of center 
-        function Castle(x, y, size) {
+        function Castle(location, size) {
             var _this = _super.call(this) || this;
-            _this.x = x;
-            _this.y = y;
+            _this.location = location;
             _this.walls.push(new Wall(//1
-            x - (size / 2), y - (size / 2), x - (size / 8), y - (size / 2)));
+            new Coord(_this.location.x - (size / 2), _this.location.y - (size / 2)), new Coord(_this.location.x - (size / 8), _this.location.y - (size / 2))));
             _this.walls.push(new Wall(//2
-            x + (size / 8), y - (size / 2), x + (size / 2), y - (size / 2)));
+            new Coord(_this.location.x + (size / 8), _this.location.y - (size / 2)), new Coord(_this.location.x + (size / 2), _this.location.y - (size / 2))));
             _this.walls.push(new Wall(//3
-            x + (size / 2), y - (size / 2), x + (size / 2), y - (size / 8)));
+            new Coord(_this.location.x + (size / 2), _this.location.y - (size / 2)), new Coord(_this.location.x + (size / 2), _this.location.y - (size / 8))));
             _this.walls.push(new Wall(//4
-            x + (size / 2), y + (size / 8), x + (size / 2), y + (size / 2)));
+            new Coord(_this.location.x + (size / 2), _this.location.y + (size / 8)), new Coord(_this.location.x + (size / 2), _this.location.y + (size / 2))));
             _this.walls.push(new Wall(//5
-            x + (size / 2), y + (size / 2), x + (size / 8), y + (size / 2)));
+            new Coord(_this.location.x + (size / 2), _this.location.y + (size / 2)), new Coord(_this.location.x + (size / 8), _this.location.y + (size / 2))));
             _this.walls.push(new Wall(//6
-            x - (size / 8), y + (size / 2), x - (size / 2), y + (size / 2)));
+            new Coord(_this.location.x - (size / 8), _this.location.y + (size / 2)), new Coord(_this.location.x - (size / 2), _this.location.y + (size / 2))));
             _this.walls.push(new Wall(//7
-            x - (size / 2), y + (size / 2), x - (size / 2), y + (size / 8)));
+            new Coord(_this.location.x - (size / 2), _this.location.y + (size / 2)), new Coord(_this.location.x - (size / 2), _this.location.y + (size / 8))));
             _this.walls.push(new Wall(//8
-            x - (size / 2), y - (size / 8), x - (size / 2), y - (size / 2)));
+            new Coord(_this.location.x - (size / 2), _this.location.y - (size / 8)), new Coord(_this.location.x - (size / 2), _this.location.y - (size / 2))));
             _this.walls.push(new Wall(//9
-            x - (size / 8), y - (size / 4), x + (size / 8), y - (size / 4)));
+            new Coord(_this.location.x - (size / 8), _this.location.y - (size / 4)), new Coord(_this.location.x + (size / 8), _this.location.y - (size / 4))));
             _this.walls.push(new Wall(//10
-            x + (size / 4), y - (size / 8), x + (size / 4), y + (size / 8)));
+            new Coord(_this.location.x + (size / 4), _this.location.y - (size / 8)), new Coord(_this.location.x + (size / 4), _this.location.y + (size / 8))));
             _this.walls.push(new Wall(//11
-            x - (size / 8), y + (size / 4), x + (size / 8), y + (size / 4)));
+            new Coord(_this.location.x - (size / 8), _this.location.y + (size / 4)), new Coord(_this.location.x + (size / 8), _this.location.y + (size / 4))));
             _this.walls.push(new Wall(//12
-            x - (size / 4), y - (size / 8), x - (size / 4), y + (size / 8)));
+            new Coord(_this.location.x - (size / 4), _this.location.y - (size / 8)), new Coord(_this.location.x - (size / 4), _this.location.y + (size / 8))));
             return _this;
         }
         return Castle;
@@ -134,7 +131,7 @@ var output = function (input) {
                 // If the results have the same sign (both positive or both negative) then forget it, the points are on the same side, the segments do not intersect. If one is positive and the other negative, then the points are on opposite sides.
                 for (var i = 0; i < this.walls.length; i++) {
                     if (this.pointsAreSplit(x1, y1, x2, y2, this.walls[i]) &&
-                        this.pointsAreSplit(this.walls[i].x1, this.walls[i].y1, this.walls[i].x2, this.walls[i].y2, new Wall(x1, y1, x2, y2))) {
+                        this.pointsAreSplit(this.walls[i].end1.x, this.walls[i].end1.y, this.walls[i].end2.x, this.walls[i].end2.y, new Wall(new Coord(x1, y1), new Coord(x2, y2)))) {
                         return false;
                     }
                 }
@@ -142,8 +139,8 @@ var output = function (input) {
             };
             // returns true if x1, y1 are on opposite sides of wall
             _this.pointsAreSplit = function (x1, y1, x2, y2, wall) {
-                var val1 = (wall.x2 - wall.x1) * (y1 - wall.y2) - (wall.y2 - wall.y1) * (x1 - wall.x2);
-                var val2 = (wall.x2 - wall.x1) * (y2 - wall.y2) - (wall.y2 - wall.y1) * (x2 - wall.x2);
+                var val1 = (wall.end2.x - wall.end1.x) * (y1 - wall.end2.y) - (wall.end2.y - wall.end1.y) * (x1 - wall.end2.x);
+                var val2 = (wall.end2.x - wall.end1.x) * (y2 - wall.end2.y) - (wall.end2.y - wall.end1.y) * (x2 - wall.end2.x);
                 if ((val1 < 0 && val2 > 0) || (val1 > 0 && val2 < 0)) { // if points have opposite signs,
                     return true; // then they are opposite sides of the wall
                 }
@@ -151,10 +148,10 @@ var output = function (input) {
             };
             _this.width = width;
             _this.height = height;
-            _this.walls.push(new Wall(0, 0, width, 0));
-            _this.walls.push(new Wall(width, 0, width, height));
-            _this.walls.push(new Wall(0, height, width, height));
-            _this.walls.push(new Wall(0, height, 0, 0));
+            _this.walls.push(new Wall(new Coord(0, 0), new Coord(width, 0)));
+            _this.walls.push(new Wall(new Coord(width, 0), new Coord(width, height)));
+            _this.walls.push(new Wall(new Coord(0, height), new Coord(width, height)));
+            _this.walls.push(new Wall(new Coord(0, height), new Coord(0, 0)));
             return _this;
         }
         return Map;
@@ -279,15 +276,15 @@ var output = function (input) {
             // put stuff on the map
             if (Math.random() < 0.3) {
                 for (var i = 0; i < 60; i++) {
-                    this.map.addWall(new Wall(i * (this.map.width / 60), 50 + (Math.random() * (this.map.height * 0.8)), i * (this.map.width / 60), Math.random() * (this.map.height * 0.8)));
+                    this.map.addWall(new Wall(new Coord(i * (this.map.width / 60), 50 + (Math.random() * (this.map.height * 0.8))), new Coord(i * (this.map.width / 60), Math.random() * (this.map.height * 0.8))));
                 }
             }
             else {
                 for (var i = 0; i < 2; i++) {
-                    this.map.addWall(new Wall(Math.random() * this.map.width, Math.random() * this.map.height, Math.random() * this.map.width, Math.random() * this.map.height));
+                    this.map.addWall(new Wall(new Coord(Math.random() * this.map.width, Math.random() * this.map.height), new Coord(Math.random() * this.map.width, Math.random() * this.map.height)));
                 }
                 for (var i = 0; i < 15; i++) {
-                    var castle = new Castle(Math.random() * (0.7 * this.map.width), Math.random() * (0.7 * this.map.height), Math.random() * 500);
+                    var castle = new Castle(new Coord(Math.random() * (0.7 * this.map.width), Math.random() * (0.7 * this.map.height)), Math.random() * 500);
                     for (var j = 0; j < castle.walls.length; j++) {
                         this.map.addWall(castle.walls[j]);
                     }
