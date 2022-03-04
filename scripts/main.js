@@ -172,14 +172,13 @@ var output = function (input) {
                 this.map.draw();
                 this.drawList(this.bullets);
                 // player
-                world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
-                this.player.draw();
                 this.getCharacterBullets(this.player);
                 if (this.checkIsShot(this.player, this.bullets)) {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
+                }
+                if (!this.player.draw()) {
                     if (this.player.hp == 0) {
-                        document.getElementById("message").textContent = "You Lose.";
                         playerIsDead = true;
                     }
                 }
@@ -434,6 +433,7 @@ var output = function (input) {
         function Player(size, x, y, map) {
             var _this = _super.call(this, size, x, y, map) || this;
             _this.draw = function () {
+                this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
                     this.fire(null);
                 }
@@ -442,6 +442,12 @@ var output = function (input) {
                 }
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
+                if (this.hp == 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             };
             _this.isFiring = false;
             _this.isMoving = false;
@@ -679,6 +685,7 @@ var output = function (input) {
         if (!world.draw()) {
             input.noLoop();
         }
+        document.getElementById("message").textContent = "You Lose.";
     };
 };
 var display = new p5(output, "canvas");

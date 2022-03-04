@@ -368,14 +368,13 @@ var output = function (input) {
             this.drawList(this.bullets);
 
             // player
-            world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
-            this.player.draw();
             this.getCharacterBullets(this.player);
             if (this.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
+            }
+            if (!this.player.draw()) {
                 if (this.player.hp == 0) {
-                    document.getElementById("message").textContent = "You Lose.";
                     playerIsDead = true;
                 }
             }
@@ -623,6 +622,7 @@ var output = function (input) {
             this.isMoving = false;
         }
         draw = function () {
+            this.point(this.x, this.y, input.mouseX, input.mouseY);
             if (this.isFiring) {
                 this.fire(null);
             }
@@ -635,7 +635,13 @@ var output = function (input) {
                 this.y, 
                 this.size
             );
+            if (this.hp == 0) {
+                return false;
+            } else {
+                return true;
+            }
         }
+        
     }
 
     class NPC extends Character {
@@ -915,6 +921,7 @@ var output = function (input) {
         if (!world.draw()) {
             input.noLoop();
         }
+        document.getElementById("message").textContent = "You Lose.";
     }
 
 };
