@@ -368,10 +368,7 @@ var output = function (input) {
             // bullets
             for (var i = 0; i < this.bullets.length; i++) {
                 if (this.bullets[i] != null) {
-                    if (this.bullets[i].age < 30) {
-                        this.bullets[i].move(15, 0);
-                        this.bullets[i].draw();
-                    } else {
+                    if (!this.bullets[i].draw()) {
                         this.bullets[i] = null;
                     }
                 }
@@ -575,12 +572,18 @@ var output = function (input) {
         }
         draw = function () {
             input.fill(256, 256);
+            this.move(15, 0);
             input.circle(
                 this.x, 
                 this.y, 
                 this.size,
             );
             this.age++;
+            if (this.age < 30) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
