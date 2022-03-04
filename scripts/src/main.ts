@@ -365,14 +365,7 @@ var output = function (input) {
             this.frameCount++;
             this.map.draw();
         
-            // bullets
-            for (var i = 0; i < this.bullets.length; i++) {
-                if (this.bullets[i] != null) {
-                    if (!this.bullets[i].draw()) {
-                        this.bullets[i] = null;
-                    }
-                }
-            }
+            this.drawList(this.bullets);
 
             // player
             world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
@@ -448,6 +441,16 @@ var output = function (input) {
             }
 
         };
+
+        drawList = function(list) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i] != null) {
+                    if (!list[i].draw()) {
+                        list[i] = null;
+                    }
+                }
+            }
+        }
 
         getCharacterBullets = function(character) {
             for (var i = 0; i < character.bullets.length; i++) {

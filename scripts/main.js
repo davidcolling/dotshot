@@ -170,18 +170,7 @@ var output = function (input) {
                 // 
                 this.frameCount++;
                 this.map.draw();
-                // bullets
-                for (var i = 0; i < this.bullets.length; i++) {
-                    if (this.bullets[i] != null) {
-                        if (this.bullets[i].age < 30) {
-                            this.bullets[i].move(15, 0);
-                            this.bullets[i].draw();
-                        }
-                        else {
-                            this.bullets[i] = null;
-                        }
-                    }
-                }
+                this.drawList(this.bullets);
                 // player
                 world.player.point(world.player.x, world.player.y, input.mouseX, input.mouseY);
                 this.player.draw();
@@ -246,6 +235,15 @@ var output = function (input) {
                 }
                 else {
                     return true;
+                }
+            };
+            this.drawList = function (list) {
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i] != null) {
+                        if (!list[i].draw()) {
+                            list[i] = null;
+                        }
+                    }
                 }
             };
             this.getCharacterBullets = function (character) {
@@ -393,8 +391,15 @@ var output = function (input) {
             var _this = _super.call(this, 3, x, y, direction, map) || this;
             _this.draw = function () {
                 input.fill(256, 256);
+                this.move(15, 0);
                 input.circle(this.x, this.y, this.size);
                 this.age++;
+                if (this.age < 30) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             };
             _this.age = 0;
             return _this;
