@@ -376,6 +376,7 @@ var output = function (input) {
             if (!this.player.draw()) {
                 if (this.player.hp == 0) {
                     playerIsDead = true;
+                    document.getElementById("message").textContent = "You Lose.";
                 }
             }
             this.healthBar.draw();
@@ -921,7 +922,6 @@ var output = function (input) {
         if (!world.draw()) {
             input.noLoop();
         }
-        document.getElementById("message").textContent = "You Lose.";
     }
 
 };
