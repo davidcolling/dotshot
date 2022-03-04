@@ -257,7 +257,17 @@ var output = function (input) {
             // obj2 is the projectile
             this.isShot = function (obj1, obj2) {
                 return (5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) &&
-                    World.isInFrontOf(obj1, obj2));
+                    this.isInFrontOf(obj1, obj2));
+            };
+            this.isInFrontOf = function (obj1, obj2) {
+                return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+            };
+            this.calculateDifference = function (direction1, direction2) {
+                var difference = direction1 - direction2;
+                if (difference > 180) {
+                    difference = 360 - difference;
+                }
+                return difference;
             };
             this.checkIsShot = function (obj, arr) {
                 for (var i = 0; i < arr.length; i++) {
@@ -305,9 +315,6 @@ var output = function (input) {
         World.calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
         };
-        World.isInFrontOf = function (obj1, obj2) {
-            return 90 >= Math.abs(World.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
-        };
         World.calculateDirection = function (x1, y1, x2, y2) {
             var dx = x1 - x2;
             var dy = y1 - y2;
@@ -330,13 +337,6 @@ var output = function (input) {
                 }
                 return direction;
             }
-        };
-        World.calculateDifference = function (direction1, direction2) {
-            var difference = direction1 - direction2;
-            if (difference > 180) {
-                difference = 360 - difference;
-            }
-            return difference;
         };
         return World;
     }());
