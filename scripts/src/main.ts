@@ -354,7 +354,7 @@ var output = function (input) {
 
             this.mines = new Array();
             for (var i = 0; i < 20; i++ ) {
-                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
+                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map));
             }
         }
 
