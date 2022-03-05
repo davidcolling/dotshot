@@ -384,22 +384,13 @@ var output = function (input) {
             // npc
             for (var i = 0; i < this.enemies.length; i++) {
                 if (this.enemies[i] != null) {
-                    this.enemies[i].draw();
 
                     // calculate npc behavior
                     var seesPlayer = (
                         400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
                         this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
                     );
-                    if ( this.enemies[i].isHunting || seesPlayer) {
-                        if (seesPlayer) {
-                            this.enemies[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-                        }
-                        this.enemies[i].attack(seesPlayer);
-                    } else {
-                        this.enemies[i].idle();
-                    }
-
+                    this.enemies[i].do(seesPlayer, new Coord(this.player.x, this.player.y));
                     this.getCharacterBullets(this.enemies[i]);
 
                     //check for shots
@@ -680,6 +671,17 @@ var output = function (input) {
             this.move(1, 0);
         }
         attack = function (seesPlayer) {}
+        do = function (seesPlayer, lastSeenPlayerCoord) {
+            this.draw();
+            if ( this.isHunting || seesPlayer) {
+                if (seesPlayer) {
+                    this.lastSeenPlayerCoord = lastSeenPlayerCoord;
+                }
+                this.attack(seesPlayer);
+            } else {
+                this.idle();
+            }
+        }
     }
 
     class Bomb extends NPC {
