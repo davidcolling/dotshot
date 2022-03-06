@@ -390,15 +390,17 @@ var output = function (input) {
                         400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
                         this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
                     );
-                    this.enemies[i].do(seesPlayer, new Coord(this.player.x, this.player.y));
-                    this.getCharacterBullets(this.enemies[i]);
 
                     //check for shots
                     if (this.checkIsShot(this.enemies[i], this.bullets)) {
-                        this.enemies[i].hp -= 1;
-                        if (this.enemies[i].hp == 0) {
-                            this.enemies[i] = null;
-                        }
+                        this.enemies[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                    } else {
+                        this.enemies[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                    }
+
+                    this.getCharacterBullets(this.enemies[i]);
+                    if (this.enemies[i].hp == 0) {
+                        this.enemies[i] = null;
                     }
     
                     if (this.enemies[i] != null) {
@@ -671,8 +673,9 @@ var output = function (input) {
             this.move(1, 0);
         }
         attack = function (seesPlayer) {}
-        do = function (seesPlayer, lastSeenPlayerCoord) {
+        decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
             this.draw();
+            this.hp += hpOffset;
             if ( this.isHunting || seesPlayer) {
                 if (seesPlayer) {
                     this.lastSeenPlayerCoord = lastSeenPlayerCoord;
