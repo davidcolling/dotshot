@@ -382,34 +382,7 @@ var output = function (input) {
             this.healthBar.draw();
         
             // npc
-            for (var i = 0; i < this.enemies.length; i++) {
-                if (this.enemies[i] != null) {
-
-                    // calculate npc behavior
-                    var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) && 
-                        this.map.isOpen(this.player.x, this.player.y, this.enemies[i].x, this.enemies[i].y) 
-                    );
-
-                    //check for shots
-                    if (this.checkIsShot(this.enemies[i], this.bullets)) {
-                        this.enemies[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
-                    } else {
-                        this.enemies[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
-                    }
-
-                    this.getCharacterBullets(this.enemies[i]);
-                    if (this.enemies[i].hp == 0) {
-                        this.enemies[i] = null;
-                    }
-    
-                    if (this.enemies[i] != null) {
-                        if (this.enemies[i].didExplode) {
-                            this.enemies[i] = null;
-                        }
-                    }
-                }
-            }
+            this.decideDrawList(this.enemies);
 
             // mines
             for ( var i = 0; i < this.mines.length; i++) {
@@ -440,6 +413,37 @@ var output = function (input) {
                 if (list[i] != null) {
                     if (!list[i].draw()) {
                         list[i] = null;
+                    }
+                }
+            }
+        }
+
+        decideDrawListEnemies = function(list) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i] != null) {
+
+                    // calculate npc behavior
+                    var seesPlayer = (
+                        400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) && 
+                        this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y) 
+                    );
+
+                    //check for shots
+                    if (this.checkIsShot(list[i], this.bullets)) {
+                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                    } else {
+                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                    }
+
+                    this.getCharacterBullets(list[i]);
+                    if (list[i].hp == 0) {
+                        list[i] = null;
+                    }
+    
+                    if (list[i] != null) {
+                        if (list[i].didExplode) {
+                            list[i] = null;
+                        }
                     }
                 }
             }
