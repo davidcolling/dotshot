@@ -385,7 +385,7 @@ var output = function (input) {
             this.drawAnimateEnemies(this.enemies);
 
             // mines
-            drawAnimateMines(this.mines);
+            this.drawAnimateMines(this.mines);
 
             if (playerIsDead) {
                 return false;
