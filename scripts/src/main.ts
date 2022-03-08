@@ -418,7 +418,7 @@ var output = function (input) {
             }
         }
 
-        decideDrawListEnemies = function(list) {
+        decideDrawList = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
 
