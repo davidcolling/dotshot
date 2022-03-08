@@ -365,7 +365,7 @@ var output = function (input) {
             this.frameCount++;
             this.map.draw();
         
-            this.drawList(this.bullets);
+            this.drawBullets(this.bullets);
 
             // player
             this.getCharacterBullets(this.player);
@@ -382,23 +382,10 @@ var output = function (input) {
             this.healthBar.draw();
         
             // npc
-            this.decideDrawList(this.enemies);
+            this.drawAnimateEnemies(this.enemies);
 
             // mines
-            for ( var i = 0; i < this.mines.length; i++) {
-                if (this.mines[i] != null) {
-                    this.mines[i].draw();
-                    // check for collisions
-                    if (this.checkIsShot(this.mines[i], this.bullets)) {
-                        this.mines[i].didIgnite = true;
-                    }
-                    // see if it gave up it bullets yet
-                    if (this.mines[i].didExplode) {
-                        this.getCharacterBullets(this.mines[i]);
-                        this.mines[i] = null;
-                    }
-                }
-            }
+            drawAnimateMines(this.mines);
 
             if (playerIsDead) {
                 return false;
@@ -408,7 +395,7 @@ var output = function (input) {
 
         };
 
-        drawList = function(list) {
+        drawBullets = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
                     if (!list[i].draw()) {
@@ -418,7 +405,7 @@ var output = function (input) {
             }
         }
 
-        decideDrawList = function(list) {
+        drawAnimateEnemies = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
 
@@ -444,6 +431,23 @@ var output = function (input) {
                         if (list[i].didExplode) {
                             list[i] = null;
                         }
+                    }
+                }
+            }
+        }
+
+        drawAnimateMines = function(list) {
+            for ( var i = 0; i < list.length; i++) {
+                if (list[i] != null) {
+                    list[i].draw();
+                    // check for collisions
+                    if (this.checkIsShot(list[i], this.bullets)) {
+                        list[i].didIgnite = true;
+                    }
+                    // see if it gave up it bullets yet
+                    if (list[i].didExplode) {
+                        this.getCharacterBullets(list[i]);
+                        list[i] = null;
                     }
                 }
             }
