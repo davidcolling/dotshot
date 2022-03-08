@@ -184,9 +184,7 @@ var output = function (input) {
                     }
                 }
                 this.healthBar.draw();
-                // npc
                 this.drawAnimateEnemies(this.enemies);
-                // mines
                 this.drawAnimateMines(this.mines);
                 if (playerIsDead) {
                     return false;
@@ -508,8 +506,10 @@ var output = function (input) {
                         this.explode();
                     }
                 }
+                input.stroke(0, 256, 0, 256);
                 input.fill(0, 256, 0, 256);
                 input.circle(this.x, this.y, this.size);
+                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
                 this.fire(this.direction);
@@ -592,8 +592,10 @@ var output = function (input) {
             var _this = _super.call(this, size, x, y, map, 1000, 0, 200) || this;
             _this.draw = function () {
                 this.weaponCooldownCounter++;
+                input.stroke(256, 0, 0, 256);
                 input.fill(256, 0, 0, 256);
                 input.circle(this.x, this.y, this.size);
+                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.attack = function (seesPlayer) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
@@ -626,8 +628,10 @@ var output = function (input) {
                 if (this.didIgnite) {
                     this.explode();
                 }
+                input.stroke(0, 0, 256, 256);
                 input.fill(0, 0, 256, 256);
                 input.circle(this.x, this.y, this.size);
+                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
                 for (var i = 0; i < 3; i++) {
