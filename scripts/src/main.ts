@@ -374,10 +374,8 @@ var output = function (input) {
                 this.healthBar.hp = this.player.hp;
             }
             if (!this.player.draw()) {
-                if (this.player.hp == 0) {
-                    playerIsDead = true;
-                    document.getElementById("message").textContent = "You Lose.";
-                }
+                playerIsDead = true;
+                document.getElementById("message").textContent = "You Lose.";
             }
             this.healthBar.draw();
         
