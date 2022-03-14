@@ -346,24 +346,64 @@ var output = function (input) {
                 if (offsetDirection > 359) {
                     offsetDirection -= 360;
                 }
+                var quadrantAngle;
+                var quadrantAngleInRadians;
                 if (offsetDirection >= 0 && offsetDirection < 90) {
-                    dx = offsetDirection;
-                    dy = -1 * (90 - offsetDirection);
+                    quadrantAngle = offsetDirection;
+                    if (quadrantAngle < 45) {
+                        quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                        dx = velocity * Math.asin(quadrantAngleInRadians);
+                        dy = velocity * Math.acos(quadrantAngleInRadians);
+                    }
+                    else {
+                        quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                        dx = velocity * Math.acos(quadrantAngleInRadians);
+                        dy = velocity * Math.asin(quadrantAngleInRadians);
+                    }
                 }
                 else if (offsetDirection >= 90 && offsetDirection < 180) {
-                    dx = 180 - offsetDirection;
-                    dy = offsetDirection - 90;
+                    quadrantAngle = offsetDirection - 90;
+                    if (quadrantAngle < 45) {
+                        quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                        dx = velocity * Math.acos(quadrantAngleInRadians);
+                        dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                    }
+                    else {
+                        quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                        dx = velocity * Math.asin(quadrantAngleInRadians);
+                        dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                    }
                 }
                 else if (offsetDirection >= 180 && offsetDirection < 270) {
-                    dx = -1 * (offsetDirection - 180);
-                    dy = 270 - offsetDirection;
+                    quadrantAngle = offsetDirection - 180;
+                    if (quadrantAngle < 45) {
+                        quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                        dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                        dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                    }
+                    else {
+                        quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                        dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                        dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                    }
                 }
                 else if (offsetDirection >= 270 && offsetDirection < 360) {
-                    dx = offsetDirection - 360;
-                    dy = -1 * (offsetDirection - 270);
+                    quadrantAngle = offsetDirection - 270;
+                    if (quadrantAngle < 45) {
+                        quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                        dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                        dy = velocity * Math.asin(quadrantAngleInRadians);
+                    }
+                    else {
+                        quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                        dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                        dy = velocity * Math.acos(quadrantAngleInRadians);
+                    }
                 }
-                var newX = this.x + (velocity * (dx / 90));
-                var newY = this.y + (velocity * (dy / 90));
+                console.log(dx);
+                console.log(dy);
+                var newX = this.x + dx;
+                var newY = this.y + dy;
                 // part two determines if the coordinates are somewhere the character can actually go
                 if (this.map.isOpen(this.x, this.y, newX, newY) &&
                     0 < newX && // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
