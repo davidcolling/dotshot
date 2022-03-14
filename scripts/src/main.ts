@@ -533,8 +533,8 @@ var output = function (input) {
             if (offsetDirection > 359) {
                 offsetDirection -= 360;
             }
-            var quadrantAngle
-            var quadrantAngleInRadians
+            var quadrantAngle;
+            var quadrantAngleInRadians;
             if (offsetDirection >= 0 && offsetDirection < 90) {
                 quadrantAngle = offsetDirection;
                 if (quadrantAngle < 45) {
