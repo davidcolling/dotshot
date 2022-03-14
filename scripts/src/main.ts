@@ -540,48 +540,46 @@ var output = function (input) {
                 if (quadrantAngle < 45) {
                     quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = velocity * Math.asin(quadrantAngleInRadians);
-                    dy = velocity * Math.acos(quadrantAngleInRadians);
+                    dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
                 } else {
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                    quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
                     dx = velocity * Math.acos(quadrantAngleInRadians);
-                    dy = velocity * Math.asin(quadrantAngleInRadians);
+                    dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
                 }
             } else if (offsetDirection >= 90 && offsetDirection < 180) {
                 quadrantAngle = offsetDirection - 90;
                 if (quadrantAngle < 45) {
                     quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = velocity * Math.acos(quadrantAngleInRadians);
-                    dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                    dy = velocity * Math.asin(quadrantAngleInRadians);
                 } else {
                     quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
                     dx = velocity * Math.asin(quadrantAngleInRadians);
-                    dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                    dy = velocity * Math.acos(quadrantAngleInRadians);
                 }
             } else if (offsetDirection >= 180 && offsetDirection < 270) {
                 quadrantAngle = offsetDirection - 180;
                 if (quadrantAngle < 45) {
                     quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
-                    dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                    dy = velocity * Math.acos(quadrantAngleInRadians);
                 } else {
                     quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
                     dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
-                    dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                    dy = velocity * Math.asin(quadrantAngleInRadians);
                 }
             } else if (offsetDirection >= 270 && offsetDirection < 360) {
                 quadrantAngle = offsetDirection - 270;
                 if (quadrantAngle < 45) {
                     quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
-                    dy = velocity * Math.asin(quadrantAngleInRadians);
+                    dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
                 } else {
                     quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
                     dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
-                    dy = velocity * Math.acos(quadrantAngleInRadians);
+                    dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
                 }
             }
-            console.log(dx)
-            console.log(dy)
             var newX = this.x + dx;
             var newY = this.y + dy;
             // part two determines if the coordinates are somewhere the character can actually go
