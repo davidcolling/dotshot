@@ -352,54 +352,56 @@ var output = function (input) {
                     quadrantAngle = offsetDirection;
                     if (quadrantAngle < 45) {
                         quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
-                        dx = velocity * Math.asin(quadrantAngleInRadians);
-                        dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                        dx = Math.asin(quadrantAngleInRadians);
+                        dy = Math.acos(quadrantAngleInRadians) * -1;
                     }
                     else {
                         quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
-                        dx = velocity * Math.acos(quadrantAngleInRadians);
-                        dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                        dx = Math.acos(quadrantAngleInRadians);
+                        dy = Math.asin(quadrantAngleInRadians) * -1;
                     }
                 }
                 else if (offsetDirection >= 90 && offsetDirection < 180) {
                     quadrantAngle = offsetDirection - 90;
                     if (quadrantAngle < 45) {
                         quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
-                        dx = velocity * Math.acos(quadrantAngleInRadians);
-                        dy = velocity * Math.asin(quadrantAngleInRadians);
+                        dx = Math.acos(quadrantAngleInRadians);
+                        dy = Math.asin(quadrantAngleInRadians);
                     }
                     else {
                         quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
-                        dx = velocity * Math.asin(quadrantAngleInRadians);
-                        dy = velocity * Math.acos(quadrantAngleInRadians);
+                        dx = Math.asin(quadrantAngleInRadians);
+                        dy = Math.acos(quadrantAngleInRadians);
                     }
                 }
                 else if (offsetDirection >= 180 && offsetDirection < 270) {
                     quadrantAngle = offsetDirection - 180;
                     if (quadrantAngle < 45) {
                         quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
-                        dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
-                        dy = velocity * Math.acos(quadrantAngleInRadians);
+                        dx = Math.asin(quadrantAngleInRadians) * -1;
+                        dy = Math.acos(quadrantAngleInRadians);
                     }
                     else {
                         quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
-                        dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
-                        dy = velocity * Math.asin(quadrantAngleInRadians);
+                        dx = Math.acos(quadrantAngleInRadians) * -1;
+                        dy = Math.asin(quadrantAngleInRadians);
                     }
                 }
                 else if (offsetDirection >= 270 && offsetDirection < 360) {
                     quadrantAngle = offsetDirection - 270;
                     if (quadrantAngle < 45) {
                         quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
-                        dx = velocity * Math.acos(quadrantAngleInRadians) * -1;
-                        dy = velocity * Math.asin(quadrantAngleInRadians) * -1;
+                        dx = Math.acos(quadrantAngleInRadians) * -1;
+                        dy = Math.asin(quadrantAngleInRadians) * -1;
                     }
                     else {
                         quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
-                        dx = velocity * Math.asin(quadrantAngleInRadians) * -1;
-                        dy = velocity * Math.acos(quadrantAngleInRadians) * -1;
+                        dx = Math.asin(quadrantAngleInRadians) * -1;
+                        dy = Math.acos(quadrantAngleInRadians) * -1;
                     }
                 }
+                dx *= velocity;
+                dy *= velocity;
                 var newX = this.x + dx;
                 var newY = this.y + dy;
                 // part two determines if the coordinates are somewhere the character can actually go
