@@ -542,7 +542,8 @@ var output = function (input) {
                     dx = Math.asin(quadrantAngleInRadians);
                     dy = Math.acos(quadrantAngleInRadians) * -1;
                 } else {
-                    quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                    quadrantAngle = 90 - quadrantAngle;
+                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.acos(quadrantAngleInRadians);
                     dy = Math.asin(quadrantAngleInRadians) * -1;
                 }
@@ -553,7 +554,8 @@ var output = function (input) {
                     dx = Math.acos(quadrantAngleInRadians);
                     dy = Math.asin(quadrantAngleInRadians);
                 } else {
-                    quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                    quadrantAngle = 90 - quadrantAngle;
+                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.asin(quadrantAngleInRadians);
                     dy = Math.acos(quadrantAngleInRadians);
                 }
@@ -564,7 +566,8 @@ var output = function (input) {
                     dx = Math.asin(quadrantAngleInRadians) * -1;
                     dy = Math.acos(quadrantAngleInRadians);
                 } else {
-                    quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                    quadrantAngle = 90 - quadrantAngle;
+                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.acos(quadrantAngleInRadians) * -1;
                     dy = Math.asin(quadrantAngleInRadians);
                 }
@@ -575,7 +578,8 @@ var output = function (input) {
                     dx = Math.acos(quadrantAngleInRadians) * -1;
                     dy = Math.asin(quadrantAngleInRadians) * -1;
                 } else {
-                    quadrantAngleInRadians = (90 - quadrantAngle) * (Math.PI / 180);
+                    quadrantAngle = 90 - quadrantAngle;
+                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.asin(quadrantAngleInRadians) * -1;
                     dy = Math.acos(quadrantAngleInRadians) * -1;
                 }
