@@ -535,48 +535,43 @@ var output = function (input) {
             }
             var dividend = Math.floor(offsetDirection / 90);
             var quadrantAngle = offsetDirection - (dividend * 90);
-            var quadrantAngleInRadians;
+            var quadrantAngleIsLowHalf = quadrantAngle < 45;
+            var finalAngle
+            if (quadrantAngleIsLowHalf) {
+                 finalAngle = quadrantAngle;
+            } else {
+                 finalAngle = 90 - quadrantAngle;
+            }
+            var quadrantAngleInRadians = finalAngle * (Math.PI / 180);
             if (offsetDirection >= 0 && offsetDirection < 90) {
-                if (quadrantAngle < 45) {
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                if (quadrantAngleIsLowHalf) {
                     dx = Math.asin(quadrantAngleInRadians);
                     dy = Math.acos(quadrantAngleInRadians) * -1;
                 } else {
-                    quadrantAngle = 90 - quadrantAngle;
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.acos(quadrantAngleInRadians);
                     dy = Math.asin(quadrantAngleInRadians) * -1;
                 }
             } else if (offsetDirection >= 90 && offsetDirection < 180) {
-                if (quadrantAngle < 45) {
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                if (quadrantAngleIsLowHalf) {
                     dx = Math.acos(quadrantAngleInRadians);
                     dy = Math.asin(quadrantAngleInRadians);
                 } else {
-                    quadrantAngle = 90 - quadrantAngle;
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.asin(quadrantAngleInRadians);
                     dy = Math.acos(quadrantAngleInRadians);
                 }
             } else if (offsetDirection >= 180 && offsetDirection < 270) {
-                if (quadrantAngle < 45) {
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                if (quadrantAngleIsLowHalf) {
                     dx = Math.asin(quadrantAngleInRadians) * -1;
                     dy = Math.acos(quadrantAngleInRadians);
                 } else {
-                    quadrantAngle = 90 - quadrantAngle;
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.acos(quadrantAngleInRadians) * -1;
                     dy = Math.asin(quadrantAngleInRadians);
                 }
             } else if (offsetDirection >= 270 && offsetDirection < 360) {
-                if (quadrantAngle < 45) {
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
+                if (quadrantAngleIsLowHalf) {
                     dx = Math.acos(quadrantAngleInRadians) * -1;
                     dy = Math.asin(quadrantAngleInRadians) * -1;
                 } else {
-                    quadrantAngle = 90 - quadrantAngle;
-                    quadrantAngleInRadians = quadrantAngle * (Math.PI / 180);
                     dx = Math.asin(quadrantAngleInRadians) * -1;
                     dy = Math.acos(quadrantAngleInRadians) * -1;
                 }
