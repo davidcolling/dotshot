@@ -358,7 +358,7 @@ var output = function (input) {
                 }
                 var angleInRadians = finalAngle * (Math.PI / 180);
                 // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
-                if (quadrant == 0) {
+                if (quadrant % 2 == 0) {
                     if (quadrantAngleIsLowHalf) {
                         dx = Math.asin(angleInRadians);
                         dy = Math.acos(angleInRadians);
@@ -368,8 +368,12 @@ var output = function (input) {
                         dy = Math.asin(angleInRadians);
                     }
                     dy *= -1;
+                    if (quadrant == 2) {
+                        dx *= -1;
+                        dy *= -1;
+                    }
                 }
-                else if (quadrant == 1) {
+                else {
                     if (quadrantAngleIsLowHalf) {
                         dx = Math.acos(angleInRadians);
                         dy = Math.asin(angleInRadians);
@@ -378,29 +382,10 @@ var output = function (input) {
                         dx = Math.asin(angleInRadians);
                         dy = Math.acos(angleInRadians);
                     }
-                }
-                else if (quadrant == 2) {
-                    if (quadrantAngleIsLowHalf) {
-                        dx = Math.asin(angleInRadians);
-                        dy = Math.acos(angleInRadians);
+                    if (quadrant == 3) {
+                        dx *= -1;
+                        dy *= -1;
                     }
-                    else {
-                        dx = Math.acos(angleInRadians);
-                        dy = Math.asin(angleInRadians);
-                    }
-                    dx *= -1;
-                }
-                else if (quadrant == 3) {
-                    if (quadrantAngleIsLowHalf) {
-                        dx = Math.acos(angleInRadians);
-                        dy = Math.asin(angleInRadians);
-                    }
-                    else {
-                        dx = Math.asin(angleInRadians);
-                        dy = Math.acos(angleInRadians);
-                    }
-                    dx *= -1;
-                    dy *= -1;
                 }
                 dx *= velocity;
                 dy *= velocity;
