@@ -184,6 +184,7 @@ var output = function (input) {
                 this.healthBar.draw();
                 this.drawAnimateEnemies(this.enemies);
                 this.drawAnimateMines(this.mines);
+                this.drawAnimateChickens(this.chickens);
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
                         this.food[i].draw();
@@ -246,6 +247,26 @@ var output = function (input) {
                         // see if it gave up it bullets yet
                         if (list[i].didExplode) {
                             this.getCharacterBullets(list[i]);
+                            list[i] = null;
+                        }
+                    }
+                }
+            };
+            this.drawAnimateChickens = function (list) {
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i] != null) {
+                        list[i].draw();
+                        // calculate npc behavior
+                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) &&
+                            this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y));
+                        if (this.checkIsShot(list[i], this.bullets)) {
+                            list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                        }
+                        else {
+                            list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                        }
+                        if (list[i].hp <= 0) {
+                            this.food.push(new Food(list[i].x, list[i].y));
                             list[i] = null;
                         }
                     }
@@ -317,6 +338,10 @@ var output = function (input) {
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
                 this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+            }
+            this.chickens = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map));
             }
         }
         World.calculateDistance = function (x1, y1, x2, y2) {
@@ -545,6 +570,40 @@ var output = function (input) {
         }
         return NPC;
     }(Character));
+    var Chicken = /** @class */ (function (_super) {
+        __extends(Chicken, _super);
+        function Chicken(x, y, map) {
+            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+            _this.draw = function () {
+                input.stroke(0, 256, 256, 256);
+                input.fill(0, 256, 256, 256);
+                input.circle(this.x, this.y, this.size);
+                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+            };
+            _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+                this.draw();
+                this.hp += hpOffset;
+                if (seesPlayer) {
+                    if (this.fleeAge < this.fleeLife) {
+                        this.fleeAge++;
+                    }
+                    else {
+                        this.fleeAge = 0;
+                        this.direction = Math.random() * 360;
+                    }
+                    this.move(3, 0);
+                }
+                else {
+                    this.idle();
+                }
+            };
+            _this.isRunning = false;
+            _this.fleeAge = 0;
+            _this.fleeLife = 20;
+            return _this;
+        }
+        return Chicken;
+    }(NPC));
     var Bomb = /** @class */ (function (_super) {
         __extends(Bomb, _super);
         function Bomb(x, y, map) {

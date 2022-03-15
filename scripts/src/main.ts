@@ -305,6 +305,7 @@ var output = function (input) {
         player: Player;
         healthBar: HealthBar;
         food: Array<Food>;
+        chickens: Array<Chicken>;
 
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
@@ -362,6 +363,11 @@ var output = function (input) {
             for (var i = 0; i < 5; i++) {
                 this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
+
+            this.chickens = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map));
+            }
         }
 
         draw = function () {
@@ -387,6 +393,7 @@ var output = function (input) {
         
             this.drawAnimateEnemies(this.enemies);
             this.drawAnimateMines(this.mines);
+            this.drawAnimateChickens(this.chickens);
 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
@@ -464,6 +471,30 @@ var output = function (input) {
                 }
             }
         }
+
+        drawAnimateChickens = function(list) {
+            for ( var i = 0; i < list.length; i++) {
+                if (list[i] != null) {
+                    list[i].draw();
+                    // calculate npc behavior
+                    var seesPlayer = (
+                        400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) && 
+                        this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y) 
+                    );
+                    if (this.checkIsShot(list[i], this.bullets)) {
+                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                    } else {
+                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                    }
+
+                    if (list[i].hp <= 0) {
+                        this.food.push(new Food(list[i].x, list[i].y));
+                        list[i] = null;
+                    }
+                }
+            }
+        }
+
 
         getCharacterBullets = function(character) {
             for (var i = 0; i < character.bullets.length; i++) {
@@ -749,6 +780,50 @@ var output = function (input) {
             } else {
                 this.idle();
             }
+        }
+    }
+
+    class Chicken extends NPC {
+        isRunning: boolean;
+        fleeAge: number;
+        fleeLife: number;
+
+        constructor(x, y, map) {
+            super(5, x, y, map, 1000, 0, 200);
+            this.isRunning = false;
+            this.fleeAge = 0;
+            this.fleeLife = 20;
+        }
+        draw = function () {
+            input.stroke(0, 256, 256, 256);
+            input.fill(0, 256, 256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+            input.stroke(
+                defaultStrokeColor.r, 
+                defaultStrokeColor.g, 
+                defaultStrokeColor.b, 
+                defaultStrokeColor.a, 
+            );            
+        }    
+        decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            this.draw();
+            this.hp += hpOffset;
+            if (seesPlayer) {
+                if (this.fleeAge < this.fleeLife) {
+                    this.fleeAge++;
+                } else {
+                    this.fleeAge = 0;
+                    this.direction = Math.random() * 360;
+                }
+                this.move(3, 0);
+            } else {
+                this.idle();
+            }
+
         }
     }
 
