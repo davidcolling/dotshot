@@ -549,11 +549,12 @@ var output = function (input) {
             if (quadrant == 0) {
                 if (quadrantAngleIsLowHalf) {
                     dx = Math.asin(angleInRadians);
-                    dy = Math.acos(angleInRadians) * -1;
+                    dy = Math.acos(angleInRadians);
                 } else {
                     dx = Math.acos(angleInRadians);
-                    dy = Math.asin(angleInRadians) * -1;
+                    dy = Math.asin(angleInRadians);
                 }
+                dy *= -1;
             } else if (quadrant == 1) {
                 if (quadrantAngleIsLowHalf) {
                     dx = Math.acos(angleInRadians);
@@ -564,20 +565,23 @@ var output = function (input) {
                 }
             } else if (quadrant == 2) {
                 if (quadrantAngleIsLowHalf) {
-                    dx = Math.asin(angleInRadians) * -1;
+                    dx = Math.asin(angleInRadians);
                     dy = Math.acos(angleInRadians);
                 } else {
-                    dx = Math.acos(angleInRadians) * -1;
+                    dx = Math.acos(angleInRadians);
                     dy = Math.asin(angleInRadians);
                 }
+                dx *= -1;
             } else if (quadrant == 3) {
                 if (quadrantAngleIsLowHalf) {
-                    dx = Math.acos(angleInRadians) * -1;
-                    dy = Math.asin(angleInRadians) * -1;
+                    dx = Math.acos(angleInRadians);
+                    dy = Math.asin(angleInRadians);
                 } else {
-                    dx = Math.asin(angleInRadians) * -1;
-                    dy = Math.acos(angleInRadians) * -1;
+                    dx = Math.asin(angleInRadians);
+                    dy = Math.acos(angleInRadians);
                 }
+                dx *= -1;
+                dy *= -1;
             }
 
             dx *= velocity;
