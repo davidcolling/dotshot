@@ -346,8 +346,8 @@ var output = function (input) {
                 if (offsetDirection > 359) {
                     offsetDirection -= 360;
                 }
-                var dividend = Math.floor(offsetDirection / 90);
-                var quadrantAngle = offsetDirection - (dividend * 90);
+                var quadrant = Math.floor(offsetDirection / 90);
+                var quadrantAngle = offsetDirection - (quadrant * 90);
                 var quadrantAngleIsLowHalf = quadrantAngle < 45;
                 var finalAngle;
                 if (quadrantAngleIsLowHalf) {
@@ -356,46 +356,46 @@ var output = function (input) {
                 else {
                     finalAngle = 90 - quadrantAngle;
                 }
-                var quadrantAngleInRadians = finalAngle * (Math.PI / 180);
-                // 
-                if (dividend == 0) {
+                var angleInRadians = finalAngle * (Math.PI / 180);
+                // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
+                if (quadrant == 0) {
                     if (quadrantAngleIsLowHalf) {
-                        dx = Math.asin(quadrantAngleInRadians);
-                        dy = Math.acos(quadrantAngleInRadians) * -1;
+                        dx = Math.asin(angleInRadians);
+                        dy = Math.acos(angleInRadians) * -1;
                     }
                     else {
-                        dx = Math.acos(quadrantAngleInRadians);
-                        dy = Math.asin(quadrantAngleInRadians) * -1;
+                        dx = Math.acos(angleInRadians);
+                        dy = Math.asin(angleInRadians) * -1;
                     }
                 }
-                else if (dividend == 1) {
+                else if (quadrant == 1) {
                     if (quadrantAngleIsLowHalf) {
-                        dx = Math.acos(quadrantAngleInRadians);
-                        dy = Math.asin(quadrantAngleInRadians);
+                        dx = Math.acos(angleInRadians);
+                        dy = Math.asin(angleInRadians);
                     }
                     else {
-                        dx = Math.asin(quadrantAngleInRadians);
-                        dy = Math.acos(quadrantAngleInRadians);
+                        dx = Math.asin(angleInRadians);
+                        dy = Math.acos(angleInRadians);
                     }
                 }
-                else if (dividend == 2) {
+                else if (quadrant == 2) {
                     if (quadrantAngleIsLowHalf) {
-                        dx = Math.asin(quadrantAngleInRadians) * -1;
-                        dy = Math.acos(quadrantAngleInRadians);
+                        dx = Math.asin(angleInRadians) * -1;
+                        dy = Math.acos(angleInRadians);
                     }
                     else {
-                        dx = Math.acos(quadrantAngleInRadians) * -1;
-                        dy = Math.asin(quadrantAngleInRadians);
+                        dx = Math.acos(angleInRadians) * -1;
+                        dy = Math.asin(angleInRadians);
                     }
                 }
-                else if (dividend == 3) {
+                else if (quadrant == 3) {
                     if (quadrantAngleIsLowHalf) {
-                        dx = Math.acos(quadrantAngleInRadians) * -1;
-                        dy = Math.asin(quadrantAngleInRadians) * -1;
+                        dx = Math.acos(angleInRadians) * -1;
+                        dy = Math.asin(angleInRadians) * -1;
                     }
                     else {
-                        dx = Math.asin(quadrantAngleInRadians) * -1;
-                        dy = Math.acos(quadrantAngleInRadians) * -1;
+                        dx = Math.asin(angleInRadians) * -1;
+                        dy = Math.acos(angleInRadians) * -1;
                     }
                 }
                 dx *= velocity;
