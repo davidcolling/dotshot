@@ -545,7 +545,7 @@ var output = function (input) {
             }
             var quadrantAngleInRadians = finalAngle * (Math.PI / 180);
 
-            // 
+            // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
             if (dividend == 0) {
                 if (quadrantAngleIsLowHalf) {
                     dx = Math.asin(quadrantAngleInRadians);
@@ -579,6 +579,7 @@ var output = function (input) {
                     dy = Math.acos(quadrantAngleInRadians) * -1;
                 }
             }
+
             dx *= velocity;
             dy *= velocity;
             var newX = this.x + dx;
