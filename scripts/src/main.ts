@@ -304,6 +304,7 @@ var output = function (input) {
         mines: Array<NPC>;
         player: Player;
         healthBar: HealthBar;
+        food: Array<Food>;
 
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
@@ -356,6 +357,11 @@ var output = function (input) {
             for (var i = 0; i < 20; i++ ) {
                 this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map));
             }
+            
+            this.food = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+            }
         }
 
         draw = function () {
@@ -381,6 +387,17 @@ var output = function (input) {
         
             this.drawAnimateEnemies(this.enemies);
             this.drawAnimateMines(this.mines);
+
+            for (var i = 0; i < this.food.length; i ++) {
+                if (this.food[i] != null) {
+                    this.food[i].draw();
+                    if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                        this.food[i] = null;
+                        this.player.hp++;
+                        this.healthBar.hp = this.player.hp;
+                    }
+                }
+            }
 
             if (playerIsDead) {
                 return false;
@@ -637,6 +654,20 @@ var output = function (input) {
             }
             var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
             this.bullets.push(bullet);
+        }
+    }
+
+    class Food extends CenteredShape {
+        constructor(x, y) {
+            super(2, x, y);
+        }
+        draw = function () {
+            input.fill(256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
         }
     }
 

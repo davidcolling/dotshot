@@ -184,6 +184,16 @@ var output = function (input) {
                 this.healthBar.draw();
                 this.drawAnimateEnemies(this.enemies);
                 this.drawAnimateMines(this.mines);
+                for (var i = 0; i < this.food.length; i++) {
+                    if (this.food[i] != null) {
+                        this.food[i].draw();
+                        if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                            this.food[i] = null;
+                            this.player.hp++;
+                            this.healthBar.hp = this.player.hp;
+                        }
+                    }
+                }
                 if (playerIsDead) {
                     return false;
                 }
@@ -303,6 +313,10 @@ var output = function (input) {
             this.mines = new Array();
             for (var i = 0; i < 20; i++) {
                 this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map));
+            }
+            this.food = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
         }
         World.calculateDistance = function (x1, y1, x2, y2) {
@@ -451,6 +465,18 @@ var output = function (input) {
         }
         return Character;
     }(Moveable));
+    var Food = /** @class */ (function (_super) {
+        __extends(Food, _super);
+        function Food(x, y) {
+            var _this = _super.call(this, 2, x, y) || this;
+            _this.draw = function () {
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            return _this;
+        }
+        return Food;
+    }(CenteredShape));
     var Player = /** @class */ (function (_super) {
         __extends(Player, _super);
         function Player(size, x, y, map) {
