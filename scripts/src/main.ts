@@ -527,14 +527,11 @@ var output = function (input) {
         move = function (velocity, offset) {
             // this function can be understood in two basic parts
             // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-            var dx;
-            var dy;
-
             var offsetDirection = this.direction + offset;
             if (offsetDirection > 359) {
                 offsetDirection -= 360;
             }
-            var quadrant = Math.floor(offsetDirection / 90);
+            var quadrant = Math.floor(offsetDirection / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
             var quadrantAngle = offsetDirection - (quadrant * 90);
             var quadrantAngleIsLowHalf = quadrantAngle < 45;
             var finalAngle
@@ -545,6 +542,8 @@ var output = function (input) {
             }
             var angleInRadians = finalAngle * (Math.PI / 180);
 
+            var dx;
+            var dy;
             // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
             if (quadrant % 2 == 0) {
                 if (quadrantAngleIsLowHalf) {
