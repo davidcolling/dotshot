@@ -189,9 +189,11 @@ var output = function (input) {
                     if (this.food[i] != null) {
                         this.food[i].draw();
                         if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
-                            this.food[i] = null;
-                            this.player.hp++;
-                            this.healthBar.hp = this.player.hp;
+                            if (this.player.hp < this.healthBar.max) {
+                                this.food[i] = null;
+                                this.player.hp++;
+                                this.healthBar.hp = this.player.hp;
+                            }
                         }
                     }
                 }
