@@ -7,6 +7,10 @@ A 2D shooter game with tiny little dots.
 
 Made with processing p5 and TypeScript.
 
+Inspired by the map-like look of one of 
+Matt's sketches and BZFlag.
+(https://github.com/mcthomas/Processing-Sketches/blob/main/images/A6.png)
+
 To Do
 soon :
     - improve the angle calculation 
