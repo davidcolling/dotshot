@@ -577,15 +577,11 @@ var output = function (input) {
         point = function (x1, y1, x2, y2) {
             this.direction = World.calculateDirection(x1, y1, x2, y2);
         }
-        move = function (velocity, offset) {
+        move = function (velocity) {
             // this function can be understood in two basic parts
             // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-            var offsetDirection = this.direction + offset;
-            if (offsetDirection > 359) {
-                offsetDirection -= 360;
-            }
-            var quadrant = Math.floor(offsetDirection / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-            var quadrantAngle = offsetDirection - (quadrant * 90);
+            var quadrant = Math.floor(this.direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
+            var quadrantAngle = this.direction - (quadrant * 90);
             var quadrantAngleIsLowHalf = quadrantAngle < 45;
             var finalAngle
             if (quadrantAngleIsLowHalf) {
@@ -658,7 +654,7 @@ var output = function (input) {
         draw = function () {
             input.fill(256, 256);
             this.point(this.x, this.y, this.target.x, this.target.y);
-            this.move(15, 0);
+            this.move(15);
             input.circle(
                 this.x, 
                 this.y, 
@@ -717,7 +713,7 @@ var output = function (input) {
                 this.fire(new Coord(input.mouseX, input.mouseY));
             }
             if (this.isMoving) {
-                this.move(2, 0);
+                this.move(2);
             }
             input.fill(256, 256);
             input.circle(
@@ -768,7 +764,7 @@ var output = function (input) {
                 this.direction = Math.random() * 360;
             }
             this.idleAge++;
-            this.move(1, 0);
+            this.move(1);
         }
         attack = function (seesPlayer) {}
         decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
@@ -821,7 +817,7 @@ var output = function (input) {
                     this.fleeAge = 0;
                     this.direction = Math.random() * 360;
                 }
-                this.move(3, 0);
+                this.move(3);
             } else {
                 this.idle();
             }
@@ -909,7 +905,7 @@ var output = function (input) {
 
             if (willMove) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-                this.move(1.6, 0);
+                this.move(1.6);
             }
 
             if (!this.isHunting) {
@@ -947,7 +943,7 @@ var output = function (input) {
         }
         attack = function (seesPlayer) {
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
-            this.move(0.5, 0);
+            this.move(0.5);
             if (seesPlayer) {
                 if (this.weaponCooldownCounter % 16 == 0) {
                     this.fire(new Coord(this.target.x, this.target.y));
