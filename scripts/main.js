@@ -346,6 +346,54 @@ var output = function (input) {
                 this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map));
             }
         }
+        World.calculateCoordinate = function (length, direction) {
+            var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
+            var quadrantAngle = direction - (quadrant * 90);
+            var quadrantAngleIsLowHalf = quadrantAngle < 45;
+            var finalAngle;
+            if (quadrantAngleIsLowHalf) {
+                finalAngle = quadrantAngle;
+            }
+            else {
+                finalAngle = 90 - quadrantAngle;
+            }
+            var angleInRadians = finalAngle * (Math.PI / 180);
+            var dx = 1;
+            var dy = 1;
+            // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
+            if (quadrant % 2 == 0) {
+                if (quadrantAngleIsLowHalf) {
+                    dx = Math.asin(angleInRadians);
+                    dy = Math.acos(angleInRadians);
+                }
+                else {
+                    dx = Math.acos(angleInRadians);
+                    dy = Math.asin(angleInRadians);
+                }
+                dy *= -1;
+                if (quadrant == 2) {
+                    dx *= -1;
+                    dy *= -1;
+                }
+            }
+            else {
+                if (quadrantAngleIsLowHalf) {
+                    dx = Math.acos(angleInRadians);
+                    dy = Math.asin(angleInRadians);
+                }
+                else {
+                    dx = Math.asin(angleInRadians);
+                    dy = Math.acos(angleInRadians);
+                }
+                if (quadrant == 3) {
+                    dx *= -1;
+                    dy *= -1;
+                }
+            }
+            dx *= length;
+            dy *= length;
+            return new Coord(dx, dy);
+        };
         World.calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
         };
@@ -384,53 +432,9 @@ var output = function (input) {
             _this.move = function (velocity) {
                 // this function can be understood in two basic parts
                 // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-                var quadrant = Math.floor(this.direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-                var quadrantAngle = this.direction - (quadrant * 90);
-                var quadrantAngleIsLowHalf = quadrantAngle < 45;
-                var finalAngle;
-                if (quadrantAngleIsLowHalf) {
-                    finalAngle = quadrantAngle;
-                }
-                else {
-                    finalAngle = 90 - quadrantAngle;
-                }
-                var angleInRadians = finalAngle * (Math.PI / 180);
-                var dx;
-                var dy;
-                // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
-                if (quadrant % 2 == 0) {
-                    if (quadrantAngleIsLowHalf) {
-                        dx = Math.asin(angleInRadians);
-                        dy = Math.acos(angleInRadians);
-                    }
-                    else {
-                        dx = Math.acos(angleInRadians);
-                        dy = Math.asin(angleInRadians);
-                    }
-                    dy *= -1;
-                    if (quadrant == 2) {
-                        dx *= -1;
-                        dy *= -1;
-                    }
-                }
-                else {
-                    if (quadrantAngleIsLowHalf) {
-                        dx = Math.acos(angleInRadians);
-                        dy = Math.asin(angleInRadians);
-                    }
-                    else {
-                        dx = Math.asin(angleInRadians);
-                        dy = Math.acos(angleInRadians);
-                    }
-                    if (quadrant == 3) {
-                        dx *= -1;
-                        dy *= -1;
-                    }
-                }
-                dx *= velocity;
-                dy *= velocity;
-                var newX = this.x + dx;
-                var newY = this.y + dy;
+                var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+                var newX = this.x + relativeChangeCoordinate.x;
+                var newY = this.y + relativeChangeCoordinate.y;
                 // part two determines if the coordinates are somewhere the character can actually go
                 if (this.map.isOpen(this.x, this.y, newX, newY) &&
                     0 < newX && // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees

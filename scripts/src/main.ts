@@ -563,25 +563,9 @@ var output = function (input) {
             return false;
         };
 
-    }
-
-    class Moveable extends CenteredShape {
-        direction: number;
-        map: Map;
-
-        constructor(size, x, y, direction, map) {
-            super(size, x, y);
-            this.direction = direction;
-            this.map = map;
-        }
-        point = function (x1, y1, x2, y2) {
-            this.direction = World.calculateDirection(x1, y1, x2, y2);
-        }
-        move = function (velocity) {
-            // this function can be understood in two basic parts
-            // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-            var quadrant = Math.floor(this.direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-            var quadrantAngle = this.direction - (quadrant * 90);
+        static calculateCoordinate(length, direction): Coord {
+            var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
+            var quadrantAngle = direction - (quadrant * 90);
             var quadrantAngleIsLowHalf = quadrantAngle < 45;
             var finalAngle
             if (quadrantAngleIsLowHalf) {
@@ -591,8 +575,8 @@ var output = function (input) {
             }
             var angleInRadians = finalAngle * (Math.PI / 180);
 
-            var dx;
-            var dy;
+            var dx = 1;
+            var dy = 1;
             // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
             if (quadrant % 2 == 0) {
                 if (quadrantAngleIsLowHalf) {
@@ -624,10 +608,33 @@ var output = function (input) {
                 }
             }
 
-            dx *= velocity;
-            dy *= velocity;
-            var newX = this.x + dx;
-            var newY = this.y + dy;
+
+            dx *= length;
+            dy *= length;
+
+            return new Coord(dx, dy);
+        }
+
+    }
+
+    class Moveable extends CenteredShape {
+        direction: number;
+        map: Map;
+
+        constructor(size, x, y, direction, map) {
+            super(size, x, y);
+            this.direction = direction;
+            this.map = map;
+        }
+        point = function (x1, y1, x2, y2) {
+            this.direction = World.calculateDirection(x1, y1, x2, y2);
+        }
+        move = function (velocity) {
+            // this function can be understood in two basic parts
+            // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
+            var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+            var newX = this.x + relativeChangeCoordinate.x;
+            var newY = this.y + relativeChangeCoordinate.y;
             // part two determines if the coordinates are somewhere the character can actually go
             if (
                 this.map.isOpen(this.x, this.y, newX, newY) &&
