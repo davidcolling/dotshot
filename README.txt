@@ -13,9 +13,7 @@ Matt's sketches and BZFlag.
 
 To Do
 soon :
-    - improve the angle calculation 
-    imprecision which causes NPCs to
-    have poor aim
+    - improve realism in Bullet class
     - clean up non-polymorphic logic 
     shown by the difference in the 
     looping functions called in 
