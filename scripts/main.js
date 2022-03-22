@@ -733,14 +733,32 @@ var output = function (input) {
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
-                var top = new Coord(this.x, this.y - 300);
-                var right = new Coord(this.x + 300, this.y);
-                var bottom = new Coord(this.x, this.y + 300);
-                var left = new Coord(this.x - 300, this.y);
-                this.fire(top);
-                this.fire(right);
-                this.fire(bottom);
-                this.fire(left);
+                var directions = Array();
+                directions.push(new Coord(this.x, this.y - 300));
+                directions.push(new Coord(this.x + 300, this.y));
+                directions.push(new Coord(this.x, this.y + 300));
+                directions.push(new Coord(this.x - 300, this.y));
+                for (var i = 0; i < directions.length; i++) {
+                    this.fire(directions[i]);
+                    this.fire(new Coord(directions[i].x + 1, directions[i].y + 1));
+                    this.fire(new Coord(directions[i].x - 1, directions[i].y - 1));
+                    this.fire(new Coord(directions[i].x + 2, directions[i].y + 2));
+                    this.fire(new Coord(directions[i].x - 2, directions[i].y - 2));
+                    this.fire(new Coord(directions[i].x + 3, directions[i].y + 3));
+                    this.fire(new Coord(directions[i].x - 3, directions[i].y - 3));
+                    this.fire(new Coord(directions[i].x + 4, directions[i].y + 4));
+                    this.fire(new Coord(directions[i].x - 4, directions[i].y - 4));
+                    this.fire(new Coord(directions[i].x + 5, directions[i].y + 5));
+                    this.fire(new Coord(directions[i].x - 5, directions[i].y - 5));
+                    this.fire(new Coord(directions[i].x + 10, directions[i].y + 10));
+                    this.fire(new Coord(directions[i].x - 10, directions[i].y - 10));
+                    this.fire(new Coord(directions[i].x + 20, directions[i].y + 20));
+                    this.fire(new Coord(directions[i].x - 20, directions[i].y - 20));
+                    this.fire(new Coord(directions[i].x + 30, directions[i].y + 30));
+                    this.fire(new Coord(directions[i].x - 30, directions[i].y - 30));
+                    this.fire(new Coord(directions[i].x + 40, directions[i].y + 40));
+                    this.fire(new Coord(directions[i].x - 40, directions[i].y - 40));
+                }
                 this.didExplode = true;
             };
             _this.move = function () { };
