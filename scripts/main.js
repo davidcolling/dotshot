@@ -330,8 +330,8 @@ var output = function (input) {
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
             for (var i = 0; i < numberOfEnemies; i++) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
-                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
+                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
             }
             this.mines = new Array();
             for (var i = 0; i < 20; i++) {
@@ -378,6 +378,9 @@ var output = function (input) {
         __extends(Moveable, _super);
         function Moveable(size, x, y, direction, map) {
             var _this = _super.call(this, size, x, y) || this;
+            _this.point = function (x1, y1, x2, y2) {
+                this.direction = World.calculateDirection(x1, y1, x2, y2);
+            };
             _this.move = function (velocity, offset) {
                 // this function can be understood in two basic parts
                 // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
@@ -450,10 +453,11 @@ var output = function (input) {
     }(CenteredShape));
     var Bullet = /** @class */ (function (_super) {
         __extends(Bullet, _super);
-        function Bullet(x, y, direction, map) {
-            var _this = _super.call(this, 3, x, y, direction, map) || this;
+        function Bullet(x, y, target, map) {
+            var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
             _this.draw = function () {
                 input.fill(256, 256);
+                this.point(this.x, this.y, this.target.x, this.target.y);
                 this.move(15, 0);
                 input.circle(this.x, this.y, this.size);
                 this.age++;
@@ -465,6 +469,7 @@ var output = function (input) {
                 }
             };
             _this.age = 0;
+            _this.target = target;
             return _this;
         }
         return Bullet;
@@ -473,17 +478,8 @@ var output = function (input) {
         __extends(Character, _super);
         function Character(size, x, y, map) {
             var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
-            _this.point = function (x1, y1, x2, y2) {
-                this.direction = World.calculateDirection(x1, y1, x2, y2);
-            };
-            _this.fire = function (direction) {
-                if (direction == null) {
-                    var bulletDirection = this.direction;
-                }
-                else {
-                    var bulletDirection = direction;
-                }
-                var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
+            _this.fire = function (target) {
+                var bullet = new Bullet(this.x, this.y, target, this.map);
                 this.bullets.push(bullet);
             };
             _this.hp = 8;
@@ -533,7 +529,7 @@ var output = function (input) {
     }(Character));
     var NPC = /** @class */ (function (_super) {
         __extends(NPC, _super);
-        function NPC(size, x, y, map, life, idleAge, idleLife) {
+        function NPC(size, x, y, map, target, life, idleAge, idleLife) {
             var _this = _super.call(this, size, x, y, map) || this;
             _this.draw = function () {
                 input.fill(256, 256);
@@ -568,6 +564,7 @@ var output = function (input) {
             _this.idleAge = idleAge;
             _this.idleLife = idleLife;
             _this.lastSeenPlayerCoord = null;
+            _this.target = target;
             return _this;
         }
         return NPC;
@@ -575,7 +572,7 @@ var output = function (input) {
     var Chicken = /** @class */ (function (_super) {
         __extends(Chicken, _super);
         function Chicken(x, y, map) {
-            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+            var _this = _super.call(this, 5, x, y, map, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 input.stroke(0, 256, 256, 256);
                 input.fill(0, 256, 256, 256);
@@ -608,8 +605,8 @@ var output = function (input) {
     }(NPC));
     var Bomb = /** @class */ (function (_super) {
         __extends(Bomb, _super);
-        function Bomb(x, y, map) {
-            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+        function Bomb(x, y, map, target) {
+            var _this = _super.call(this, 5, x, y, map, target, 1000, 0, 200) || this;
             _this.draw = function () {
                 if (this.didIgnite) {
                     this.igniteAge++;
@@ -624,23 +621,13 @@ var output = function (input) {
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
-                this.fire(this.direction);
-                this.fire(this.direction + 1);
-                this.fire(this.direction - 1);
-                this.fire(this.direction + 2);
-                this.fire(this.direction - 2);
-                this.fire(this.direction + 3);
-                this.fire(this.direction - 3);
-                this.fire(this.direction + 4);
-                this.fire(this.direction - 4);
-                this.fire(this.direction + 5);
-                this.fire(this.direction - 5);
-                this.fire(this.direction + 10);
-                this.fire(this.direction - 10);
-                this.fire(this.direction + 20);
-                this.fire(this.direction - 20);
-                this.fire(this.direction + 30);
-                this.fire(this.direction - 30);
+                this.fire(new Coord(this.target.x, this.target.y));
+                this.fire(new Coord(this.target.x + 1, this.target.y + 1));
+                this.fire(new Coord(this.target.x - 1, this.target.y - 1));
+                this.fire(new Coord(this.target.x + 2, this.target.y + 2));
+                this.fire(new Coord(this.target.x - 2, this.target.y - 2));
+                this.fire(new Coord(this.target.x + 3, this.target.y + 3));
+                this.fire(new Coord(this.target.x - 3, this.target.y - 3));
             };
             // animation for when its about to explode
             _this.pulse = function () {
@@ -700,8 +687,8 @@ var output = function (input) {
     ;
     var Pirate = /** @class */ (function (_super) {
         __extends(Pirate, _super);
-        function Pirate(size, x, y, map) {
-            var _this = _super.call(this, size, x, y, map, 1000, 0, 200) || this;
+        function Pirate(size, x, y, map, target) {
+            var _this = _super.call(this, size, x, y, map, target, 1000, 0, 200) || this;
             _this.draw = function () {
                 this.weaponCooldownCounter++;
                 input.stroke(256, 0, 0, 256);
@@ -714,7 +701,7 @@ var output = function (input) {
                 this.move(0.5, 0);
                 if (seesPlayer) {
                     if (this.weaponCooldownCounter % 16 == 0) {
-                        this.fire(null);
+                        this.fire(new Coord(this.target.x, this.target.y));
                     }
                 }
                 if (this.isHunting) {
@@ -735,7 +722,7 @@ var output = function (input) {
     var Mine = /** @class */ (function (_super) {
         __extends(Mine, _super);
         function Mine(x, y, map) {
-            var _this = _super.call(this, 5, x, y, map, 1000, 0, 200) || this;
+            var _this = _super.call(this, 5, x, y, map, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 if (this.didIgnite) {
                     this.explode();
@@ -746,26 +733,14 @@ var output = function (input) {
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
-                for (var i = 0; i < 3; i++) {
-                    var perpendicular = 90 * i;
-                    this.fire(perpendicular);
-                    this.fire(perpendicular + 1);
-                    this.fire(perpendicular - 1);
-                    this.fire(perpendicular + 2);
-                    this.fire(perpendicular - 2);
-                    this.fire(perpendicular + 3);
-                    this.fire(perpendicular - 3);
-                    this.fire(perpendicular + 4);
-                    this.fire(perpendicular - 4);
-                    this.fire(perpendicular + 5);
-                    this.fire(perpendicular - 5);
-                    this.fire(perpendicular + 10);
-                    this.fire(perpendicular - 10);
-                    this.fire(perpendicular + 20);
-                    this.fire(perpendicular - 20);
-                    this.fire(perpendicular + 30);
-                    this.fire(perpendicular - 30);
-                }
+                var top = new Coord(this.x, this.y - 300);
+                var right = new Coord(this.x + 300, this.y);
+                var bottom = new Coord(this.x, this.y + 300);
+                var left = new Coord(this.x - 300, this.y);
+                this.fire(top);
+                this.fire(right);
+                this.fire(bottom);
+                this.fire(left);
                 this.didExplode = true;
             };
             _this.move = function () { };

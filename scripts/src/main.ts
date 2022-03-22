@@ -350,8 +350,8 @@ var output = function (input) {
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
-                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map));
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
+                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
             }
 
             this.mines = new Array();
@@ -574,6 +574,9 @@ var output = function (input) {
             this.direction = direction;
             this.map = map;
         }
+        point = function (x1, y1, x2, y2) {
+            this.direction = World.calculateDirection(x1, y1, x2, y2);
+        }
         move = function (velocity, offset) {
             // this function can be understood in two basic parts
             // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
@@ -645,13 +648,16 @@ var output = function (input) {
 
     class Bullet extends Moveable {
         age: number;
+        target: Coord;
 
-        constructor(x, y, direction, map) {
-            super(3, x, y, direction, map);
+        constructor(x, y, target, map) {
+            super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
             this.age = 0;
+            this.target = target;
         }
         draw = function () {
             input.fill(256, 256);
+            this.point(this.x, this.y, this.target.x, this.target.y);
             this.move(15, 0);
             input.circle(
                 this.x, 
@@ -676,16 +682,8 @@ var output = function (input) {
             this.hp = 8;
             this.bullets = new Array();
         }
-        point = function (x1, y1, x2, y2) {
-            this.direction = World.calculateDirection(x1, y1, x2, y2);
-        }
-        fire = function(direction) {
-            if (direction == null) {
-                var bulletDirection = this.direction;
-            } else {
-                var bulletDirection = direction;
-            }
-            var bullet = new Bullet(this.x, this.y, bulletDirection, this.map);
+        fire = function(target) {
+            var bullet = new Bullet(this.x, this.y, target, this.map);
             this.bullets.push(bullet);
         }
     }
@@ -743,8 +741,9 @@ var output = function (input) {
         idleAge: number;
         idleLife: number;
         lastSeenPlayerCoord: Coord;
+        target: Character;
 
-       constructor(size, x, y, map, life, idleAge, idleLife) {
+       constructor(size, x, y, map, target, life, idleAge, idleLife) {
             super(size, x, y, map);
             this.didExplode = false;
             this.isHunting = false;
@@ -752,6 +751,7 @@ var output = function (input) {
             this.idleAge = idleAge;
             this.idleLife = idleLife;
             this.lastSeenPlayerCoord = null;
+            this.target = target;
         }
         draw = function () {
             input.fill(256, 256);
@@ -791,7 +791,7 @@ var output = function (input) {
         fleeLife: number;
 
         constructor(x, y, map) {
-            super(5, x, y, map, 1000, 0, 200);
+            super(5, x, y, map, null, 1000, 0, 200);
             this.isRunning = false;
             this.fleeAge = 0;
             this.fleeLife = 20;
@@ -834,8 +834,8 @@ var output = function (input) {
         igniteAge: number;
         isGrowing: boolean;
 
-        constructor(x, y, map) {
-            super(5, x, y, map, 1000, 0, 200);
+        constructor(x, y, map, target) {
+            super(5, x, y, map, target, 1000, 0, 200);
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
@@ -863,31 +863,16 @@ var output = function (input) {
             );            
         }
         explode = function () {
-            this.fire(this.direction);
+            this.fire(new Coord(this.target.x, this.target.y));
 
-            this.fire(this.direction + 1);
-            this.fire(this.direction - 1);
+            this.fire(new Coord(this.target.x + 1, this.target.y + 1));
+            this.fire(new Coord(this.target.x - 1, this.target.y - 1));
 
-            this.fire(this.direction + 2);
-            this.fire(this.direction - 2);
+            this.fire(new Coord(this.target.x + 2, this.target.y + 2));
+            this.fire(new Coord(this.target.x - 2, this.target.y - 2));
 
-            this.fire(this.direction + 3);
-            this.fire(this.direction - 3);
-
-            this.fire(this.direction + 4);
-            this.fire(this.direction - 4);
-
-            this.fire(this.direction + 5);
-            this.fire(this.direction - 5);
-
-            this.fire(this.direction + 10);
-            this.fire(this.direction - 10);
-
-            this.fire(this.direction + 20);
-            this.fire(this.direction - 20);
-
-            this.fire(this.direction + 30);
-            this.fire(this.direction - 30);
+            this.fire(new Coord(this.target.x + 3, this.target.y + 3));
+            this.fire(new Coord(this.target.x - 3, this.target.y - 3));
         }
         // animation for when its about to explode
         pulse = function () {
@@ -940,8 +925,8 @@ var output = function (input) {
     class Pirate extends NPC {
         weaponCooldownCounter: number;
 
-        constructor(size, x, y, map) {
-            super(size, x, y, map, 1000, 0, 200);
+        constructor(size, x, y, map, target) {
+            super(size, x, y, map, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
         }
         draw = function () {
@@ -965,7 +950,7 @@ var output = function (input) {
             this.move(0.5, 0);
             if (seesPlayer) {
                 if (this.weaponCooldownCounter % 16 == 0) {
-                    this.fire(null);
+                    this.fire(new Coord(this.target.x, this.target.y));
                 }
             }
             if (this.isHunting) {
@@ -983,7 +968,7 @@ var output = function (input) {
         didExplode: boolean;
 
         constructor(x, y, map) {
-            super(5, x, y, map, 1000, 0, 200);
+            super(5, x, y, map, null, 1000, 0, 200);
             this.didIgnite = false;
             this.didExplode = false;
         }
@@ -1006,35 +991,15 @@ var output = function (input) {
             );            
         }
         explode = function () {
-            for (var i = 0; i < 3; i++) {
-                var perpendicular = 90 * i;
+            var top = new Coord(this.x, this.y - 300);
+            var right = new Coord(this.x + 300, this.y);
+            var bottom = new Coord(this.x, this.y + 300);
+            var left = new Coord(this.x - 300, this.y);
 
-                this.fire(perpendicular);
-    
-                this.fire(perpendicular + 1);
-                this.fire(perpendicular - 1);
-    
-                this.fire(perpendicular + 2);
-                this.fire(perpendicular - 2);
-    
-                this.fire(perpendicular + 3);
-                this.fire(perpendicular - 3);
-    
-                this.fire(perpendicular + 4);
-                this.fire(perpendicular - 4);
-    
-                this.fire(perpendicular + 5);
-                this.fire(perpendicular - 5);
-    
-                this.fire(perpendicular + 10);
-                this.fire(perpendicular - 10);
-    
-                this.fire(perpendicular + 20);
-                this.fire(perpendicular - 20);
-    
-                this.fire(perpendicular + 30);
-                this.fire(perpendicular - 30);
-            }
+            this.fire(top)
+            this.fire(right)
+            this.fire(bottom)
+            this.fire(left)
 
             this.didExplode = true;
         }
