@@ -469,9 +469,7 @@ var output = function (input) {
                 }
             };
             _this.age = 0;
-            _this.maximumDistance = 500;
-            var relativeTargetCoordinate = World.calculateCoordinate(_this.maximumDistance, _this.direction);
-            _this.target = new Coord(_this.x + relativeTargetCoordinate.x, _this.y + relativeTargetCoordinate.y);
+            _this.target = target;
             return _this;
         }
         return Bullet;
