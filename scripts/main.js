@@ -507,7 +507,7 @@ var output = function (input) {
             _this.draw = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
-                    this.fire(null);
+                    this.fire(new Coord(input.mouseX, input.mouseY));
                 }
                 if (this.isMoving) {
                     this.move(2, 0);
