@@ -575,8 +575,8 @@ var output = function (input) {
             }
             var angleInRadians = finalAngle * (Math.PI / 180);
 
-            var dx = 1;
-            var dy = 1;
+            var dx;
+            var dy;
             // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
             if (quadrant % 2 == 0) {
                 if (quadrantAngleIsLowHalf) {
