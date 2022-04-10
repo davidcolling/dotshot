@@ -28,12 +28,14 @@ var output = function (input) {
             if (this.hp != 0) {
                 input.stroke(256, 0, 0, 256);
                 input.fill(256, 0, 0, 256);
+                input.strokeWeight(5);
                 input.line(
                     0, 
                     this.map.height - 1, 
                     this.map.width * (this.hp / this.max), 
                     this.map.height - 1
                 );
+                input.strokeWeight(1);
                 input.stroke(
                     defaultStrokeColor.r, 
                     defaultStrokeColor.g, 
