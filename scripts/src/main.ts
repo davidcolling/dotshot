@@ -311,7 +311,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
-            this.healthBar = new HealthBar(8, this.map);
+            this.healthBar = new HealthBar(32, this.map);
 
             // put stuff on the map
             if (Math.random() < 0.3) {
@@ -401,7 +401,7 @@ var output = function (input) {
                     if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                         if (this.player.hp < this.healthBar.max) {
                             this.food[i] = null;
-                            this.player.hp++;
+                            this.player.hp += 10;
                             this.healthBar.hp = this.player.hp;
                         }
                     }
@@ -680,9 +680,9 @@ var output = function (input) {
         hp: number;
         bullets: Array<Bullet>;
 
-        constructor(size, x, y, map) {
+        constructor(size, x, y, map, maxHP) {
             super(size, x, y, Math.random() * 360, map);
-            this.hp = 8;
+            this.hp = maxHP;
             this.bullets = new Array();
         }
         fire = function(target) {
@@ -710,7 +710,7 @@ var output = function (input) {
         isMoving: boolean;
 
         constructor(size, x, y, map) {
-            super(size, x, y, map);
+            super(size, x, y, map, 32);
             this.isFiring = false; 
             this.isMoving = false;
         }
@@ -747,7 +747,7 @@ var output = function (input) {
         target: Character;
 
        constructor(size, x, y, map, target, life, idleAge, idleLife) {
-            super(size, x, y, map);
+            super(size, x, y, map, 8);
             this.didExplode = false;
             this.isHunting = false;
             this.age = 0;

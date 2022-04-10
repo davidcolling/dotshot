@@ -191,7 +191,7 @@ var output = function (input) {
                         if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                             if (this.player.hp < this.healthBar.max) {
                                 this.food[i] = null;
-                                this.player.hp++;
+                                this.player.hp += 10;
                                 this.healthBar.hp = this.player.hp;
                             }
                         }
@@ -308,7 +308,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
-            this.healthBar = new HealthBar(8, this.map);
+            this.healthBar = new HealthBar(32, this.map);
             // put stuff on the map
             if (Math.random() < 0.3) {
                 for (var i = 0; i < 60; i++) {
@@ -476,13 +476,13 @@ var output = function (input) {
     }(Moveable));
     var Character = /** @class */ (function (_super) {
         __extends(Character, _super);
-        function Character(size, x, y, map) {
+        function Character(size, x, y, map, maxHP) {
             var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
             _this.fire = function (target) {
                 var bullet = new Bullet(this.x, this.y, target, this.map);
                 this.bullets.push(bullet);
             };
-            _this.hp = 8;
+            _this.hp = maxHP;
             _this.bullets = new Array();
             return _this;
         }
@@ -503,7 +503,7 @@ var output = function (input) {
     var Player = /** @class */ (function (_super) {
         __extends(Player, _super);
         function Player(size, x, y, map) {
-            var _this = _super.call(this, size, x, y, map) || this;
+            var _this = _super.call(this, size, x, y, map, 32) || this;
             _this.draw = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
@@ -530,7 +530,7 @@ var output = function (input) {
     var NPC = /** @class */ (function (_super) {
         __extends(NPC, _super);
         function NPC(size, x, y, map, target, life, idleAge, idleLife) {
-            var _this = _super.call(this, size, x, y, map) || this;
+            var _this = _super.call(this, size, x, y, map, 8) || this;
             _this.draw = function () {
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
