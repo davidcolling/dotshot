@@ -808,6 +808,9 @@ var output = function (input) {
         input.clear();
         if (!world.draw()) {
             input.noLoop();
+            setInterval(function () {
+                window.location.reload();
+            }, 3000);
         }
     };
 };
