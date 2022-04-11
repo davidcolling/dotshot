@@ -802,8 +802,8 @@ var output = function (input) {
             this.fleeLife = 20;
         }
         draw = function () {
-            input.stroke(0, 256, 256, 256);
-            input.fill(0, 256, 256, 256);
+            input.stroke(256, 256, 256, 256);
+            input.fill(256, 256, 256, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -853,8 +853,8 @@ var output = function (input) {
                     this.explode();
                 }
             }
-            input.stroke(0, 256, 0, 256);
-            input.fill(0, 256, 0, 256);
+            input.stroke(128, 0, 0, 256);
+            input.fill(128, 0, 0, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -981,8 +981,8 @@ var output = function (input) {
             if (this.didIgnite) {
                 this.explode();
             }
-            input.stroke(0, 0, 256, 256);
-            input.fill(0, 0, 256, 256);
+            input.stroke(128, 128, 128, 256);
+            input.fill(128, 128, 128, 256);
             input.circle(
                 this.x, 
                 this.y, 

@@ -576,8 +576,8 @@ var output = function (input) {
         function Chicken(x, y, map) {
             var _this = _super.call(this, 5, x, y, map, null, 1000, 0, 200) || this;
             _this.draw = function () {
-                input.stroke(0, 256, 256, 256);
-                input.fill(0, 256, 256, 256);
+                input.stroke(256, 256, 256, 256);
+                input.fill(256, 256, 256, 256);
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
@@ -617,8 +617,8 @@ var output = function (input) {
                         this.explode();
                     }
                 }
-                input.stroke(0, 256, 0, 256);
-                input.fill(0, 256, 0, 256);
+                input.stroke(128, 0, 0, 256);
+                input.fill(128, 0, 0, 256);
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
@@ -729,8 +729,8 @@ var output = function (input) {
                 if (this.didIgnite) {
                     this.explode();
                 }
-                input.stroke(0, 0, 256, 256);
-                input.fill(0, 0, 256, 256);
+                input.stroke(128, 128, 128, 256);
+                input.fill(128, 128, 128, 256);
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
