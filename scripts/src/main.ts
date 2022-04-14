@@ -654,15 +654,22 @@ var output = function (input) {
     class Bullet extends Moveable {
         age: number;
         target: Coord;
+        hasPassedTarget: boolean;
 
         constructor(x, y, target, map) {
             super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
             this.age = 0;
             this.target = target;
+            this.hasPassedTarget = false;
         }
         draw = function () {
             input.fill(256, 256);
-            this.point(this.x, this.y, this.target.x, this.target.y);
+            if (!this.hasPassedTarget) {
+                if (World.calculateDistance(this.x, this.y, this.target.x, this.target.y) > 2) {
+                    this.point(this.x, this.y, this.target.x, this.target.y);
+                    this.hasPassedTarget = true;
+                }
+            }
             this.move(15);
             input.circle(
                 this.x, 

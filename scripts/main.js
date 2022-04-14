@@ -459,7 +459,12 @@ var output = function (input) {
             var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
             _this.draw = function () {
                 input.fill(256, 256);
-                this.point(this.x, this.y, this.target.x, this.target.y);
+                if (!this.hasPassedTarget) {
+                    if (World.calculateDistance(this.x, this.y, this.target.x, this.target.y) > 2) {
+                        this.point(this.x, this.y, this.target.x, this.target.y);
+                        this.hasPassedTarget = true;
+                    }
+                }
                 this.move(15);
                 input.circle(this.x, this.y, this.size);
                 this.age++;
@@ -472,6 +477,7 @@ var output = function (input) {
             };
             _this.age = 0;
             _this.target = target;
+            _this.hasPassedTarget = false;
             return _this;
         }
         return Bullet;
