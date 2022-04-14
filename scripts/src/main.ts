@@ -313,7 +313,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
-            this.healthBar = new HealthBar(32, this.map);
+            this.healthBar = new HealthBar(16, this.map);
 
             // put stuff on the map
             if (Math.random() < 0.3) {
@@ -721,7 +721,7 @@ var output = function (input) {
         isMoving: boolean;
 
         constructor(size, x, y, map) {
-            super(size, x, y, map, 32);
+            super(size, x, y, map, 16);
             this.isFiring = false; 
             this.isMoving = false;
         }

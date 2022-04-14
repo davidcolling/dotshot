@@ -310,7 +310,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
-            this.healthBar = new HealthBar(32, this.map);
+            this.healthBar = new HealthBar(16, this.map);
             // put stuff on the map
             if (Math.random() < 0.3) {
                 for (var i = 0; i < 60; i++) {
@@ -514,7 +514,7 @@ var output = function (input) {
     var Player = /** @class */ (function (_super) {
         __extends(Player, _super);
         function Player(size, x, y, map) {
-            var _this = _super.call(this, size, x, y, map, 32) || this;
+            var _this = _super.call(this, size, x, y, map, 16) || this;
             _this.draw = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
