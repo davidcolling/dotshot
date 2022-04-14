@@ -665,8 +665,10 @@ var output = function (input) {
         draw = function () {
             input.fill(256, 256);
             if (!this.hasPassedTarget) {
-                if (World.calculateDistance(this.x, this.y, this.target.x, this.target.y) > 2) {
+                var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
+                if (distance > 10) {
                     this.point(this.x, this.y, this.target.x, this.target.y);
+                } else {
                     this.hasPassedTarget = true;
                 }
             }
