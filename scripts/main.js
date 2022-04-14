@@ -520,7 +520,13 @@ var output = function (input) {
             _this.draw = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
-                    this.fire(new Coord(input.mouseX, input.mouseY));
+                    this.firingAge++;
+                    if (this.firingAge % 4 == 0) {
+                        this.fire(new Coord(input.mouseX, input.mouseY));
+                    }
+                }
+                else {
+                    this.firingAge = 0;
                 }
                 if (this.isMoving) {
                     this.move(2);
@@ -536,6 +542,7 @@ var output = function (input) {
             };
             _this.isFiring = false;
             _this.isMoving = false;
+            _this.firingAge = 0;
             return _this;
         }
         return Player;

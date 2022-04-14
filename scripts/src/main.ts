@@ -721,16 +721,23 @@ var output = function (input) {
     class Player extends Character {
         isFiring: boolean;
         isMoving: boolean;
+        firingAge: number;
 
         constructor(size, x, y, map) {
             super(size, x, y, map, 16);
             this.isFiring = false; 
             this.isMoving = false;
+            this.firingAge = 0;
         }
         draw = function () {
             this.point(this.x, this.y, input.mouseX, input.mouseY);
             if (this.isFiring) {
-                this.fire(new Coord(input.mouseX, input.mouseY));
+                this.firingAge++;
+                if (this.firingAge % 4 == 0) {
+                    this.fire(new Coord(input.mouseX, input.mouseY));
+                }
+            } else {
+                this.firingAge = 0;
             }
             if (this.isMoving) {
                 this.move(2);
