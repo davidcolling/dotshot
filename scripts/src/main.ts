@@ -513,10 +513,10 @@ var output = function (input) {
 
         // obj2 is the projectile
         isShot= function(obj1, obj2) {
-            var one =  5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
-            var two = this.isInFrontOf(obj1, obj2);
-            var three = this.map.isOpen(obj1.x, obj1.y, obj2.x, obj2.y);
-            return one && two && three;
+            var isClose=  5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
+            var isInFrontOf= this.isInFrontOf(obj1, obj2);
+            var isOpen= this.map.isOpen(obj1.x, obj1.y, obj2.x, obj2.y);
+            return isClose && isInFrontOf && isOpen;
         }
 
         isInFrontOf = function(obj1, obj2) {
