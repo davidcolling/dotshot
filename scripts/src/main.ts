@@ -765,6 +765,8 @@ var output = function (input) {
         idleLife: number;
         lastSeenPlayerCoord: Coord;
         target: Character;
+        previousSize: number;
+        isHit: boolean
 
        constructor(size, x, y, map, target, life, idleAge, idleLife) {
             super(size, x, y, map, 8);
@@ -775,6 +777,8 @@ var output = function (input) {
             this.idleLife = idleLife;
             this.lastSeenPlayerCoord = null;
             this.target = target;
+            this.previousSize = this.size;
+            this.isHit = false;
         }
         draw = function () {
             input.fill(256, 256);
@@ -795,7 +799,15 @@ var output = function (input) {
         }
         attack = function (seesPlayer) {}
         decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            if (hpOffset < 0) {
+                this.isHit = true;
+                this.size = 11;
+            }
             this.draw();
+            if (this.isHit) {
+                this.isHit = false;
+                this.size = this.previousSize;
+            }
             this.hp += hpOffset;
             if ( this.isHunting || seesPlayer) {
                 if (seesPlayer) {

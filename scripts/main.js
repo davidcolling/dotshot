@@ -566,7 +566,15 @@ var output = function (input) {
             };
             _this.attack = function (seesPlayer) { };
             _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+                if (hpOffset < 0) {
+                    this.isHit = true;
+                    this.size = 11;
+                }
                 this.draw();
+                if (this.isHit) {
+                    this.isHit = false;
+                    this.size = this.previousSize;
+                }
                 this.hp += hpOffset;
                 if (this.isHunting || seesPlayer) {
                     if (seesPlayer) {
@@ -585,6 +593,8 @@ var output = function (input) {
             _this.idleLife = idleLife;
             _this.lastSeenPlayerCoord = null;
             _this.target = target;
+            _this.previousSize = _this.size;
+            _this.isHit = false;
             return _this;
         }
         return NPC;
