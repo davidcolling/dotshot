@@ -506,11 +506,29 @@ var output = function (input) {
         function Food(x, y) {
             var _this = _super.call(this, 2, x, y) || this;
             _this.draw = function () {
+                this.growAge++;
+                if (this.growAge % 3 == 0) {
+                    if (this.size == 4) {
+                        this.isGrowing = false;
+                    }
+                    if (this.size == 1) {
+                        this.isGrowing = true;
+                    }
+                    if (this.isGrowing) {
+                        this.size++;
+                    }
+                    else {
+                        this.size--;
+                    }
+                }
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
             };
+            _this.isGrowing = true;
+            _this.growAge = 0;
             return _this;
         }
+        ;
         return Food;
     }(CenteredShape));
     var Player = /** @class */ (function (_super) {
