@@ -69,6 +69,39 @@ var output = function (input) {
         }
     }
 
+    class Food extends CenteredShape {
+        isGrowing: boolean;;
+        growAge: number;
+
+        constructor(x, y) {
+            super(2, x, y);
+            this.isGrowing = true;
+            this.growAge = 0;
+        }
+        draw = function () {
+            this.growAge++;
+            if (this.growAge % 3 == 0) {
+                if (this.size == 4) {
+                    this.isGrowing = false;
+                }
+                if (this.size == 1) {
+                    this.isGrowing = true;
+                }
+                if (this.isGrowing) {
+                    this.size++;
+                } else {
+                    this.size--;
+                }
+            }
+            input.fill(256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
+    }
+
     class Wall {
         end1: Coord;
         end2: Coord;
@@ -701,39 +734,6 @@ var output = function (input) {
         fire = function(target) {
             var bullet = new Bullet(this.x, this.y, target, this.map);
             this.bullets.push(bullet);
-        }
-    }
-
-    class Food extends CenteredShape {
-        isGrowing: boolean;;
-        growAge: number;
-
-        constructor(x, y) {
-            super(2, x, y);
-            this.isGrowing = true;
-            this.growAge = 0;
-        }
-        draw = function () {
-            this.growAge++;
-            if (this.growAge % 3 == 0) {
-                if (this.size == 4) {
-                    this.isGrowing = false;
-                }
-                if (this.size == 1) {
-                    this.isGrowing = true;
-                }
-                if (this.isGrowing) {
-                    this.size++;
-                } else {
-                    this.size--;
-                }
-            }
-            input.fill(256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
         }
     }
 
