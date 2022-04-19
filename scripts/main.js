@@ -57,6 +57,36 @@ var output = function (input) {
         }
         return Coord;
     }());
+    var Food = /** @class */ (function (_super) {
+        __extends(Food, _super);
+        function Food(x, y) {
+            var _this = _super.call(this, 2, x, y) || this;
+            _this.draw = function () {
+                this.growAge++;
+                if (this.growAge % 3 == 0) {
+                    if (this.size == 4) {
+                        this.isGrowing = false;
+                    }
+                    if (this.size == 1) {
+                        this.isGrowing = true;
+                    }
+                    if (this.isGrowing) {
+                        this.size++;
+                    }
+                    else {
+                        this.size--;
+                    }
+                }
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.isGrowing = true;
+            _this.growAge = 0;
+            return _this;
+        }
+        ;
+        return Food;
+    }(CenteredShape));
     var Wall = /** @class */ (function () {
         function Wall(end1, end2) {
             this.draw = function () {
@@ -501,36 +531,6 @@ var output = function (input) {
         }
         return Character;
     }(Moveable));
-    var Food = /** @class */ (function (_super) {
-        __extends(Food, _super);
-        function Food(x, y) {
-            var _this = _super.call(this, 2, x, y) || this;
-            _this.draw = function () {
-                this.growAge++;
-                if (this.growAge % 3 == 0) {
-                    if (this.size == 4) {
-                        this.isGrowing = false;
-                    }
-                    if (this.size == 1) {
-                        this.isGrowing = true;
-                    }
-                    if (this.isGrowing) {
-                        this.size++;
-                    }
-                    else {
-                        this.size--;
-                    }
-                }
-                input.fill(256, 256);
-                input.circle(this.x, this.y, this.size);
-            };
-            _this.isGrowing = true;
-            _this.growAge = 0;
-            return _this;
-        }
-        ;
-        return Food;
-    }(CenteredShape));
     var Player = /** @class */ (function (_super) {
         __extends(Player, _super);
         function Player(size, x, y, map) {
@@ -567,8 +567,8 @@ var output = function (input) {
     }(Character));
     var NPC = /** @class */ (function (_super) {
         __extends(NPC, _super);
-        function NPC(size, x, y, map, target, life, idleAge, idleLife) {
-            var _this = _super.call(this, size, x, y, map, 8) || this;
+        function NPC(size, x, y, map, maxHP, target, life, idleAge, idleLife) {
+            var _this = _super.call(this, size, x, y, map, maxHP) || this;
             _this.draw = function () {
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
@@ -620,7 +620,7 @@ var output = function (input) {
     var Chicken = /** @class */ (function (_super) {
         __extends(Chicken, _super);
         function Chicken(x, y, map) {
-            var _this = _super.call(this, 5, x, y, map, null, 1000, 0, 200) || this;
+            var _this = _super.call(this, 5, x, y, map, 8, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 input.stroke(256, 256, 256, 256);
                 input.fill(256, 256, 256, 256);
@@ -654,7 +654,7 @@ var output = function (input) {
     var Bomb = /** @class */ (function (_super) {
         __extends(Bomb, _super);
         function Bomb(x, y, map, target) {
-            var _this = _super.call(this, 5, x, y, map, target, 1000, 0, 200) || this;
+            var _this = _super.call(this, 5, x, y, map, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
                 if (this.didIgnite) {
                     this.igniteAge++;
@@ -736,7 +736,7 @@ var output = function (input) {
     var Pirate = /** @class */ (function (_super) {
         __extends(Pirate, _super);
         function Pirate(size, x, y, map, target) {
-            var _this = _super.call(this, size, x, y, map, target, 1000, 0, 200) || this;
+            var _this = _super.call(this, size, x, y, map, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
                 this.weaponCooldownCounter++;
                 input.stroke(256, 0, 0, 256);
@@ -770,7 +770,7 @@ var output = function (input) {
     var Mine = /** @class */ (function (_super) {
         __extends(Mine, _super);
         function Mine(x, y, map) {
-            var _this = _super.call(this, 5, x, y, map, null, 1000, 0, 200) || this;
+            var _this = _super.call(this, 5, x, y, map, 1, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 if (this.didIgnite) {
                     this.explode();

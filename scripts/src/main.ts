@@ -787,8 +787,8 @@ var output = function (input) {
         previousSize: number;
         isHit: boolean
 
-       constructor(size, x, y, map, target, life, idleAge, idleLife) {
-            super(size, x, y, map, 8);
+       constructor(size, x, y, map, maxHP, target, life, idleAge, idleLife) {
+            super(size, x, y, map, maxHP);
             this.didExplode = false;
             this.isHunting = false;
             this.age = 0;
@@ -845,7 +845,7 @@ var output = function (input) {
         fleeLife: number;
 
         constructor(x, y, map) {
-            super(5, x, y, map, null, 1000, 0, 200);
+            super(5, x, y, map, 8, null, 1000, 0, 200);
             this.isRunning = false;
             this.fleeAge = 0;
             this.fleeLife = 20;
@@ -889,7 +889,7 @@ var output = function (input) {
         isGrowing: boolean;
 
         constructor(x, y, map, target) {
-            super(5, x, y, map, target, 1000, 0, 200);
+            super(5, x, y, map, 8, target, 1000, 0, 200);
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
@@ -980,7 +980,7 @@ var output = function (input) {
         weaponCooldownCounter: number;
 
         constructor(size, x, y, map, target) {
-            super(size, x, y, map, target, 1000, 0, 200);
+            super(size, x, y, map, 8, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
         }
         draw = function () {
@@ -1022,7 +1022,7 @@ var output = function (input) {
         didExplode: boolean;
 
         constructor(x, y, map) {
-            super(5, x, y, map, null, 1000, 0, 200);
+            super(5, x, y, map, 1, null, 1000, 0, 200);
             this.didIgnite = false;
             this.didExplode = false;
         }
