@@ -262,27 +262,6 @@ var output = function (input) {
                         if (list[i].hp == 0) {
                             list[i] = null;
                         }
-                        if (list[i] != null) {
-                            if (list[i].didExplode) {
-                                list[i] = null;
-                            }
-                        }
-                    }
-                }
-            };
-            this.drawAnimateMines = function (list) {
-                for (var i = 0; i < list.length; i++) {
-                    if (list[i] != null) {
-                        list[i].draw();
-                        // check for collisions
-                        if (this.checkIsShot(list[i], this.bullets)) {
-                            list[i].didIgnite = true;
-                        }
-                        // see if it gave up it bullets yet
-                        if (list[i].didExplode) {
-                            this.getCharacterBullets(list[i]);
-                            list[i] = null;
-                        }
                     }
                 }
             };
@@ -300,6 +279,22 @@ var output = function (input) {
                         }
                         if (list[i].hp <= 0) {
                             this.food.push(new Food(list[i].x, list[i].y));
+                            list[i] = null;
+                        }
+                    }
+                }
+            };
+            this.drawAnimateMines = function (list) {
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i] != null) {
+                        list[i].draw();
+                        // check for collisions
+                        if (this.checkIsShot(list[i], this.bullets)) {
+                            list[i].didIgnite = true;
+                        }
+                        // see if it gave up it bullets yet
+                        if (list[i].didExplode) {
+                            this.getCharacterBullets(list[i]);
                             list[i] = null;
                         }
                     }
@@ -675,6 +670,7 @@ var output = function (input) {
                 this.fire(new Coord(this.target.x - 2, this.target.y - 2));
                 this.fire(new Coord(this.target.x + 3, this.target.y + 3));
                 this.fire(new Coord(this.target.x - 3, this.target.y - 3));
+                this.hp = 0;
             };
             // animation for when its about to explode
             _this.pulse = function () {

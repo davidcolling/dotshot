@@ -483,11 +483,6 @@ var output = function (input) {
                         list[i] = null;
                     }
     
-                    if (list[i] != null) {
-                        if (list[i].didExplode) {
-                            list[i] = null;
-                        }
-                    }
                 }
             }
         }
@@ -926,6 +921,7 @@ var output = function (input) {
 
             this.fire(new Coord(this.target.x + 3, this.target.y + 3));
             this.fire(new Coord(this.target.x - 3, this.target.y - 3));
+            this.hp = 0;
         }
         // animation for when its about to explode
         pulse = function () {
