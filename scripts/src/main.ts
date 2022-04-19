@@ -383,15 +383,15 @@ var output = function (input) {
 
             // make characters
             this.enemies = new Array();
-            this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map);
+            this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
-                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player));
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
             }
 
             this.mines = new Array();
             for (var i = 0; i < 20; i++ ) {
-                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map));
+                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
             }
             
             this.food = new Array();
@@ -401,7 +401,7 @@ var output = function (input) {
 
             this.chickens = new Array();
             for (var i = 0; i < 5; i++) {
-                this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map));
+                this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
         }
 
@@ -415,7 +415,6 @@ var output = function (input) {
             this.drawBullets(this.bullets);
 
             // player
-            this.getCharacterBullets(this.player);
             if (this.checkIsShot(this.player, this.bullets)) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
@@ -428,7 +427,7 @@ var output = function (input) {
         
             this.drawAnimateEnemies(this.enemies);
             this.drawAnimateMines(this.mines);
-            this.drawAnimateChickens(this.chickens);
+            this.drawAnimateEnemies(this.chickens);
 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
@@ -478,33 +477,10 @@ var output = function (input) {
                         list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
                     }
 
-                    this.getCharacterBullets(list[i]);
-                    if (list[i].hp == 0) {
+                    if (list[i].hp <= 0) {
                         list[i] = null;
                     }
     
-                }
-            }
-        }
-
-        drawAnimateChickens = function(list) {
-            for ( var i = 0; i < list.length; i++) {
-                if (list[i] != null) {
-                    // calculate npc behavior
-                    var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) && 
-                        this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y) 
-                    );
-                    if (this.checkIsShot(list[i], this.bullets)) {
-                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
-                    } else {
-                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
-                    }
-
-                    if (list[i].hp <= 0) {
-                        this.food.push(new Food(list[i].x, list[i].y));
-                        list[i] = null;
-                    }
                 }
             }
         }
@@ -519,7 +495,6 @@ var output = function (input) {
                     }
                     // see if it gave up it bullets yet
                     if (list[i].didExplode) {
-                        this.getCharacterBullets(list[i]);
                         list[i] = null;
                     }
                 }
@@ -720,8 +695,8 @@ var output = function (input) {
         hp: number;
         bullets: Array<Bullet>;
 
-        constructor(size, x, y, map, maxHP) {
-            super(size, x, y, Math.random() * 360, map);
+        constructor(size, x, y, map, bullets, maxHP) {
+            super(size, x, y, 0, map);
             this.hp = maxHP;
             this.bullets = new Array();
         }
@@ -736,8 +711,8 @@ var output = function (input) {
         isMoving: boolean;
         firingAge: number;
 
-        constructor(size, x, y, map) {
-            super(size, x, y, map, 16);
+        constructor(size, x, y, map, bullets) {
+            super(size, x, y, map, bullets, 16);
             this.isFiring = false; 
             this.isMoving = false;
             this.firingAge = 0;
@@ -781,8 +756,8 @@ var output = function (input) {
         previousSize: number;
         isHit: boolean
 
-       constructor(size, x, y, map, maxHP, target, life, idleAge, idleLife) {
-            super(size, x, y, map, maxHP);
+       constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
+            super(size, x, y, map, bullets, maxHP);
             this.didExplode = false;
             this.isHunting = false;
             this.age = 0;
@@ -837,12 +812,14 @@ var output = function (input) {
         isRunning: boolean;
         fleeAge: number;
         fleeLife: number;
+        food: Array<Food>;
 
-        constructor(x, y, map) {
-            super(5, x, y, map, 8, null, 1000, 0, 200);
+        constructor(x, y, map, food) {
+            super(5, x, y, map, null, 8, null, 1000, 0, 200);
             this.isRunning = false;
             this.fleeAge = 0;
             this.fleeLife = 20;
+            this.food = food;
         }
         draw = function () {
             input.stroke(256, 256, 256, 256);
@@ -862,6 +839,9 @@ var output = function (input) {
         decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
             this.draw();
             this.hp += hpOffset;
+            if(this.hp <= 0) {
+                this.food.push(new Food(this.x, this.y));
+            }
             if (seesPlayer) {
                 if (this.fleeAge < this.fleeLife) {
                     this.fleeAge++;
@@ -882,8 +862,8 @@ var output = function (input) {
         igniteAge: number;
         isGrowing: boolean;
 
-        constructor(x, y, map, target) {
-            super(5, x, y, map, 8, target, 1000, 0, 200);
+        constructor(x, y, map, target, bullets) {
+            super(5, x, y, map, bullets, 8, target, 1000, 0, 200);
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
@@ -974,8 +954,8 @@ var output = function (input) {
     class Pirate extends NPC {
         weaponCooldownCounter: number;
 
-        constructor(size, x, y, map, target) {
-            super(size, x, y, map, 8, target, 1000, 0, 200);
+        constructor(size, x, y, map, bullets, target) {
+            super(size, x, y, map, bullets, 8, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
         }
         draw = function () {
@@ -1016,8 +996,8 @@ var output = function (input) {
         didIgnite: boolean;
         didExplode: boolean;
 
-        constructor(x, y, map) {
-            super(5, x, y, map, 1, null, 1000, 0, 200);
+        constructor(x, y, map, bullets) {
+            super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
             this.didIgnite = false;
             this.didExplode = false;
         }
