@@ -492,23 +492,6 @@ var output = function (input) {
             }
         }
 
-        drawAnimateMines = function(list) {
-            for ( var i = 0; i < list.length; i++) {
-                if (list[i] != null) {
-                    list[i].draw();
-                    // check for collisions
-                    if (this.checkIsShot(list[i], this.bullets)) {
-                        list[i].didIgnite = true;
-                    }
-                    // see if it gave up it bullets yet
-                    if (list[i].didExplode) {
-                        this.getCharacterBullets(list[i]);
-                        list[i] = null;
-                    }
-                }
-            }
-        }
-
         drawAnimateChickens = function(list) {
             for ( var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
@@ -525,6 +508,23 @@ var output = function (input) {
 
                     if (list[i].hp <= 0) {
                         this.food.push(new Food(list[i].x, list[i].y));
+                        list[i] = null;
+                    }
+                }
+            }
+        }
+
+        drawAnimateMines = function(list) {
+            for ( var i = 0; i < list.length; i++) {
+                if (list[i] != null) {
+                    list[i].draw();
+                    // check for collisions
+                    if (this.checkIsShot(list[i], this.bullets)) {
+                        list[i].didIgnite = true;
+                    }
+                    // see if it gave up it bullets yet
+                    if (list[i].didExplode) {
+                        this.getCharacterBullets(list[i]);
                         list[i] = null;
                     }
                 }
