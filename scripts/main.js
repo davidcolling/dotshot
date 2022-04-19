@@ -289,7 +289,6 @@ var output = function (input) {
             this.drawAnimateChickens = function (list) {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] != null) {
-                        list[i].draw();
                         // calculate npc behavior
                         var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) &&
                             this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y));
