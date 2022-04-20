@@ -385,7 +385,7 @@ var output = function (input) {
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
             }
 
@@ -698,11 +698,9 @@ var output = function (input) {
         constructor(size, x, y, map, bullets, maxHP) {
             super(size, x, y, 0, map);
             this.hp = maxHP;
-            this.bullets = new Array();
         }
         fire = function(target) {
-            var bullet = new Bullet(this.x, this.y, target, this.map);
-            this.bullets.push(bullet);
+            this.bullets.push(new Bullet(this.x, this.y, target, this.map));
         }
     }
 
@@ -716,6 +714,7 @@ var output = function (input) {
             this.isFiring = false; 
             this.isMoving = false;
             this.firingAge = 0;
+            this.bullets = bullets;
         }
         draw = function () {
             this.point(this.x, this.y, input.mouseX, input.mouseY);
@@ -867,6 +866,7 @@ var output = function (input) {
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
+            this.bullets = bullets;
         }
         draw = function () {
             if (this.didIgnite) {
@@ -957,6 +957,7 @@ var output = function (input) {
         constructor(size, x, y, map, bullets, target) {
             super(size, x, y, map, bullets, 8, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
+            this.bullets = bullets;
         }
         draw = function () {
             this.weaponCooldownCounter++;
@@ -1000,6 +1001,7 @@ var output = function (input) {
             super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
             this.didIgnite = false;
             this.didExplode = false;
+            this.bullets = bullets;
         }
         draw = function () {
             if (this.didIgnite) {

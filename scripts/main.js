@@ -336,7 +336,7 @@ var output = function (input) {
             this.enemies = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
             for (var i = 0; i < numberOfEnemies; i++) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
             }
             this.mines = new Array();
@@ -441,7 +441,6 @@ var output = function (input) {
                 var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 var newX = this.x + relativeChangeCoordinate.x;
                 var newY = this.y + relativeChangeCoordinate.y;
-                console.log('m');
                 // part two determines if the coordinates are somewhere the character can actually go
                 if (this.map.isOpen(this.x, this.y, newX, newY) &&
                     0 < newX && // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
@@ -495,11 +494,9 @@ var output = function (input) {
         function Character(size, x, y, map, bullets, maxHP) {
             var _this = _super.call(this, size, x, y, 0, map) || this;
             _this.fire = function (target) {
-                var bullet = new Bullet(this.x, this.y, target, this.map);
-                this.bullets.push(bullet);
+                this.bullets.push(new Bullet(this.x, this.y, target, this.map));
             };
             _this.hp = maxHP;
-            _this.bullets = new Array();
             return _this;
         }
         return Character;
@@ -534,6 +531,7 @@ var output = function (input) {
             _this.isFiring = false;
             _this.isMoving = false;
             _this.firingAge = 0;
+            _this.bullets = bullets;
             return _this;
         }
         return Player;
@@ -706,6 +704,7 @@ var output = function (input) {
             _this.didIgnite = false;
             _this.igniteAge = 0;
             _this.isGrowing = true;
+            _this.bullets = bullets;
             return _this;
         }
         return Bomb;
@@ -740,6 +739,7 @@ var output = function (input) {
                 }
             };
             _this.weaponCooldownCounter = 0;
+            _this.bullets = bullets;
             return _this;
         }
         return Pirate;
@@ -792,6 +792,7 @@ var output = function (input) {
             _this.attack = function () { };
             _this.didIgnite = false;
             _this.didExplode = false;
+            _this.bullets = bullets;
             return _this;
         }
         return Mine;
