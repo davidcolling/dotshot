@@ -425,9 +425,9 @@ var output = function (input) {
             }
             this.healthBar.draw();
         
-            this.drawAnimateEnemies(this.enemies);
+            this.drawAnimateNPCs(this.enemies);
             this.drawAnimateMines(this.mines);
-            this.drawAnimateEnemies(this.chickens);
+            this.drawAnimateNPCs(this.chickens);
 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
@@ -460,7 +460,7 @@ var output = function (input) {
             }
         }
 
-        drawAnimateEnemies = function(list) {
+        drawAnimateNPCs = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
 

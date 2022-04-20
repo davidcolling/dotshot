@@ -213,9 +213,9 @@ var output = function (input) {
                     document.getElementById("message").textContent = "You Lose.";
                 }
                 this.healthBar.draw();
-                this.drawAnimateEnemies(this.enemies);
+                this.drawAnimateNPCs(this.enemies);
                 this.drawAnimateMines(this.mines);
-                this.drawAnimateEnemies(this.chickens);
+                this.drawAnimateNPCs(this.chickens);
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
                         this.food[i].draw();
@@ -244,7 +244,7 @@ var output = function (input) {
                     }
                 }
             };
-            this.drawAnimateEnemies = function (list) {
+            this.drawAnimateNPCs = function (list) {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] != null) {
                         // calculate npc behavior
