@@ -335,12 +335,11 @@ var output = function (input) {
         frameCount: number;
         map: Map;
         bullets: Array<Bullet>;
-        enemies: Array<NPC>;
+        nPCs: Array<NPC>;
         mines: Array<NPC>;
         player: Player;
         healthBar: HealthBar;
         food: Array<Food>;
-        chickens: Array<Chicken>;
 
         constructor(width, height, numberOfEnemies) {
             this.frameCount = 0;
@@ -382,11 +381,14 @@ var output = function (input) {
             }
 
             // make characters
-            this.enemies = new Array();
+            this.nPCs = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.enemies.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.enemies.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
+                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+            }
+            for (var i = 0; i < 5; i++) {
+                this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
 
             this.mines = new Array();
@@ -399,10 +401,6 @@ var output = function (input) {
                 this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
 
-            this.chickens = new Array();
-            for (var i = 0; i < 5; i++) {
-                this.chickens.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
-            }
         }
 
         draw = function () {
@@ -425,9 +423,9 @@ var output = function (input) {
             }
             this.healthBar.draw();
         
-            this.drawAnimateNPCs(this.enemies);
+            this.drawAnimateNPCs(this.nPCs);
             this.drawAnimateMines(this.mines);
-            this.drawAnimateNPCs(this.chickens);
+            this.drawAnimateNPCs(this.nPCs);
 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
