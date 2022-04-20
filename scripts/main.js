@@ -215,7 +215,6 @@ var output = function (input) {
                 this.healthBar.draw();
                 this.drawAnimateNPCs(this.nPCs);
                 this.drawAnimateMines(this.mines);
-                this.drawAnimateNPCs(this.nPCs);
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
                         this.food[i].draw();
