@@ -497,7 +497,7 @@ var output = function (input) {
         __extends(Player, _super);
         function Player(size, x, y, map, bullets) {
             var _this = _super.call(this, size, x, y, map, bullets, 16) || this;
-            _this.draw = function () {
+            _this.act = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
                     this.firingAge++;
@@ -511,6 +511,9 @@ var output = function (input) {
                 if (this.isMoving) {
                     this.move(2);
                 }
+            };
+            _this.draw = function () {
+                this.act();
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
                 if (this.hp == 0) {

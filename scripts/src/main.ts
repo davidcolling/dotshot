@@ -706,7 +706,7 @@ var output = function (input) {
             this.firingAge = 0;
             this.bullets = bullets;
         }
-        draw = function () {
+        act = function () {
             this.point(this.x, this.y, input.mouseX, input.mouseY);
             if (this.isFiring) {
                 this.firingAge++;
@@ -719,6 +719,9 @@ var output = function (input) {
             if (this.isMoving) {
                 this.move(2);
             }
+        }
+        draw = function () {
+            this.act();
             input.fill(256, 256);
             input.circle(
                 this.x, 
