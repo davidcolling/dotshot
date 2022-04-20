@@ -689,7 +689,7 @@ var output = function (input) {
         bullets: Array<Bullet>;
 
         constructor(size, x, y, map, bullets, maxHP) {
-            super(size, x, y, 0, map);
+            super(size, x, y, Math.random() * 360, map);
             this.hp = maxHP;
         }
         fire = function(target) {

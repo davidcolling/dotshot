@@ -486,7 +486,7 @@ var output = function (input) {
     var Character = /** @class */ (function (_super) {
         __extends(Character, _super);
         function Character(size, x, y, map, bullets, maxHP) {
-            var _this = _super.call(this, size, x, y, 0, map) || this;
+            var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
             _this.fire = function (target) {
                 this.bullets.push(new Bullet(this.x, this.y, target, this.map));
             };
