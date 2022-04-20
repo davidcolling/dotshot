@@ -502,13 +502,6 @@ var output = function (input) {
         }
 
 
-        getCharacterBullets = function(character) {
-            for (var i = 0; i < character.bullets.length; i++) {
-                this.bullets.push(character.bullets[i]);
-            }
-            character.bullets = new Array();
-        }
-
         static calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
         };

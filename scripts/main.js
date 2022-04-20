@@ -278,12 +278,6 @@ var output = function (input) {
                     }
                 }
             };
-            this.getCharacterBullets = function (character) {
-                for (var i = 0; i < character.bullets.length; i++) {
-                    this.bullets.push(character.bullets[i]);
-                }
-                character.bullets = new Array();
-            };
             // obj2 is the projectile
             this.isShot = function (obj1, obj2) {
                 var isClose = 5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y);
