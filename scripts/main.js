@@ -226,11 +226,9 @@ var output = function (input) {
                             this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
-                            this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                            this.nPCs[i].hp--;
                         }
-                        else {
-                            this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
-                        }
+                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
                         this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
                             this.nPCs[i] = null;
@@ -537,16 +535,7 @@ var output = function (input) {
                 this.idleAge++;
                 this.move(1);
             };
-            _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
-                if (hpOffset < 0) {
-                    this.isHit = true;
-                    this.size = 11;
-                }
-                if (this.isHit) {
-                    this.isHit = false;
-                    this.size = this.previousSize;
-                }
-                this.hp += hpOffset;
+            _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord) {
                 if (this.isHunting || seesPlayer) {
                     if (seesPlayer) {
                         this.lastSeenPlayerCoord = lastSeenPlayerCoord;
@@ -566,7 +555,6 @@ var output = function (input) {
             _this.lastSeenPlayerCoord = null;
             _this.target = target;
             _this.previousSize = _this.size;
-            _this.isHit = false;
             return _this;
         }
         return NPC;
@@ -626,7 +614,7 @@ var output = function (input) {
                         this.explode();
                     }
                 }
-                this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
+                this.decideDraw(seesPlayer, lastSeenPlayerCoord);
             };
             _this.explode = function () {
                 this.fire(new Coord(this.target.x, this.target.y));
@@ -707,7 +695,7 @@ var output = function (input) {
             };
             _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
                 this.weaponCooldownCounter++;
-                this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
+                this.decideDraw(seesPlayer, lastSeenPlayerCoord);
             };
             _this.attack = function (seesPlayer) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
