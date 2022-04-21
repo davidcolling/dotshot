@@ -221,15 +221,17 @@ var output = function (input) {
                 this.healthBar.draw();
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
-                        // calculate npc behavior
-                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
-                            this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
+                        if (this.frameCount % 2 == 0) {
+                            // calculate npc behavior
+                            var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
+                                this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
+                            this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
+                        }
+                        this.nPCs[i].draw();
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
-                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
-                        this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
                             this.nPCs[i] = null;
                         }
@@ -244,7 +246,9 @@ var output = function (input) {
                 }
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
-                        this.food[i].step();
+                        if (this.frameCount % 2 == 0) {
+                            this.food[i].step();
+                        }
                         this.food[i].draw();
                         if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                             if (this.player.hp < this.healthBar.max) {
