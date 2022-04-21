@@ -425,10 +425,39 @@ var output = function (input) {
                 document.getElementById("message").textContent = "You Lose.";
             }
             this.healthBar.draw();
-        
-            this.drawAnimateNPCs(this.nPCs);
-            this.drawAnimateMines(this.mines);
 
+            for (var i = 0; i < this.nPCs.length; i++) {
+                if (this.nPCs[i] != null) {
+
+                    // calculate npc behavior
+                    var seesPlayer = (
+                        400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) && 
+                        this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) 
+                    );
+    
+                    //check for shots
+                    if (this.checkIsShot(this.nPCs[i], this.bullets)) {
+                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                    } else {
+                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                    }
+                    this.nPCs[i].draw();
+    
+                    if (this.nPCs[i].hp <= 0) {
+                        this.nPCs[i] = null;
+                    }
+
+                }
+            }
+
+            for (var i = 0; i < this.mines.length; i++) {
+                if (this.mines[i] != null) {
+                    if (!this.mines[i].draw()) {
+                        this.mines[i] = null;
+                    }
+                }
+            }
+ 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
                     this.food[i].step();
@@ -460,49 +489,6 @@ var output = function (input) {
                 }
             }
         }
-
-        drawAnimateNPCs = function(list) {
-            for (var i = 0; i < list.length; i++) {
-                if (list[i] != null) {
-
-                    // calculate npc behavior
-                    var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, list[i].x, list[i].y) && 
-                        this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y) 
-                    );
-
-                    //check for shots
-                    if (this.checkIsShot(list[i], this.bullets)) {
-                        list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), -1);
-                    } else {
-                        list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
-                    }
-                    list[i].draw();
-
-                    if (list[i].hp <= 0) {
-                        list[i] = null;
-                    }
-    
-                }
-            }
-        }
-
-        drawAnimateMines = function(list) {
-            for ( var i = 0; i < list.length; i++) {
-                if (list[i] != null) {
-                    list[i].draw();
-                    // check for collisions
-                    if (this.checkIsShot(list[i], this.bullets)) {
-                        list[i].didIgnite = true;
-                    }
-                    // see if it gave up it bullets yet
-                    if (list[i].didExplode) {
-                        list[i] = null;
-                    }
-                }
-            }
-        }
-
 
         static calculateDistance = function (x1, y1, x2, y2) {
             return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
