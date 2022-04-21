@@ -210,9 +210,7 @@ var output = function (input) {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
                 }
-                if (this.frameCount % 2 == 0) {
-                    this.player.act();
-                }
+                this.player.act();
                 this.player.draw();
                 if (this.player.hp == 0) {
                     playerIsDead = true;
@@ -221,12 +219,10 @@ var output = function (input) {
                 this.healthBar.draw();
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
-                        if (this.frameCount % 2 == 0) {
-                            // calculate npc behavior
-                            var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
-                                this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
-                            this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
-                        }
+                        // calculate npc behavior
+                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
+                            this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
+                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
                         this.nPCs[i].draw();
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
@@ -251,14 +247,12 @@ var output = function (input) {
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
                         this.food[i].draw();
-                        if (this.frameCount % 2 == 0) {
-                            this.food[i].step();
-                            if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
-                                if (this.player.hp < this.healthBar.max) {
-                                    this.food[i] = null;
-                                    this.player.hp += 10;
-                                    this.healthBar.hp = this.player.hp;
-                                }
+                        this.food[i].step();
+                        if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                            if (this.player.hp < this.healthBar.max) {
+                                this.food[i] = null;
+                                this.player.hp += 10;
+                                this.healthBar.hp = this.player.hp;
                             }
                         }
                     }
@@ -809,6 +803,7 @@ var output = function (input) {
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
+        input.frameRate(10000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
         world = new World(width, height, 10);
