@@ -61,7 +61,7 @@ var output = function (input) {
         __extends(Food, _super);
         function Food(x, y) {
             var _this = _super.call(this, 2, x, y) || this;
-            _this.draw = function () {
+            _this.step = function () {
                 this.growAge++;
                 if (this.growAge % 3 == 0) {
                     if (this.size == 4) {
@@ -77,6 +77,8 @@ var output = function (input) {
                         this.size--;
                     }
                 }
+            };
+            _this.draw = function () {
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
             };
@@ -218,6 +220,7 @@ var output = function (input) {
                 this.drawAnimateMines(this.mines);
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
+                        this.food[i].step();
                         this.food[i].draw();
                         if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                             if (this.player.hp < this.healthBar.max) {

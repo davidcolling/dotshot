@@ -78,7 +78,7 @@ var output = function (input) {
             this.isGrowing = true;
             this.growAge = 0;
         }
-        draw = function () {
+        step = function () {
             this.growAge++;
             if (this.growAge % 3 == 0) {
                 if (this.size == 4) {
@@ -93,6 +93,8 @@ var output = function (input) {
                     this.size--;
                 }
             }
+        }
+        draw = function () {
             input.fill(256, 256);
             input.circle(
                 this.x, 
@@ -429,6 +431,7 @@ var output = function (input) {
 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
+                    this.food[i].step();
                     this.food[i].draw();
                     if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                         if (this.player.hp < this.healthBar.max) {
