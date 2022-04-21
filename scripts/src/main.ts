@@ -470,15 +470,15 @@ var output = function (input) {
  
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
+                    this.food[i].draw();
                     if (this.frameCount % 2 == 0) {
                         this.food[i].step();
-                    }
-                    this.food[i].draw();
-                    if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
-                        if (this.player.hp < this.healthBar.max) {
-                            this.food[i] = null;
-                            this.player.hp += 10;
-                            this.healthBar.hp = this.player.hp;
+                        if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                            if (this.player.hp < this.healthBar.max) {
+                                this.food[i] = null;
+                                this.player.hp += 10;
+                                this.healthBar.hp = this.player.hp;
+                            }
                         }
                     }
                 }
