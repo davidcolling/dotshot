@@ -420,7 +420,8 @@ var output = function (input) {
                 this.healthBar.hp = this.player.hp;
             }
             this.player.act();
-            if (!this.player.draw()) {
+            this.player.draw();
+            if (this.player.hp == 0) {
                 playerIsDead = true;
                 document.getElementById("message").textContent = "You Lose.";
             }
@@ -718,11 +719,6 @@ var output = function (input) {
                 this.y, 
                 this.size
             );
-            if (this.hp == 0) {
-                return false;
-            } else {
-                return true;
-            }
         }
         
     }
