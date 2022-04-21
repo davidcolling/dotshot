@@ -457,7 +457,12 @@ var output = function (input) {
 
             for (var i = 0; i < this.mines.length; i++) {
                 if (this.mines[i] != null) {
-                    if (!this.mines[i].draw()) {
+                    this.mines[i].draw();
+                    if (this.checkIsShot(this.mines[i], this.bullets)) {
+                        this.mines[i].didIgnite = true;
+                    }
+
+                    if (this.mines[i].didExplode) {
                         this.mines[i] = null;
                     }
                 }
