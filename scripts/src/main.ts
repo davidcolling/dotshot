@@ -469,9 +469,9 @@ var output = function (input) {
 
                     //check for shots
                     if (this.checkIsShot(list[i], this.bullets)) {
-                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                        list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), -1);
                     } else {
-                        list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                        list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
                     }
 
                     if (list[i].hp <= 0) {
@@ -777,7 +777,6 @@ var output = function (input) {
             this.idleAge++;
             this.move(1);
         }
-        attack = function (seesPlayer) {}
         decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
             if (hpOffset < 0) {
                 this.isHit = true;
@@ -798,6 +797,9 @@ var output = function (input) {
                 this.idle();
             }
         }
+
+        attack = function (seesPlayer) {}
+
     }
 
     class Chicken extends NPC {
@@ -828,7 +830,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }    
-        decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
             this.draw();
             this.hp += hpOffset;
             if(this.hp <= 0) {
@@ -862,13 +864,6 @@ var output = function (input) {
             this.bullets = bullets;
         }
         draw = function () {
-            if (this.didIgnite) {
-                this.igniteAge++;
-                if (this.igniteAge > 100) {
-                    this.didExplode = true;
-                    this.explode();
-                }
-            }
             input.stroke(128, 0, 0, 256);
             input.fill(128, 0, 0, 256);
             input.circle(
@@ -882,6 +877,16 @@ var output = function (input) {
                 defaultStrokeColor.b, 
                 defaultStrokeColor.a, 
             );            
+        }
+        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            if (this.didIgnite) {
+                this.igniteAge++;
+                if (this.igniteAge > 100) {
+                    this.didExplode = true;
+                    this.explode();
+                }
+            }
+            this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
         }
         explode = function () {
             this.fire(new Coord(this.target.x, this.target.y));
@@ -953,7 +958,6 @@ var output = function (input) {
             this.bullets = bullets;
         }
         draw = function () {
-            this.weaponCooldownCounter++;
             input.stroke(256, 0, 0, 256);
             input.fill(256, 0, 0, 256);
             input.circle(
@@ -967,6 +971,10 @@ var output = function (input) {
                 defaultStrokeColor.b, 
                 defaultStrokeColor.a, 
             );            
+        }
+        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            this.weaponCooldownCounter++;
+            this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
         }
         attack = function (seesPlayer) {
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);

@@ -251,10 +251,10 @@ var output = function (input) {
                             this.map.isOpen(this.player.x, this.player.y, list[i].x, list[i].y));
                         //check for shots
                         if (this.checkIsShot(list[i], this.bullets)) {
-                            list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), -1);
+                            list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), -1);
                         }
                         else {
-                            list[i].decideDraw(seesPlayer, new Coord(this.player.x, this.player.y), 0);
+                            list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
                         }
                         if (list[i].hp <= 0) {
                             list[i] = null;
@@ -548,7 +548,6 @@ var output = function (input) {
                 this.idleAge++;
                 this.move(1);
             };
-            _this.attack = function (seesPlayer) { };
             _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
                 if (hpOffset < 0) {
                     this.isHit = true;
@@ -570,6 +569,7 @@ var output = function (input) {
                     this.idle();
                 }
             };
+            _this.attack = function (seesPlayer) { };
             _this.didExplode = false;
             _this.isHunting = false;
             _this.age = 0;
@@ -593,7 +593,7 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
                 this.draw();
                 this.hp += hpOffset;
                 if (this.hp <= 0) {
@@ -626,6 +626,12 @@ var output = function (input) {
         function Bomb(x, y, map, target, bullets) {
             var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
+                input.stroke(128, 0, 0, 256);
+                input.fill(128, 0, 0, 256);
+                input.circle(this.x, this.y, this.size);
+                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+            };
+            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
                 if (this.didIgnite) {
                     this.igniteAge++;
                     if (this.igniteAge > 100) {
@@ -633,10 +639,7 @@ var output = function (input) {
                         this.explode();
                     }
                 }
-                input.stroke(128, 0, 0, 256);
-                input.fill(128, 0, 0, 256);
-                input.circle(this.x, this.y, this.size);
-                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
             };
             _this.explode = function () {
                 this.fire(new Coord(this.target.x, this.target.y));
@@ -710,11 +713,14 @@ var output = function (input) {
         function Pirate(size, x, y, map, bullets, target) {
             var _this = _super.call(this, size, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
-                this.weaponCooldownCounter++;
                 input.stroke(256, 0, 0, 256);
                 input.fill(256, 0, 0, 256);
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+            };
+            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+                this.weaponCooldownCounter++;
+                this.decideDraw(seesPlayer, lastSeenPlayerCoord, hpOffset);
             };
             _this.attack = function (seesPlayer) {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
