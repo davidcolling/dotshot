@@ -257,6 +257,7 @@ var output = function (input) {
                         else {
                             list[i].act(seesPlayer, new Coord(this.player.x, this.player.y), 0);
                         }
+                        list[i].draw();
                         if (list[i].hp <= 0) {
                             list[i] = null;
                         }
@@ -553,7 +554,6 @@ var output = function (input) {
                     this.isHit = true;
                     this.size = 11;
                 }
-                this.draw();
                 if (this.isHit) {
                     this.isHit = false;
                     this.size = this.previousSize;
@@ -594,7 +594,6 @@ var output = function (input) {
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
-                this.draw();
                 this.hp += hpOffset;
                 if (this.hp <= 0) {
                     this.food.push(new Food(this.x, this.y));
