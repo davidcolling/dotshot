@@ -14,15 +14,7 @@ Matt's sketches and BZFlag.
 To Do
 soon :
     - improve realism in Bullet class
-    - clean up non-polymorphic logic 
-    shown by the difference in the 
-    looping functions called in 
-    World.draw()
 long term:
-    - characters can regain hp. caused 
-    by:
-        - food? passage of time? 
-        experience?
     - make NPCs more able to go around 
     walls
         - share 'sliding' behavior with
@@ -33,3 +25,6 @@ long term:
 		- more defensive strategy
     - larger worlds
     - player can build walls
+    - player can use experience to 
+    access more weapons
+
