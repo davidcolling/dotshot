@@ -210,7 +210,9 @@ var output = function (input) {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
                 }
-                this.player.act();
+                if (this.frameCount % 2 == 0) {
+                    this.player.act();
+                }
                 this.player.draw();
                 if (this.player.hp == 0) {
                     playerIsDead = true;
