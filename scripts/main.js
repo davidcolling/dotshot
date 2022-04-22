@@ -89,6 +89,46 @@ var output = function (input) {
         ;
         return Food;
     }(CenteredShape));
+    var GridSquare = /** @class */ (function () {
+        function GridSquare(size, isEmpty) {
+            this.draw = function () {
+                if (this.isEmpty) {
+                    return;
+                }
+            };
+            this.size = size;
+            this.isEmpty = isEmpty;
+        }
+        return GridSquare;
+    }());
+    var GridMap = /** @class */ (function () {
+        function GridMap(screenHeight, screenWidth) {
+            this.draw = function () {
+                for (var i = 0; i < this.width; i++) {
+                    for (var j = 0; j < this.height; j++) {
+                        this.map[i][j].draw();
+                    }
+                }
+            };
+            this.isOpen = function (x1, y1, x2, y2) {
+                return true;
+            };
+            var gridSquareSize = 8;
+            var height = gridSquareSize * (screenHeight / gridSquareSize);
+            var width = gridSquareSize * (screenWidth / gridSquareSize);
+            this.gridSquareSize = gridSquareSize;
+            this.height = height;
+            this.width = width;
+            this.map = Array();
+            for (var i = 0; i < width; i++) {
+                this.map[i] = new Array();
+                for (var j = 0; j < height; j++) {
+                    this.map[i][j] = new GridSquare(gridSquareSize, true);
+                }
+            }
+        }
+        return GridMap;
+    }());
     var Wall = /** @class */ (function () {
         function Wall(end1, end2) {
             this.draw = function () {
@@ -301,26 +341,9 @@ var output = function (input) {
                 return false;
             };
             this.frameCount = 0;
-            this.map = new Map(width, height);
+            this.map = new GridMap(width, height);
             this.bullets = new Array();
             this.healthBar = new HealthBar(32, this.map);
-            // put stuff on the map
-            if (Math.random() < 0.3) {
-                for (var i = 0; i < 60; i++) {
-                    this.map.addWall(new Wall(new Coord(i * (this.map.width / 60), 50 + (Math.random() * (this.map.height * 0.8))), new Coord(i * (this.map.width / 60), Math.random() * (this.map.height * 0.8))));
-                }
-            }
-            else {
-                for (var i = 0; i < 2; i++) {
-                    this.map.addWall(new Wall(new Coord(Math.random() * this.map.width, Math.random() * this.map.height), new Coord(Math.random() * this.map.width, Math.random() * this.map.height)));
-                }
-                for (var i = 0; i < 15; i++) {
-                    var castle = new Castle(new Coord(Math.random() * (0.7 * this.map.width), Math.random() * (0.7 * this.map.height)), Math.random() * 500);
-                    for (var j = 0; j < castle.walls.length; j++) {
-                        this.map.addWall(castle.walls[j]);
-                    }
-                }
-            }
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
                 this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
