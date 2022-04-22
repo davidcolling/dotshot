@@ -128,8 +128,8 @@ var output = function (input) {
         
         constructor(screenHeight, screenWidth) {
             var gridSquareSize = 8;
-            var height = gridSquareSize * (screenHeight / gridSquareSize);
-            var width = gridSquareSize * (screenWidth / gridSquareSize);
+            var height = gridSquareSize * Math.floor(screenHeight / gridSquareSize);
+            var width = gridSquareSize * Math.floor(screenWidth / gridSquareSize);
             this.gridSquareSize = gridSquareSize;
             this.height = height;
             this.width = width;
