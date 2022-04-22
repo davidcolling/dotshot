@@ -492,7 +492,7 @@ var output = function (input) {
     var Player = /** @class */ (function (_super) {
         __extends(Player, _super);
         function Player(size, x, y, map, bullets) {
-            var _this = _super.call(this, size, x, y, map, bullets, 16) || this;
+            var _this = _super.call(this, size, x, y, map, bullets, 64) || this;
             _this.act = function () {
                 this.point(this.x, this.y, input.mouseX, input.mouseY);
                 if (this.isFiring) {
