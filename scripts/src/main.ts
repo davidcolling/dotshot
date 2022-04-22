@@ -347,7 +347,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.map = new Map(width, height);
             this.bullets = new Array();
-            this.healthBar = new HealthBar(16, this.map);
+            this.healthBar = new HealthBar(32, this.map);
 
             // put stuff on the map
             if (Math.random() < 0.3) {
@@ -502,7 +502,7 @@ var output = function (input) {
 
         // obj2 is the projectile
         isShot= function(obj1, obj2) {
-            var isClose=  5 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
+            var isClose=  7 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
             var isInFrontOf= this.isInFrontOf(obj1, obj2);
             var isOpen= this.map.isOpen(obj1.x, obj1.y, obj2.x, obj2.y);
             return isClose && isInFrontOf && isOpen;
@@ -697,7 +697,7 @@ var output = function (input) {
         firingAge: number;
 
         constructor(size, x, y, map, bullets) {
-            super(size, x, y, map, bullets, 64);
+            super(size, x, y, map, bullets, 32);
             this.isFiring = false; 
             this.isMoving = false;
             this.firingAge = 0;
