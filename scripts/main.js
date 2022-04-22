@@ -222,12 +222,12 @@ var output = function (input) {
                         // calculate npc behavior
                         var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
                             this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
-                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
-                        this.nPCs[i].draw();
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
+                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
+                        this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
                             this.nPCs[i] = null;
                         }
@@ -321,6 +321,10 @@ var output = function (input) {
                     }
                 }
             }
+            this.food = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+            }
             // make characters
             this.nPCs = new Array();
             this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
@@ -334,10 +338,6 @@ var output = function (input) {
             this.mines = new Array();
             for (var i = 0; i < 20; i++) {
                 this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-            }
-            this.food = new Array();
-            for (var i = 0; i < 5; i++) {
-                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
         }
         World.calculateCoordinate = function (length, direction) {

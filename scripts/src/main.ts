@@ -381,6 +381,11 @@ var output = function (input) {
                     }
                 }
             }
+            
+            this.food = new Array();
+            for (var i = 0; i < 5; i++) {
+                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+            }
 
             // make characters
             this.nPCs = new Array();
@@ -396,11 +401,6 @@ var output = function (input) {
             this.mines = new Array();
             for (var i = 0; i < 20; i++ ) {
                 this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-            }
-            
-            this.food = new Array();
-            for (var i = 0; i < 5; i++) {
-                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
 
         }
@@ -436,14 +436,14 @@ var output = function (input) {
                         this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) 
                     );
     
-                    this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
-
-                    this.nPCs[i].draw();
                     //check for shots
                     if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                         this.nPCs[i].hp--;
                     }
     
+                    this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
+
+                    this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
                         this.nPCs[i] = null;
                     }
