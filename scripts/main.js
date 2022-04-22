@@ -505,7 +505,7 @@ var output = function (input) {
                     this.firingAge = 0;
                 }
                 if (this.isMoving) {
-                    this.move(2);
+                    this.move(3);
                 }
             };
             _this.draw = function () {
@@ -571,8 +571,7 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
-                this.hp += hpOffset;
+            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
                 if (this.hp <= 0) {
                     this.food.push(new Food(this.x, this.y));
                 }
@@ -584,7 +583,7 @@ var output = function (input) {
                         this.fleeAge = 0;
                         this.direction = Math.random() * 360;
                     }
-                    this.move(3);
+                    this.move(2);
                 }
                 else {
                     this.idle();
@@ -608,7 +607,7 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
                 if (this.didIgnite) {
                     this.igniteAge++;
                     if (this.igniteAge > 100) {
@@ -695,7 +694,7 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
                 this.weaponCooldownCounter++;
                 this.decideDraw(seesPlayer, lastSeenPlayerCoord);
             };

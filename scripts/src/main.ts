@@ -714,7 +714,7 @@ var output = function (input) {
                 this.firingAge = 0;
             }
             if (this.isMoving) {
-                this.move(2);
+                this.move(3);
             }
         }
         draw = function () {
@@ -809,8 +809,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }    
-        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
-            this.hp += hpOffset;
+        act = function (seesPlayer, lastSeenPlayerCoord) {
             if(this.hp <= 0) {
                 this.food.push(new Food(this.x, this.y));
             }
@@ -821,7 +820,7 @@ var output = function (input) {
                     this.fleeAge = 0;
                     this.direction = Math.random() * 360;
                 }
-                this.move(3);
+                this.move(2);
             } else {
                 this.idle();
             }
@@ -856,7 +855,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+        act = function (seesPlayer, lastSeenPlayerCoord) {
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 100) {
@@ -950,7 +949,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function (seesPlayer, lastSeenPlayerCoord, hpOffset) {
+        act = function (seesPlayer, lastSeenPlayerCoord) {
             this.weaponCooldownCounter++;
             this.decideDraw(seesPlayer, lastSeenPlayerCoord);
         }
