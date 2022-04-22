@@ -460,10 +460,10 @@ var output = function (input) {
                         this.hasPassedTarget = true;
                     }
                 }
-                this.move(15);
+                this.move(6);
                 input.circle(this.x, this.y, this.size);
                 this.age++;
-                if (this.age < 30) {
+                if (this.age < 80) {
                     return true;
                 }
                 else {
@@ -803,7 +803,7 @@ var output = function (input) {
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
-        input.frameRate(10000);
+        input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
         world = new World(width, height, 10);
