@@ -126,7 +126,7 @@ var output = function (input) {
         map: Array<Array<GridSquare>>;
         gridSquareSize: number;
         
-        constructor(screenHeight, screenWidth) {
+        constructor(screenWidth, screenHeight) {
             var gridSquareSize = 8;
             var height = gridSquareSize * Math.floor(screenHeight / gridSquareSize);
             var width = gridSquareSize * Math.floor(screenWidth / gridSquareSize);

@@ -102,7 +102,7 @@ var output = function (input) {
         return GridSquare;
     }());
     var GridMap = /** @class */ (function () {
-        function GridMap(screenHeight, screenWidth) {
+        function GridMap(screenWidth, screenHeight) {
             this.draw = function () {
                 for (var i = 0; i < this.width; i++) {
                     for (var j = 0; j < this.height; j++) {
