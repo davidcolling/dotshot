@@ -131,37 +131,43 @@ var output = function (input) {
     }
 
     class GridMap {
-        height: number;
         width: number;
+        height: number;
+        gridWidth:number;
+        gridHeight:number;
         map: Array<Array<GridSquare>>;
         gridSquareSize: number;
         
         constructor(screenWidth, screenHeight) {
             var gridSquareSize = 8;
-            var height = gridSquareSize * Math.floor(screenHeight / gridSquareSize);
-            var width = gridSquareSize * Math.floor(screenWidth / gridSquareSize);
+            var gridWidth = Math.floor(screenWidth / gridSquareSize);
+            var gridHeight = Math.floor(screenHeight / gridSquareSize);
+            var width = gridSquareSize * gridWidth;
+            var height = gridSquareSize * gridHeight;
             this.gridSquareSize = gridSquareSize;
-            this.height = height;
             this.width = width;
+            this.height = height;
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
             this.map = Array();
-            for (var i = 0; i < width ; i ++) {
+            for (var i = 0; i < gridWidth ; i ++) {
                 this.map[i] = new Array();
-                for (var j = 0; j < height; j ++) {
+                for (var j = 0; j < gridHeight; j ++) {
+                    var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
                     var isEmpty
                     if (Math.random() < .001) {
                         isEmpty = false;
                     } else {
                         isEmpty = true;
                     }
-                        
-                    this.map[i][j] = new GridSquare(gridSquareSize, new Coord((i * gridSquareSize), (j * gridSquareSize)), isEmpty);
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, isEmpty);
                 }
             }
         }
 
         draw = function () {
-            for (var i = 0; i < this.width ; i ++) {
-                for (var j = 0; j < this.height; j ++) {
+            for (var i = 0; i < this.gridWidth; i ++) {
+                for (var j = 0; j < this.gridHeight; j ++) {
                     this.map[i][j].draw();
                 }
             }
