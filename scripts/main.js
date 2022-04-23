@@ -90,14 +90,19 @@ var output = function (input) {
         return Food;
     }(CenteredShape));
     var GridSquare = /** @class */ (function () {
-        function GridSquare(size, isEmpty) {
+        function GridSquare(size, coord, isEmpty) {
             this.draw = function () {
                 if (this.isEmpty) {
                     return;
                 }
+                else {
+                    input.fill(256, 256);
+                    input.rect(this.coord.x, this.coord.y, this.size, this.size);
+                }
             };
             this.size = size;
             this.isEmpty = isEmpty;
+            this.coord = coord;
         }
         return GridSquare;
     }());
@@ -123,7 +128,14 @@ var output = function (input) {
             for (var i = 0; i < width; i++) {
                 this.map[i] = new Array();
                 for (var j = 0; j < height; j++) {
-                    this.map[i][j] = new GridSquare(gridSquareSize, true);
+                    var isEmpty;
+                    if (Math.random() < .001) {
+                        isEmpty = false;
+                    }
+                    else {
+                        isEmpty = true;
+                    }
+                    this.map[i][j] = new GridSquare(gridSquareSize, new Coord((i * gridSquareSize), (j * gridSquareSize)), isEmpty);
                 }
             }
         }

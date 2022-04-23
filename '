@@ -109,10 +109,9 @@ var output = function (input) {
         isEmpty: boolean;
         coord: Coord;
 
-        constructor(size, coord, isEmpty) {
+        constructor(size, isEmpty) {
             this.size = size;
             this.isEmpty = isEmpty;
-            this.coord = coord;
         }
 
         draw = function () {
@@ -121,10 +120,6 @@ var output = function (input) {
             } else {
                 input.fill(256, 256);
                 input.rect(
-                    this.coord.x,
-                    this.coord.y,
-                    this.size,
-                    this.size
                 );
             }
         }
@@ -148,13 +143,13 @@ var output = function (input) {
                 this.map[i] = new Array();
                 for (var j = 0; j < height; j ++) {
                     var isEmpty
-                    if (Math.random() < .001) {
+                    if (Math.random() < .1) {
                         isEmpty = false;
                     } else {
-                        isEmpty = true;
+                        true;
                     }
                         
-                    this.map[i][j] = new GridSquare(gridSquareSize, new Coord((i * gridSquareSize), (j * gridSquareSize)), isEmpty);
+                    this.map[i][j] = new GridSquare(gridSquareSize, isEmpty);
                 }
             }
         }
