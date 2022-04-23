@@ -545,8 +545,7 @@ var output = function (input) {
         isShot = function(obj1, obj2) {
             var isClose =  3 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
             var isInFrontOf = this.isInFrontOf(obj1, obj2);
-            var isOpen = this.map.isOpen(obj1.x, obj1.y, obj2.x, obj2.y);
-            return isClose && isInFrontOf && isOpen;
+            return isClose && isInFrontOf;
         }
 
         isInFrontOf = function(obj1, obj2) {
