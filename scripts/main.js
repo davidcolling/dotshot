@@ -128,10 +128,8 @@ var output = function (input) {
                 }
             };
             this.getGridIndex = function (screenCoord) {
-                console.log(screenCoord.x + " " + screenCoord.y);
                 var indexX = Math.floor(screenCoord.x / this.gridSquareSize);
                 var indexY = Math.floor(screenCoord.y / this.gridSquareSize);
-                console.log(indexX + " " + indexY);
                 var indexCoord = new Coord(indexX, indexY);
                 return indexCoord;
             };
@@ -151,7 +149,7 @@ var output = function (input) {
                 for (var j = 0; j < gridHeight; j++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
                     var isEmpty;
-                    if (Math.random() < .001) {
+                    if (Math.random() < .03) {
                         isEmpty = false;
                     }
                     else {

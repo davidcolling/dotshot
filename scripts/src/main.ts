@@ -155,7 +155,7 @@ var output = function (input) {
                 for (var j = 0; j < gridHeight; j ++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
                     var isEmpty
-                    if (Math.random() < .001) {
+                    if (Math.random() < .03) {
                         isEmpty = false;
                     } else {
                         isEmpty = true;
