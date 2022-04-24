@@ -173,8 +173,25 @@ var output = function (input) {
             }
         }
 
-        isOpen = function (x1, y1, x2, y2) {
-            return true;
+        isOpen = function (screenCoord) {
+            if (
+                0 < screenCoord.x &&
+                screenCoord.x < this.width &&
+                0 < screenCoord.y &&
+                screenCoord.y < this.height
+            ) {
+                var gridIndex = this.getGridIndex(screenCoord);
+                return this.map[gridIndex.x][gridIndex.y].isEmpty;
+            } else {
+                return false;
+            }
+        }
+
+        getGridIndex = function (screenCoord) {
+            var indexX = Math.floor(screenCoord.x / this.gridSquareSize);
+            var indexY = Math.floor(screenCoord.y / this.gridSquareSize);
+            var indexCoord = new Coord(indexX, indexY);
+            return indexCoord;
         }
     }
 
@@ -473,8 +490,7 @@ var output = function (input) {
 
                     // calculate npc behavior
                     var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) && 
-                        this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) 
+                        400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y)
                     );
     
                     //check for shots
@@ -652,7 +668,7 @@ var output = function (input) {
 
     class Moveable extends CenteredShape {
         direction: number;
-        map: Map;
+        map: GridMap;
 
         constructor(size, x, y, direction, map) {
             super(size, x, y);
@@ -670,11 +686,7 @@ var output = function (input) {
             var newY = this.y + relativeChangeCoordinate.y;
             // part two determines if the coordinates are somewhere the character can actually go
             if (
-                this.map.isOpen(this.x, this.y, newX, newY) &&
-                0 < newX &&                                                 // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
-                newX < this.map.width &&
-                0 < newY &&
-                newY < this.map.height
+                this.map.isOpen(new Coord(newX, newY))
             ) {
                 this.x = newX;
                 this.y = newY;

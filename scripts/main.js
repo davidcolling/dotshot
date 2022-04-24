@@ -115,8 +115,25 @@ var output = function (input) {
                     }
                 }
             };
-            this.isOpen = function (x1, y1, x2, y2) {
-                return true;
+            this.isOpen = function (screenCoord) {
+                if (0 < screenCoord.x &&
+                    screenCoord.x < this.width &&
+                    0 < screenCoord.y &&
+                    screenCoord.y < this.height) {
+                    var gridIndex = this.getGridIndex(screenCoord);
+                    return this.map[gridIndex.x][gridIndex.y].isEmpty;
+                }
+                else {
+                    return false;
+                }
+            };
+            this.getGridIndex = function (screenCoord) {
+                console.log(screenCoord.x + " " + screenCoord.y);
+                var indexX = Math.floor(screenCoord.x / this.gridSquareSize);
+                var indexY = Math.floor(screenCoord.y / this.gridSquareSize);
+                console.log(indexX + " " + indexY);
+                var indexCoord = new Coord(indexX, indexY);
+                return indexCoord;
             };
             var gridSquareSize = 8;
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
@@ -277,8 +294,7 @@ var output = function (input) {
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
                         // calculate npc behavior
-                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y) &&
-                            this.map.isOpen(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
+                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
@@ -469,11 +485,7 @@ var output = function (input) {
                 var newX = this.x + relativeChangeCoordinate.x;
                 var newY = this.y + relativeChangeCoordinate.y;
                 // part two determines if the coordinates are somewhere the character can actually go
-                if (this.map.isOpen(this.x, this.y, newX, newY) &&
-                    0 < newX && // idk why but without the additional bounds checks the player sometimes disappears when moving in direction between 359-360 degrees
-                    newX < this.map.width &&
-                    0 < newY &&
-                    newY < this.map.height) {
+                if (this.map.isOpen(new Coord(newX, newY))) {
                     this.x = newX;
                     this.y = newY;
                 }
