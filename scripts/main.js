@@ -103,6 +103,7 @@ var output = function (input) {
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
+            this.visibleIndexes = new Array();
         }
         return GridSquare;
     }());
@@ -120,7 +121,7 @@ var output = function (input) {
                     screenCoord.x < this.width &&
                     0 < screenCoord.y &&
                     screenCoord.y < this.height) {
-                    var gridIndex = this.getGridIndex(screenCoord);
+                    var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
                     return this.map[gridIndex.x][gridIndex.y].isEmpty;
                 }
                 else {
@@ -128,10 +129,7 @@ var output = function (input) {
                 }
             };
             this.getGridIndex = function (screenCoord) {
-                var indexX = Math.floor(screenCoord.x / this.gridSquareSize);
-                var indexY = Math.floor(screenCoord.y / this.gridSquareSize);
-                var indexCoord = new Coord(indexX, indexY);
-                return indexCoord;
+                return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
             };
             var gridSquareSize = 8;
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
@@ -158,7 +156,32 @@ var output = function (input) {
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, isEmpty);
                 }
             }
+            var numberOfSquares = 0;
+            for (var i = 0; i < gridWidth; i++) {
+                for (var j = 0; j < gridHeight; j++) {
+                    numberOfSquares++;
+                    if (this.map[i][j].isEmpty) {
+                        for (var k = 0; k < 360; k += 2) {
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
+                            var moveCount = 0;
+                            while (coordinateTracker.move(2)) {
+                                moveCount++;
+                                if (moveCount > 50) {
+                                    break;
+                                }
+                                this.map[i][j].visibleIndexes.push(GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize));
+                            }
+                        }
+                    }
+                }
+            }
         }
+        GridMap.getGridIndex = function (screenCoord, gridSquareSize) {
+            var indexX = Math.floor(screenCoord.x / gridSquareSize);
+            var indexY = Math.floor(screenCoord.y / gridSquareSize);
+            var indexCoord = new Coord(indexX, indexY);
+            return indexCoord;
+        };
         return GridMap;
     }());
     var Wall = /** @class */ (function () {
@@ -289,15 +312,18 @@ var output = function (input) {
                     document.getElementById("message").textContent = "You Lose.";
                 }
                 this.healthBar.draw();
+                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+                for (var i = 0; i < this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.length; i++) {
+                    this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].seesPlayer = true;
+                    this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                }
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
-                        // calculate npc behavior
-                        var seesPlayer = (400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y));
                         //check for shots
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
-                        this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
+                        this.nPCs[i].act();
                         this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
                             this.nPCs[i] = null;
@@ -486,6 +512,10 @@ var output = function (input) {
                 if (this.map.isOpen(new Coord(newX, newY))) {
                     this.x = newX;
                     this.y = newY;
+                    return true;
+                }
+                else {
+                    return false;
                 }
             };
             _this.direction = direction;
@@ -586,26 +616,24 @@ var output = function (input) {
                 this.idleAge++;
                 this.move(1);
             };
-            _this.decideDraw = function (seesPlayer, lastSeenPlayerCoord) {
-                if (this.isHunting || seesPlayer) {
-                    if (seesPlayer) {
-                        this.lastSeenPlayerCoord = lastSeenPlayerCoord;
-                    }
-                    this.attack(seesPlayer);
+            _this.decideDraw = function () {
+                if (this.isHunting || this.seesPlayer) {
+                    this.attack();
                 }
                 else {
                     this.idle();
                 }
             };
-            _this.attack = function (seesPlayer) { };
+            _this.attack = function () { };
             _this.didExplode = false;
             _this.isHunting = false;
             _this.age = 0;
             _this.idleAge = idleAge;
             _this.idleLife = idleLife;
-            _this.lastSeenPlayerCoord = null;
             _this.target = target;
             _this.previousSize = _this.size;
+            _this.seesPlayer = false;
+            _this.lastSeenPlayerCoord = null;
             return _this;
         }
         return NPC;
@@ -620,11 +648,11 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
+            _this.act = function () {
                 if (this.hp <= 0) {
                     this.food.push(new Food(this.x, this.y));
                 }
-                if (seesPlayer) {
+                if (this.seesPlayer) {
                     if (this.fleeAge < this.fleeLife) {
                         this.fleeAge++;
                     }
@@ -656,7 +684,7 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
+            _this.act = function () {
                 if (this.didIgnite) {
                     this.igniteAge++;
                     if (this.igniteAge > 100) {
@@ -664,7 +692,7 @@ var output = function (input) {
                         this.explode();
                     }
                 }
-                this.decideDraw(seesPlayer, lastSeenPlayerCoord);
+                this.decideDraw();
             };
             _this.explode = function () {
                 this.fire(new Coord(this.target.x, this.target.y));
@@ -697,10 +725,10 @@ var output = function (input) {
                     }
                 }
             };
-            _this.attack = function (seesPlayer) {
+            _this.attack = function () {
                 var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
                 var willMove = true;
-                if (seesPlayer) {
+                if (this.seesPlayer) {
                     if (distance < 300) {
                         this.pulse();
                         if (distance < 200) {
@@ -743,14 +771,14 @@ var output = function (input) {
                 input.circle(this.x, this.y, this.size);
                 input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
-            _this.act = function (seesPlayer, lastSeenPlayerCoord) {
+            _this.act = function () {
                 this.weaponCooldownCounter++;
-                this.decideDraw(seesPlayer, lastSeenPlayerCoord);
+                this.decideDraw();
             };
-            _this.attack = function (seesPlayer) {
+            _this.attack = function () {
                 this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
                 this.move(0.5);
-                if (seesPlayer) {
+                if (this.seesPlayer) {
                     if (this.weaponCooldownCounter % 16 == 0) {
                         this.fire(new Coord(this.target.x, this.target.y));
                     }
@@ -813,7 +841,9 @@ var output = function (input) {
                 }
                 this.didExplode = true;
             };
-            _this.move = function () { };
+            _this.move = function () {
+                return false;
+            };
             _this.idle = function () { };
             _this.attack = function () { };
             _this.didIgnite = false;

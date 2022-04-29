@@ -108,11 +108,13 @@ var output = function (input) {
         size: number;
         isEmpty: boolean;
         coord: Coord;
+        visibleIndexes: Array<Coord>;
 
         constructor(size, coord, isEmpty) {
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
+            this.visibleIndexes = new Array();
         }
 
         draw = function () {
@@ -161,6 +163,26 @@ var output = function (input) {
                         isEmpty = true;
                     }
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, isEmpty);
+
+                }
+            }
+            var numberOfSquares = 0
+            for (var i = 0; i < gridWidth; i++) {
+                for (var j = 0; j < gridHeight; j++) {
+                    numberOfSquares++;
+                    if (this.map[i][j].isEmpty) {
+                        for (var k = 0; k < 360; k += 2) {
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
+                            var moveCount = 0;
+                            while (coordinateTracker.move(2)) {
+                                moveCount++;
+                                if (moveCount > 50) {
+                                    break;
+                                }
+                               this.map[i][j].visibleIndexes.push(GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -180,19 +202,24 @@ var output = function (input) {
                 0 < screenCoord.y &&
                 screenCoord.y < this.height
             ) {
-                var gridIndex = this.getGridIndex(screenCoord);
+                var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
                 return this.map[gridIndex.x][gridIndex.y].isEmpty;
             } else {
                 return false;
             }
         }
 
-        getGridIndex = function (screenCoord) {
-            var indexX = Math.floor(screenCoord.x / this.gridSquareSize);
-            var indexY = Math.floor(screenCoord.y / this.gridSquareSize);
+        static getGridIndex = function (screenCoord, gridSquareSize) {
+            var indexX = Math.floor(screenCoord.x / gridSquareSize);
+            var indexY = Math.floor(screenCoord.y / gridSquareSize);
             var indexCoord = new Coord(indexX, indexY);
             return indexCoord;
         }
+
+        getGridIndex = function (screenCoord) {
+            return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
+        }
+        
     }
 
     class Wall {
@@ -485,20 +512,21 @@ var output = function (input) {
             }
             this.healthBar.draw();
 
+            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+            for (var i = 0; i < this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.length; i++) {
+                this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].seesPlayer = true;
+                this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+            }
+
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
 
-                    // calculate npc behavior
-                    var seesPlayer = (
-                        400 > World.calculateDistance(this.player.x, this.player.y, this.nPCs[i].x, this.nPCs[i].y)
-                    );
-    
                     //check for shots
                     if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                         this.nPCs[i].hp--;
                     }
     
-                    this.nPCs[i].act(seesPlayer, new Coord(this.player.x, this.player.y));
+                    this.nPCs[i].act();
 
                     this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
@@ -690,6 +718,9 @@ var output = function (input) {
             ) {
                 this.x = newX;
                 this.y = newY;
+                return true;
+            } else {
+                return false;
             }
         };
     }
@@ -786,9 +817,10 @@ var output = function (input) {
         age: number;
         idleAge: number;
         idleLife: number;
-        lastSeenPlayerCoord: Coord;
         target: Character;
         previousSize: number;
+        seesPlayer:boolean;
+        lastSeenPlayerCoord: Coord;
 
        constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
             super(size, x, y, map, bullets, maxHP);
@@ -797,9 +829,10 @@ var output = function (input) {
             this.age = 0;
             this.idleAge = idleAge;
             this.idleLife = idleLife;
-            this.lastSeenPlayerCoord = null;
             this.target = target;
             this.previousSize = this.size;
+            this.seesPlayer = false;
+            this.lastSeenPlayerCoord = null;
         }
         draw = function () {
             input.fill(256, 256);
@@ -818,18 +851,15 @@ var output = function (input) {
             this.idleAge++;
             this.move(1);
         }
-        decideDraw = function (seesPlayer, lastSeenPlayerCoord) {
-            if ( this.isHunting || seesPlayer) {
-                if (seesPlayer) {
-                    this.lastSeenPlayerCoord = lastSeenPlayerCoord;
-                }
-                this.attack(seesPlayer);
+        decideDraw = function () {
+            if ( this.isHunting || this.seesPlayer) {
+                this.attack();
             } else {
                 this.idle();
             }
         }
 
-        attack = function (seesPlayer) {}
+        attack = function () {}
 
     }
 
@@ -861,11 +891,11 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }    
-        act = function (seesPlayer, lastSeenPlayerCoord) {
+        act = function () {
             if(this.hp <= 0) {
                 this.food.push(new Food(this.x, this.y));
             }
-            if (seesPlayer) {
+            if (this.seesPlayer) {
                 if (this.fleeAge < this.fleeLife) {
                     this.fleeAge++;
                 } else {
@@ -907,7 +937,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function (seesPlayer, lastSeenPlayerCoord) {
+        act = function () {
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 100) {
@@ -915,7 +945,7 @@ var output = function (input) {
                     this.explode();
                 }
             }
-            this.decideDraw(seesPlayer, lastSeenPlayerCoord);
+            this.decideDraw();
         }
         explode = function () {
             this.fire(new Coord(this.target.x, this.target.y));
@@ -948,10 +978,10 @@ var output = function (input) {
                 }
             }
         }
-        attack = function (seesPlayer) {
+        attack = function () {
             var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             var willMove = true;
-            if (seesPlayer) {
+            if (this.seesPlayer) {
                 if ( distance < 300 ) {
                     this.pulse();
                     if ( distance < 200 ) {
@@ -1001,14 +1031,14 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function (seesPlayer, lastSeenPlayerCoord) {
+        act = function () {
             this.weaponCooldownCounter++;
-            this.decideDraw(seesPlayer, lastSeenPlayerCoord);
+            this.decideDraw();
         }
-        attack = function (seesPlayer) {
+        attack = function () {
             this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             this.move(0.5);
-            if (seesPlayer) {
+            if (this.seesPlayer) {
                 if (this.weaponCooldownCounter % 16 == 0) {
                     this.fire(new Coord(this.target.x, this.target.y));
                 }
@@ -1091,7 +1121,9 @@ var output = function (input) {
 
             this.didExplode = true;
         }
-        move = function () { }
+        move = function () {
+            return false;
+        }
         idle = function () { }
         attack = function () { }
     };
