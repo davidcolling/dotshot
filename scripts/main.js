@@ -99,6 +99,7 @@ var output = function (input) {
             };
             this.gridWidth = width;
             this.gridHeight = height;
+            this.map = new Array();
             for (var i = 0; i < width; i++) {
                 this.map[i] = new Array();
                 for (var j = 0; j < height; j++) {
