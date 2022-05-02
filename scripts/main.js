@@ -169,7 +169,10 @@ var output = function (input) {
                                 if (moveCount > 50) {
                                     break;
                                 }
-                                this.map[i][j].visibleIndexes.push(GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize));
+                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
+                                if (!this.map[i][j].visibleIndexes.includes(gridCoord)) {
+                                    this.map[i][j].visibleIndexes.push(gridCoord);
+                                }
                             }
                         }
                     }

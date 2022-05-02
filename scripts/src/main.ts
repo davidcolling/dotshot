@@ -104,11 +104,34 @@ var output = function (input) {
         }
     }
 
+    class GridMapImage {
+        gridWidth:number;
+        gridHeight:number;
+        map: Array<Array<boolean>>;
+
+        constructor(width, height) {
+            this.gridWidth = width;
+            this.gridHeight = height);
+            for (var i = 0; i < width; i++) {
+                this.map[i] = new Array();
+                for (var j = 0; j < height; j++) {
+                    this.map[i][j] = false;
+                }
+            }
+        }
+        set = function(x, y) {
+            this.map[x][y] = true;
+        }
+        unSet = function(x, y) {
+            this.map[x][y] = false;
+        }
+    }
+
     class GridSquare {
         size: number;
         isEmpty: boolean;
         coord: Coord;
-        visibleIndexes: Array<Coord>;
+        visibleIndexes: GridMapImage;
 
         constructor(size, coord, isEmpty) {
             this.size = size;
@@ -179,7 +202,8 @@ var output = function (input) {
                                 if (moveCount > 50) {
                                     break;
                                 }
-                               this.map[i][j].visibleIndexes.push(GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize));
+                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
+                                this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
                         }
                     }
