@@ -89,6 +89,25 @@ var output = function (input) {
         ;
         return Food;
     }(CenteredShape));
+    var GridMapImage = /** @class */ (function () {
+        function GridMapImage(width, height) {
+            this.set = function (x, y) {
+                this.map[x][y] = true;
+            };
+            this.unSet = function (x, y) {
+                this.map[x][y] = false;
+            };
+            this.gridWidth = width;
+            this.gridHeight = height;
+            for (var i = 0; i < width; i++) {
+                this.map[i] = new Array();
+                for (var j = 0; j < height; j++) {
+                    this.map[i][j] = false;
+                }
+            }
+        }
+        return GridMapImage;
+    }());
     var GridSquare = /** @class */ (function () {
         function GridSquare(size, coord, isEmpty) {
             this.draw = function () {
@@ -103,7 +122,7 @@ var output = function (input) {
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
-            this.visibleIndexes = new Array();
+            this.visibleIndexes = null;
         }
         return GridSquare;
     }());
@@ -161,6 +180,7 @@ var output = function (input) {
                 for (var j = 0; j < gridHeight; j++) {
                     numberOfSquares++;
                     if (this.map[i][j].isEmpty) {
+                        this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
@@ -170,9 +190,7 @@ var output = function (input) {
                                     break;
                                 }
                                 var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
-                                if (!this.map[i][j].visibleIndexes.includes(gridCoord)) {
-                                    this.map[i][j].visibleIndexes.push(gridCoord);
-                                }
+                                this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
                         }
                     }

@@ -111,7 +111,7 @@ var output = function (input) {
 
         constructor(width, height) {
             this.gridWidth = width;
-            this.gridHeight = height);
+            this.gridHeight = height;
             for (var i = 0; i < width; i++) {
                 this.map[i] = new Array();
                 for (var j = 0; j < height; j++) {
@@ -137,7 +137,7 @@ var output = function (input) {
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
-            this.visibleIndexes = new Array();
+            this.visibleIndexes = null;
         }
 
         draw = function () {
@@ -194,6 +194,7 @@ var output = function (input) {
                 for (var j = 0; j < gridHeight; j++) {
                     numberOfSquares++;
                     if (this.map[i][j].isEmpty) {
+                        this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
