@@ -112,18 +112,25 @@ var output = function (input) {
     var GridSquare = /** @class */ (function () {
         function GridSquare(size, coord, isEmpty) {
             this.draw = function () {
-                if (this.isEmpty) {
-                    return;
+                if (this.isHighlighted) {
+                    input.fill(256, 0, 0, 256);
+                    input.rect(this.coord.x, this.coord.y, this.size, this.size);
                 }
                 else {
-                    input.fill(256, 256);
-                    input.rect(this.coord.x, this.coord.y, this.size, this.size);
+                    if (this.isEmpty) {
+                        return;
+                    }
+                    else {
+                        input.fill(256, 256);
+                        input.rect(this.coord.x, this.coord.y, this.size, this.size);
+                    }
                 }
             };
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
             this.visibleIndexes = null;
+            this.isHightlighted = false;
         }
         return GridSquare;
     }());
@@ -320,6 +327,17 @@ var output = function (input) {
                 var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
                 // 
                 this.frameCount++;
+                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+                for (var i = 0; i < this.map.gridWidth; i++) {
+                    for (var j = 0; j < this.map.gridWidth; j++) {
+                        if (this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[i][j]) {
+                            this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
+                        }
+                        else {
+                            this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
+                        }
+                    }
+                }
                 this.map.draw();
                 this.drawBullets(this.bullets);
                 // player
@@ -334,7 +352,6 @@ var output = function (input) {
                     document.getElementById("message").textContent = "You Lose.";
                 }
                 this.healthBar.draw();
-                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
                 for (var i = 0; i < this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.length; i++) {
                     this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].seesPlayer = true;
                     this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);

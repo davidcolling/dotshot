@@ -133,25 +133,37 @@ var output = function (input) {
         isEmpty: boolean;
         coord: Coord;
         visibleIndexes: GridMapImage;
+        isHightlighted: boolean;
 
         constructor(size, coord, isEmpty) {
             this.size = size;
             this.isEmpty = isEmpty;
             this.coord = coord;
             this.visibleIndexes = null;
+            this.isHightlighted = false;
         }
 
         draw = function () {
-            if (this.isEmpty) {
-                return;
-            } else {
-                input.fill(256, 256);
+            if (this.isHighlighted) {
+                input.fill(256, 0, 0, 256);
                 input.rect(
                     this.coord.x,
                     this.coord.y,
                     this.size,
                     this.size
                 );
+            } else {
+                if (this.isEmpty) {
+                    return;
+                } else {
+                    input.fill(256, 256);
+                    input.rect(
+                        this.coord.x,
+                        this.coord.y,
+                        this.size,
+                        this.size
+                    );
+                }
             }
         }
     }
@@ -521,6 +533,16 @@ var output = function (input) {
 
             // 
             this.frameCount++;
+            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+            for (var i = 0; i < this.map.gridWidth; i++) {
+                for (var j = 0; j < this.map.gridWidth; j++) {
+                    if (this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[i][j]) {
+                        this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
+                    } else {
+                        this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
+                    }
+                }
+            }
             this.map.draw();
         
             this.drawBullets(this.bullets);
@@ -538,7 +560,6 @@ var output = function (input) {
             }
             this.healthBar.draw();
 
-            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
             for (var i = 0; i < this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.length; i++) {
                 this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].seesPlayer = true;
                 this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
