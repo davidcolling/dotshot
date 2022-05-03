@@ -12,14 +12,18 @@ Matt's sketches and BZFlag.
 (https://github.com/mcthomas/Processing-Sketches/blob/main/images/A6.png)
 
 To Do
-soon :
-    - improve realism in Bullet class
+soon:
+    - clean
+        - use Coord everywhere
+    - make maps interesting again
+    - make ui to access world settings
+    before the game starts
 long term:
+    - improve realism in Bullet class
     - make NPCs more able to go around 
     walls
         - share 'sliding' behavior with
         all Character?
-    - use Coord everywhere
     - more believable NPC behavior
         - interact with other NPCs
 		- more defensive strategy
