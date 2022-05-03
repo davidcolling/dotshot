@@ -915,6 +915,12 @@ var output = function (input) {
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
+        if (height > 700) {
+            height = 700;
+        }
+        if (width > 700) {
+            width = 700;
+        }
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
