@@ -352,12 +352,12 @@ var output = function (input) {
                         if (this.checkIsShot(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
-                        this.nPCs[i].act();
                         var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
-                        if (this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y]) {
-                            this.nPCs[i].seesPlayer = true;
+                        this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y];
+                        if (this.nPCs[i].seesPlayer) {
                             this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
                         }
+                        this.nPCs[i].act();
                         this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
                             this.nPCs[i] = null;
