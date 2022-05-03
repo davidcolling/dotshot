@@ -328,16 +328,7 @@ var output = function (input) {
                 // 
                 this.frameCount++;
                 var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
-                for (var i = 0; i < this.map.gridWidth; i++) {
-                    for (var j = 0; j < this.map.gridWidth; j++) {
-                        if (this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[i][j]) {
-                            this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
-                        }
-                        else {
-                            this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
-                        }
-                    }
-                }
+                this.map.map[playerIndex.x][playerIndex.y].isHighlighted = true;
                 this.map.draw();
                 this.drawBullets(this.bullets);
                 // player
