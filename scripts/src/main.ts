@@ -516,14 +516,10 @@ var output = function (input) {
             for (var i = 0; i < numberOfEnemies; i++ ) {
                 this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
             }
             for (var i = 0; i < 5; i++) {
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
-            }
-
-            this.mines = new Array();
-            for (var i = 0; i < 20; i++ ) {
-                this.mines.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
             }
 
         }
@@ -574,25 +570,13 @@ var output = function (input) {
 
                     this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
+                        this.nPCs[i].die();
                         this.nPCs[i] = null;
                     }
 
                 }
             }
 
-            for (var i = 0; i < this.mines.length; i++) {
-                if (this.mines[i] != null) {
-                    this.mines[i].draw();
-                    if (this.checkIsShot(this.mines[i], this.bullets)) {
-                        this.mines[i].didIgnite = true;
-                    }
-
-                    if (this.mines[i].didExplode) {
-                        this.mines[i] = null;
-                    }
-                }
-            }
- 
             for (var i = 0; i < this.food.length; i ++) {
                 if (this.food[i] != null) {
                     this.food[i].draw();
@@ -856,7 +840,6 @@ var output = function (input) {
     }
 
     class NPC extends Character {
-        didExplode: boolean;
         isHunting: boolean;
         age: number;
         idleAge: number;
@@ -868,7 +851,6 @@ var output = function (input) {
 
        constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
             super(size, x, y, map, bullets, maxHP);
-            this.didExplode = false;
             this.isHunting = false;
             this.age = 0;
             this.idleAge = idleAge;
@@ -904,6 +886,8 @@ var output = function (input) {
         }
 
         attack = function () {}
+        die = function() {}
+        act = function() {}
 
     }
 
@@ -985,7 +969,6 @@ var output = function (input) {
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 100) {
-                    this.didExplode = true;
                     this.explode();
                 }
             }
@@ -1098,19 +1081,11 @@ var output = function (input) {
     };
 
     class Mine extends NPC {
-        didIgnite: boolean;
-        didExplode: boolean;
-
         constructor(x, y, map, bullets) {
             super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
-            this.didIgnite = false;
-            this.didExplode = false;
             this.bullets = bullets;
         }
         draw = function () {
-            if (this.didIgnite) {
-                this.explode();
-            }
             input.stroke(128, 128, 128, 256);
             input.fill(128, 128, 128, 256);
             input.circle(
@@ -1163,13 +1138,15 @@ var output = function (input) {
                 this.fire(new Coord(directions[i].x - 40, directions[i].y - 40));
             }
 
-            this.didExplode = true;
         }
         move = function () {
             return false;
         }
         idle = function () { }
         attack = function () { }
+        die = function () {
+            this.explode();
+        }
     };
 
 
