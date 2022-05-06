@@ -488,7 +488,7 @@ var output = function (input) {
     // on observer of when bullets should be collected from characters
     // an observer of when objects need to become null, eg old bullets and dead npc
     // an observer of when characters lose hp
-    // an observer of when npc should idle or attack
+    // an observer of NPC "sight" for hunting
     class World {
         frameCount: number;
         map: GridMap;
@@ -595,7 +595,8 @@ var output = function (input) {
         drawBullets = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
-                    if (!list[i].draw()) {
+                    list[i].draw();
+                    if (!list[i].step()) {
                         list[i] = null;
                     }
                 }
@@ -757,8 +758,7 @@ var output = function (input) {
             this.target = target;
             this.hasPassedTarget = false;
         }
-        draw = function () {
-            input.fill(256, 256);
+        step = function () {
             if (!this.hasPassedTarget) {
                 var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
                 if (distance > 10) {
@@ -768,17 +768,20 @@ var output = function (input) {
                 }
             }
             this.move(6);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size,
-            );
             this.age++;
             if (this.age < 80) {
                 return true;
             } else {
                 return false;
             }
+        }
+        draw = function () {
+            input.fill(256, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size,
+            );
         }
     }
 

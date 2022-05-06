@@ -320,7 +320,7 @@ var output = function (input) {
     // on observer of when bullets should be collected from characters
     // an observer of when objects need to become null, eg old bullets and dead npc
     // an observer of when characters lose hp
-    // an observer of when npc should idle or attack
+    // an observer of NPC "sight" for hunting
     var World = /** @class */ (function () {
         function World(width, height, numberOfEnemies) {
             this.draw = function () {
@@ -385,7 +385,8 @@ var output = function (input) {
             this.drawBullets = function (list) {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] != null) {
-                        if (!list[i].draw()) {
+                        list[i].draw();
+                        if (!list[i].step()) {
                             list[i] = null;
                         }
                     }
@@ -546,8 +547,7 @@ var output = function (input) {
         __extends(Bullet, _super);
         function Bullet(x, y, target, map) {
             var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
-            _this.draw = function () {
-                input.fill(256, 256);
+            _this.step = function () {
                 if (!this.hasPassedTarget) {
                     var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
                     if (distance > 10) {
@@ -558,7 +558,6 @@ var output = function (input) {
                     }
                 }
                 this.move(6);
-                input.circle(this.x, this.y, this.size);
                 this.age++;
                 if (this.age < 80) {
                     return true;
@@ -566,6 +565,10 @@ var output = function (input) {
                 else {
                     return false;
                 }
+            };
+            _this.draw = function () {
+                input.fill(256, 256);
+                input.circle(this.x, this.y, this.size);
             };
             _this.age = 0;
             _this.target = target;
