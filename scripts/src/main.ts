@@ -494,7 +494,6 @@ var output = function (input) {
         map: GridMap;
         bullets: Array<Bullet>;
         nPCs: Array<NPC>;
-        mines: Array<NPC>;
         player: Player;
         healthBar: HealthBar;
         food: Array<Food>;
