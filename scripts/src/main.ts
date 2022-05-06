@@ -547,11 +547,6 @@ var output = function (input) {
             }
             this.healthBar.draw();
 
-            for (var i = 0; i < this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.length; i++) {
-                this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].seesPlayer = true;
-                this.map.map[playerIndex.x][playerIndex.y].visibleIndexes[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
-            }
-
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
 
