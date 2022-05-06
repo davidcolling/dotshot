@@ -527,11 +527,10 @@ var output = function (input) {
         draw = function () {
             var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
 
-            // 
+            // world 
             this.frameCount++;
             var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
             this.map.draw();
-        
             this.drawBullets(this.bullets);
 
             // player
@@ -546,7 +545,21 @@ var output = function (input) {
                 document.getElementById("message").textContent = "You Lose.";
             }
             this.healthBar.draw();
+            for (var i = 0; i < this.food.length; i ++) {
+                if (this.food[i] != null) {
+                    this.food[i].draw();
+                    this.food[i].step();
+                    if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                        if (this.player.hp < this.healthBar.max) {
+                            this.food[i] = null;
+                            this.player.hp += 10;
+                            this.healthBar.hp = this.player.hp;
+                        }
+                    }
+                }
+            }
 
+            // NPCs
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
 
@@ -569,20 +582,6 @@ var output = function (input) {
                         this.nPCs[i] = null;
                     }
 
-                }
-            }
-
-            for (var i = 0; i < this.food.length; i ++) {
-                if (this.food[i] != null) {
-                    this.food[i].draw();
-                    this.food[i].step();
-                    if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
-                        if (this.player.hp < this.healthBar.max) {
-                            this.food[i] = null;
-                            this.player.hp += 10;
-                            this.healthBar.hp = this.player.hp;
-                        }
-                    }
                 }
             }
 
