@@ -577,7 +577,6 @@ var output = function (input) {
 
                     this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
-                        this.nPCs[i].die();
                         this.nPCs[i] = null;
                     }
 
@@ -882,7 +881,6 @@ var output = function (input) {
         }
 
         attack = function () {}
-        die = function() {}
         act = function() {}
 
     }
@@ -1140,8 +1138,10 @@ var output = function (input) {
         }
         idle = function () { }
         attack = function () { }
-        die = function () {
-            this.explode();
+        act = function () {
+            if (this.hp <= 0) {
+                this.explode();
+            }
         }
     };
 

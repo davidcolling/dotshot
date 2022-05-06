@@ -370,7 +370,6 @@ var output = function (input) {
                         this.nPCs[i].act();
                         this.nPCs[i].draw();
                         if (this.nPCs[i].hp <= 0) {
-                            this.nPCs[i].die();
                             this.nPCs[i] = null;
                         }
                     }
@@ -646,7 +645,6 @@ var output = function (input) {
                 }
             };
             _this.attack = function () { };
-            _this.die = function () { };
             _this.act = function () { };
             _this.isHunting = false;
             _this.age = 0;
@@ -863,8 +861,10 @@ var output = function (input) {
             };
             _this.idle = function () { };
             _this.attack = function () { };
-            _this.die = function () {
-                this.explode();
+            _this.act = function () {
+                if (this.hp <= 0) {
+                    this.explode();
+                }
             };
             _this.bullets = bullets;
             return _this;
