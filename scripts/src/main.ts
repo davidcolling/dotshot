@@ -710,7 +710,7 @@ var output = function (input) {
 
         // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
         // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
-        // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way.
+        // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David
         static calculateCoordinate(length, direction): Coord {
             var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
             var quadrantAngle = direction - (quadrant * 90);
