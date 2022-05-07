@@ -190,7 +190,7 @@ var output = function (input) {
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
             }
-            for (var i = 0; i < 30; i++) {
+            for (var i = 0; i < 50; i++) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
                 var dx;
