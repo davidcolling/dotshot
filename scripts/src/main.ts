@@ -130,9 +130,9 @@ var output = function (input) {
 
     class GridSquare {
         size: number;
-        isEmpty: boolean;
+        isEmpty: boolean; // is the square wall or open space?
         coord: Coord;
-        visibleIndexes: GridMapImage;
+        visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
         isHightlighted: boolean; // for ad-hoc debugging
 
         constructor(size, coord, isEmpty) {
@@ -169,12 +169,12 @@ var output = function (input) {
     }
 
     class GridMap {
-        width: number;
+        width: number; // number of p5 screen units wide game map is
         height: number;
-        gridWidth:number;
+        gridWidth:number; // number of GridSquare long that the game map is
         gridHeight:number;
-        map: Array<Array<GridSquare>>;
-        gridSquareSize: number;
+        map: Array<Array<GridSquare>>; // hash table used to represent the map
+        gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
         
         constructor(screenWidth, screenHeight) {
             var gridSquareSize = 8;
@@ -188,14 +188,16 @@ var output = function (input) {
             this.gridWidth = gridWidth;
             this.gridHeight = gridHeight;
             this.map = Array();
-            for (var i = 0; i < gridWidth ; i ++) {
+            // make empty map
+            for (var i = 0; i < gridWidth ; i ++) { 
                 this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j ++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
             }
-            for (var i = 0; i < 50; i++) {
+            // make walls
+            for (var i = 0; i < 50; i++) { 
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
 
@@ -231,10 +233,9 @@ var output = function (input) {
                 }
 
             }
-            var numberOfSquares = 0
-            for (var i = 0; i < gridWidth; i++) {
+            // populate visibleIndexes for each GridSquare
+            for (var i = 0; i < gridWidth; i++) { 
                 for (var j = 0; j < gridHeight; j++) {
-                    numberOfSquares++;
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
@@ -262,6 +263,7 @@ var output = function (input) {
             }
         }
 
+        // blocks out gridSquares that aren't visible from the viewpoint
         drawVisible = function (viewPointScreenCoord) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
             for (var i = 0; i < this.gridWidth; i ++) {
