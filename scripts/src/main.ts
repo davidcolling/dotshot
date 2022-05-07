@@ -575,7 +575,6 @@ var output = function (input) {
 
             // world 
             this.frameCount++;
-            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
             this.map.draw();
             this.drawBullets(this.bullets);
 
@@ -615,6 +614,7 @@ var output = function (input) {
                     }
     
                     var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
+                    var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
                     this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y];
                     if (this.nPCs[i].seesPlayer) {
                         this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
