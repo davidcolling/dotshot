@@ -143,6 +143,20 @@ var output = function (input) {
                     }
                 }
             };
+            this.drawVisible = function (viewPointScreenCoord) {
+                var viewPoint = this.getGridIndex(viewPointScreenCoord);
+                for (var i = 0; i < this.gridWidth; i++) {
+                    for (var j = 0; j < this.gridHeight; j++) {
+                        if (this.map[viewPoint.x][viewPoint.y].visibleIndexes.map[i][j]) {
+                            this.map[i][j].draw();
+                        }
+                        else {
+                            input.fill(0, 256);
+                            input.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
+                        }
+                    }
+                }
+            };
             this.isOpen = function (screenCoord) {
                 if (0 < screenCoord.x &&
                     screenCoord.x < this.width &&
@@ -365,7 +379,7 @@ var output = function (input) {
                 // world 
                 this.frameCount++;
                 var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
-                this.map.draw();
+                this.map.drawVisible(new Coord(this.player.x, this.player.y));
                 this.drawBullets(this.bullets);
                 // player
                 if (this.checkIsShot(this.player, this.bullets)) {
