@@ -15,6 +15,10 @@ To Do
 soon:
     - clean
         - use Coord everywhere
+    - make full use of new GridMap
+        - use the hash table to only
+        calculate distances that are
+        shown to be vaguely proximal
     - make ui to access world settings
     before the game starts
 long term:
