@@ -604,6 +604,7 @@ var output = function (input) {
                 }
             }
 
+            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
             // NPCs
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
@@ -614,7 +615,6 @@ var output = function (input) {
                     }
     
                     var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
-                    var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
                     this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y];
                     if (this.nPCs[i].seesPlayer) {
                         this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
