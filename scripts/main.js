@@ -559,8 +559,8 @@ var output = function (input) {
         __extends(Moveable, _super);
         function Moveable(size, x, y, direction, map) {
             var _this = _super.call(this, size, x, y) || this;
-            _this.point = function (x1, y1, x2, y2) {
-                this.direction = World.calculateDirection(x1, y1, x2, y2);
+            _this.point = function (target) {
+                this.direction = World.calculateDirection(this.x, this.y, target.x, target.y);
             };
             _this.move = function (velocity) {
                 // this function can be understood in two basic parts
@@ -592,7 +592,7 @@ var output = function (input) {
                 if (!this.hasPassedTarget) {
                     var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
                     if (distance > 10) {
-                        this.point(this.x, this.y, this.target.x, this.target.y);
+                        this.point(this.target);
                     }
                     else {
                         this.hasPassedTarget = true;
@@ -636,7 +636,7 @@ var output = function (input) {
         function Player(size, x, y, map, bullets) {
             var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
             _this.act = function () {
-                this.point(this.x, this.y, input.mouseX, input.mouseY);
+                this.point(new Coord(input.mouseX, input.mouseY));
                 if (this.isFiring) {
                     this.firingAge++;
                     if (this.firingAge % 4 == 0) {
@@ -797,7 +797,7 @@ var output = function (input) {
                     }
                 }
                 if (willMove) {
-                    this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                    this.point(this.lastSeenPlayerCoord);
                     this.move(1.6);
                 }
                 if (!this.isHunting) {
@@ -833,7 +833,7 @@ var output = function (input) {
                 this.decideDraw();
             };
             _this.attack = function () {
-                this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                this.point(this.lastSeenPlayerCoord);
                 this.move(0.5);
                 if (this.seesPlayer) {
                     if (this.weaponCooldownCounter % 16 == 0) {

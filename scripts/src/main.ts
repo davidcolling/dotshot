@@ -774,8 +774,8 @@ var output = function (input) {
             this.direction = direction;
             this.map = map;
         }
-        point = function (x1, y1, x2, y2) {
-            this.direction = World.calculateDirection(x1, y1, x2, y2);
+        point = function (target) {
+            this.direction = World.calculateDirection(this.x, this.y, target.x, target.y);
         }
         move = function (velocity) {
             // this function can be understood in two basic parts
@@ -811,7 +811,7 @@ var output = function (input) {
             if (!this.hasPassedTarget) {
                 var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
                 if (distance > 10) {
-                    this.point(this.x, this.y, this.target.x, this.target.y);
+                    this.point(this.target);
                 } else {
                     this.hasPassedTarget = true;
                 }
@@ -861,7 +861,7 @@ var output = function (input) {
             this.bullets = bullets;
         }
         act = function () {
-            this.point(this.x, this.y, input.mouseX, input.mouseY);
+            this.point(new Coord(input.mouseX, input.mouseY));
             if (this.isFiring) {
                 this.firingAge++;
                 if (this.firingAge % 4 == 0) {
@@ -1055,7 +1055,7 @@ var output = function (input) {
             }
 
             if (willMove) {
-                this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+                this.point(this.lastSeenPlayerCoord);
                 this.move(1.6);
             }
 
@@ -1097,7 +1097,7 @@ var output = function (input) {
             this.decideDraw();
         }
         attack = function () {
-            this.point(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            this.point(this.lastSeenPlayerCoord);
             this.move(0.5);
             if (this.seesPlayer) {
                 if (this.weaponCooldownCounter % 16 == 0) {
