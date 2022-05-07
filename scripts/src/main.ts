@@ -845,6 +845,7 @@ var output = function (input) {
         fire = function(target) {
             this.bullets.push(new Bullet(this.x, this.y, target, this.map));
         }
+        act = function() {}
     }
 
     class Player extends Character {
@@ -914,6 +915,7 @@ var output = function (input) {
             this.idleAge++;
             this.move(1);
         }
+        attack = function () {}
         decideDraw = function () {
             if ( this.isHunting || this.seesPlayer) {
                 this.attack();
@@ -921,10 +923,6 @@ var output = function (input) {
                 this.idle();
             }
         }
-
-        attack = function () {}
-        act = function() {}
-
     }
 
     class Chicken extends NPC {

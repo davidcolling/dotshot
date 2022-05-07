@@ -625,6 +625,7 @@ var output = function (input) {
             _this.fire = function (target) {
                 this.bullets.push(new Bullet(this.x, this.y, target, this.map));
             };
+            _this.act = function () { };
             _this.hp = maxHP;
             return _this;
         }
@@ -674,6 +675,7 @@ var output = function (input) {
                 this.idleAge++;
                 this.move(1);
             };
+            _this.attack = function () { };
             _this.decideDraw = function () {
                 if (this.isHunting || this.seesPlayer) {
                     this.attack();
@@ -682,8 +684,6 @@ var output = function (input) {
                     this.idle();
                 }
             };
-            _this.attack = function () { };
-            _this.act = function () { };
             _this.isHunting = false;
             _this.age = 0;
             _this.idleAge = idleAge;
