@@ -133,7 +133,7 @@ var output = function (input) {
         isEmpty: boolean;
         coord: Coord;
         visibleIndexes: GridMapImage;
-        isHightlighted: boolean;
+        isHightlighted: boolean; // for ad-hoc debugging
 
         constructor(size, coord, isEmpty) {
             this.size = size;
