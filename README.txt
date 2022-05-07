@@ -15,7 +15,6 @@ To Do
 soon:
     - clean
         - use Coord everywhere
-    - make maps interesting again
     - make ui to access world settings
     before the game starts
 long term:
