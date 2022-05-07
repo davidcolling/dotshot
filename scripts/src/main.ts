@@ -192,15 +192,54 @@ var output = function (input) {
                 this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j ++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                    var isEmpty
-                    if (Math.random() < .03) {
-                        isEmpty = false;
-                    } else {
-                        isEmpty = true;
-                    }
-                    this.map[i][j] = new GridSquare(gridSquareSize, coord, isEmpty);
-
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
+            }
+            for (var i = 0; i < 30; i++) {
+                var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
+                this.map[randomCoord.x][randomCoord.y].isEmpty = false;
+
+                var dx
+                var dy
+                if (Math.random() < .5) {
+                    dx = true;
+                } else {
+                    dx = false;
+                }
+                if (Math.random() < .5) {
+                    dy = true;
+                } else {
+                    dy = false;
+                }
+
+                var newX;
+                var newY;
+                for (var j = 0; j < 10; j++) {
+                    if (dx) {
+                        newX = randomCoord.x + j;
+                    } else {
+                        newX = randomCoord.x;
+                    }
+                    if (dy) {
+                        newY = randomCoord.y + j;
+                    } else {
+                        newY = randomCoord.y;
+                    }
+
+                    var newCoord = new Coord(newX, newY);
+
+                    if (
+                        newCoord.x >= gridWidth ||
+                        newCoord.x < 0 ||
+                        newCoord.y >= gridHeight ||
+                        newCoord.y < 0
+                    ) {
+                        break;
+                    } else {
+                        this.map[newCoord.x][newCoord.y].isEmpty = false;
+                    }
+                }
+
             }
             var numberOfSquares = 0
             for (var i = 0; i < gridWidth; i++) {
