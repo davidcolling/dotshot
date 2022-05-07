@@ -587,7 +587,7 @@ var output = function (input) {
             // world 
             this.frameCount++;
             var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
-            this.map.drawVisible(new Coord(this.player.x, this.player.y));
+            this.map.draw();
             this.drawBullets(this.bullets);
 
             // player
