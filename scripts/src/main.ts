@@ -905,14 +905,6 @@ var output = function (input) {
             this.seesPlayer = false;
             this.lastSeenPlayerCoord = null;
         }
-        draw = function () {
-            input.fill(256, 256);
-            input.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
-        }
         idle = function () {
             if (!(this.idleAge < this.idleLife)) {
                 this.idleAge = 0;
