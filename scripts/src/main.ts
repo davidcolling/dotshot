@@ -583,7 +583,7 @@ var output = function (input) {
                 this.player.hp -= 1;
                 this.healthBar.hp = this.player.hp;
             }
-            this.player.act();
+            this.player.step();
             this.player.draw();
             if (this.player.hp == 0) {
                 playerIsDead = true;
@@ -620,7 +620,7 @@ var output = function (input) {
                         this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
                     }
 
-                    this.nPCs[i].act();
+                    this.nPCs[i].step();
 
                     this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
@@ -845,7 +845,7 @@ var output = function (input) {
         fire = function(target) {
             this.bullets.push(new Bullet(this.x, this.y, target, this.map));
         }
-        act = function() {}
+        step = function() {}
     }
 
     class Player extends Character {
@@ -860,7 +860,7 @@ var output = function (input) {
             this.firingAge = 0;
             this.bullets = bullets;
         }
-        act = function () {
+        step = function () {
             this.point(new Coord(input.mouseX, input.mouseY));
             if (this.isFiring) {
                 this.firingAge++;
@@ -953,7 +953,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }    
-        act = function () {
+        step = function () {
             if(this.hp <= 0) {
                 this.food.push(new Food(this.x, this.y));
             }
@@ -999,7 +999,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function () {
+        step = function () {
             if (this.didIgnite) {
                 this.igniteAge++;
                 if (this.igniteAge > 100) {
@@ -1092,7 +1092,7 @@ var output = function (input) {
                 defaultStrokeColor.a, 
             );            
         }
-        act = function () {
+        step = function () {
             this.weaponCooldownCounter++;
             this.decideDraw();
         }
@@ -1178,7 +1178,7 @@ var output = function (input) {
         }
         idle = function () { }
         attack = function () { }
-        act = function () {
+        step = function () {
             if (this.hp <= 0) {
                 this.explode();
             }
