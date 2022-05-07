@@ -566,11 +566,8 @@ var output = function (input) {
                 this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-            }
-            for (var i = 0; i < 5; i++) {
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
-
         }
 
         draw = function () {

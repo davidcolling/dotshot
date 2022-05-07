@@ -143,6 +143,7 @@ var output = function (input) {
                     }
                 }
             };
+            // blocks out gridSquares that aren't visible from the viewpoint
             this.drawVisible = function (viewPointScreenCoord) {
                 var viewPoint = this.getGridIndex(viewPointScreenCoord);
                 for (var i = 0; i < this.gridWidth; i++) {
@@ -183,6 +184,7 @@ var output = function (input) {
             this.gridWidth = gridWidth;
             this.gridHeight = gridHeight;
             this.map = Array();
+            // make empty map
             for (var i = 0; i < gridWidth; i++) {
                 this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j++) {
@@ -190,6 +192,7 @@ var output = function (input) {
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
             }
+            // make walls
             for (var i = 0; i < 50; i++) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
@@ -222,10 +225,9 @@ var output = function (input) {
                     }
                 }
             }
-            var numberOfSquares = 0;
+            // populate visibleIndexes for each GridSquare
             for (var i = 0; i < gridWidth; i++) {
                 for (var j = 0; j < gridHeight; j++) {
-                    numberOfSquares++;
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
@@ -471,8 +473,6 @@ var output = function (input) {
                 this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-            }
-            for (var i = 0; i < 5; i++) {
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
         }
