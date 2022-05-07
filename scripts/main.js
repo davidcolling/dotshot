@@ -371,7 +371,7 @@ var output = function (input) {
                 this.map.draw();
                 this.drawBullets(this.bullets);
                 // player
-                if (this.checkIsShot(this.player, this.bullets)) {
+                if (this.isShotByAny(this.player, this.bullets)) {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
                 }
@@ -395,15 +395,15 @@ var output = function (input) {
                         }
                     }
                 }
+                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
                 // NPCs
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
                         //check for shots
-                        if (this.checkIsShot(this.nPCs[i], this.bullets)) {
+                        if (this.isShotByAny(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
                         var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
-                        var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
                         this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y];
                         if (this.nPCs[i].seesPlayer) {
                             this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
@@ -432,8 +432,8 @@ var output = function (input) {
                     }
                 }
             };
-            // obj2 is the projectile
-            this.isShot = function (obj1, obj2) {
+            // returns true if obj1 (target) is shot by obj2 (projectile)
+            this.isShotBy = function (obj1, obj2) {
                 var isClose = 3 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y);
                 var isInFrontOf = this.isInFrontOf(obj1, obj2);
                 return isClose && isInFrontOf;
@@ -448,10 +448,10 @@ var output = function (input) {
                 }
                 return difference;
             };
-            this.checkIsShot = function (obj, arr) {
+            this.isShotByAny = function (obj, arr) {
                 for (var i = 0; i < arr.length; i++) {
                     if (arr[i] != null) {
-                        if (this.isShot(obj, arr[i])) {
+                        if (this.isShotBy(obj, arr[i])) {
                             return true;
                         }
                     }
@@ -476,6 +476,9 @@ var output = function (input) {
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
         }
+        // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
+        // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
+        // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way.
         World.calculateCoordinate = function (length, direction) {
             var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
             var quadrantAngle = direction - (quadrant * 90);
