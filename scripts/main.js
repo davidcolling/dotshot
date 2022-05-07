@@ -193,20 +193,8 @@ var output = function (input) {
             for (var i = 0; i < 50; i++) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
-                var dx;
-                var dy;
-                if (Math.random() < .5) {
-                    dx = true;
-                }
-                else {
-                    dx = false;
-                }
-                if (Math.random() < .5) {
-                    dy = true;
-                }
-                else {
-                    dy = false;
-                }
+                var dx = Math.random() < .5;
+                var dy = Math.random() < .5;
                 var newX;
                 var newY;
                 for (var j = 0; j < 10; j++) {
