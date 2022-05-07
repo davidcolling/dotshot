@@ -218,7 +218,7 @@ var output = function (input) {
                         newCoord.x < 0 ||
                         newCoord.y >= gridHeight ||
                         newCoord.y < 0) {
-                        break;
+                        break; // don't go off the map
                     }
                     else {
                         this.map[newCoord.x][newCoord.y].isEmpty = false;
@@ -231,6 +231,7 @@ var output = function (input) {
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
+                            // wherever this moveable is able to move in a "straight" line is visible from the starting place
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
@@ -915,6 +916,9 @@ var output = function (input) {
             case "w":
                 world.player.isMoving = true;
                 break;
+            case " ":
+                world.player.isMoving = true;
+                break;
         }
     }
     document.addEventListener('keyup', stopKey);
@@ -924,6 +928,9 @@ var output = function (input) {
                 world.player.isFiring = false;
                 break;
             case "w":
+                world.player.isMoving = false;
+                break;
+            case " ":
                 world.player.isMoving = false;
                 break;
         }

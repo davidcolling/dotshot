@@ -1191,6 +1191,9 @@ var output = function (input) {
             case "w":
                 world.player.isMoving = true;
                 break;
+            case " ":
+                world.player.isMoving = true;
+                break;
         }
     }
 
@@ -1201,6 +1204,9 @@ var output = function (input) {
                 world.player.isFiring = false;
                 break;
             case "w":
+                world.player.isMoving = false;
+                break;
+            case " ":
                 world.player.isMoving = false;
                 break;
         }
