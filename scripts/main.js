@@ -627,6 +627,7 @@ var output = function (input) {
             };
             _this.step = function () { };
             _this.hp = maxHP;
+            _this.bullets = bullets;
             return _this;
         }
         return Character;
@@ -657,7 +658,6 @@ var output = function (input) {
             _this.isFiring = false;
             _this.isMoving = false;
             _this.firingAge = 0;
-            _this.bullets = bullets;
             return _this;
         }
         return Player;
@@ -689,7 +689,6 @@ var output = function (input) {
             _this.idleAge = idleAge;
             _this.idleLife = idleLife;
             _this.target = target;
-            _this.previousSize = _this.size;
             _this.seesPlayer = false;
             _this.lastSeenPlayerCoord = null;
             return _this;
@@ -812,7 +811,6 @@ var output = function (input) {
             _this.didIgnite = false;
             _this.igniteAge = 0;
             _this.isGrowing = true;
-            _this.bullets = bullets;
             return _this;
         }
         return Bomb;
@@ -850,7 +848,6 @@ var output = function (input) {
                 }
             };
             _this.weaponCooldownCounter = 0;
-            _this.bullets = bullets;
             return _this;
         }
         return Pirate;
@@ -904,7 +901,6 @@ var output = function (input) {
                     this.explode();
                 }
             };
-            _this.bullets = bullets;
             return _this;
         }
         return Mine;

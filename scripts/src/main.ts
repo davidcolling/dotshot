@@ -540,7 +540,7 @@ var output = function (input) {
     // an observer of when characters lose hp
     // an observer of NPC "sight" for hunting
     class World {
-        frameCount: number;
+        frameCount: number; // used for optionally offsetting the frequency of certain calculations
         map: GridMap;
         bullets: Array<Bullet>;
         nPCs: Array<NPC>;
@@ -841,6 +841,7 @@ var output = function (input) {
         constructor(size, x, y, map, bullets, maxHP) {
             super(size, x, y, Math.random() * 360, map);
             this.hp = maxHP;
+            this.bullets = bullets;
         }
         fire = function(target) {
             this.bullets.push(new Bullet(this.x, this.y, target, this.map));
@@ -858,7 +859,6 @@ var output = function (input) {
             this.isFiring = false; 
             this.isMoving = false;
             this.firingAge = 0;
-            this.bullets = bullets;
         }
         step = function () {
             this.point(new Coord(input.mouseX, input.mouseY));
@@ -891,7 +891,6 @@ var output = function (input) {
         idleAge: number;
         idleLife: number;
         target: Character;
-        previousSize: number;
         seesPlayer:boolean;
         lastSeenPlayerCoord: Coord;
 
@@ -902,7 +901,6 @@ var output = function (input) {
             this.idleAge = idleAge;
             this.idleLife = idleLife;
             this.target = target;
-            this.previousSize = this.size;
             this.seesPlayer = false;
             this.lastSeenPlayerCoord = null;
         }
@@ -982,7 +980,6 @@ var output = function (input) {
             this.didIgnite = false;
             this.igniteAge = 0
             this.isGrowing = true;
-            this.bullets = bullets;
         }
         draw = function () {
             input.stroke(128, 0, 0, 256);
@@ -1075,7 +1072,6 @@ var output = function (input) {
         constructor(size, x, y, map, bullets, target) {
             super(size, x, y, map, bullets, 8, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
-            this.bullets = bullets;
         }
         draw = function () {
             input.stroke(256, 0, 0, 256);
@@ -1117,7 +1113,6 @@ var output = function (input) {
     class Mine extends NPC {
         constructor(x, y, map, bullets) {
             super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
-            this.bullets = bullets;
         }
         draw = function () {
             input.stroke(128, 128, 128, 256);
