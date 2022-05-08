@@ -913,10 +913,16 @@ var output = function (input) {
             case "r":
                 world.player.isFiring = true;
                 break;
+            case "Shift":
+                world.player.isFiring = true;
+                break;
             case "w":
                 world.player.isMoving = true;
                 break;
             case " ":
+                world.player.isMoving = true;
+                break;
+            case "ArrowUp":
                 world.player.isMoving = true;
                 break;
         }
@@ -927,10 +933,16 @@ var output = function (input) {
             case "r":
                 world.player.isFiring = false;
                 break;
+            case "Shift":
+                world.player.isFiring = false;
+                break;
             case "w":
                 world.player.isMoving = false;
                 break;
             case " ":
+                world.player.isMoving = false;
+                break;
+            case "ArrowUp":
                 world.player.isMoving = false;
                 break;
         }
