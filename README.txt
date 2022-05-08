@@ -25,6 +25,8 @@ soon:
         shown to be vaguely proximal
     - make ui to access world settings
     before the game starts
+    - Player controls in more 
+    directions
 long term:
     - improve realism in Bullet class
     - make NPCs more able to go around 
