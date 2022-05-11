@@ -1243,7 +1243,7 @@ var output = function (input) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, numberOfEnemies.value, numberOfWalls.value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value);
     };
 
     input.draw = function () {
@@ -1274,12 +1274,16 @@ class DotshotSetting {
     display = function() {
         displaySlider(this.name);
     }
+    setFromDocument = function() {
+        var element = document.getElementById(this.name);
+        if (element) {
+            this.value = (element as HTMLFormElement).value;
+        }
+    }
 }
 var worldSettings = new Array();
-var numberOfEnemies = new DotshotSetting("numberOfEnemies", "10", null);
-worldSettings.push(numberOfEnemies);
-var numberOfWalls = new DotshotSetting("numberOfWalls", "50", null);
-worldSettings.push(numberOfWalls);
+worldSettings.push(new DotshotSetting("numberOfEnemies", "10", null));
+worldSettings.push(new DotshotSetting("numberOfWalls", "50", null));
 
 var displaySlider = function(name) {
     var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
@@ -1295,13 +1299,8 @@ var clearSettings = function() {
 }
 
 var startNewGame = function() {
-    let enemiesSlider = document.getElementById("numberOfEnemies")
-    if (enemiesSlider) {
-        numberOfEnemies.value = (enemiesSlider as HTMLFormElement).value;
-    }
-    let wallsSlider = document.getElementById("numberOfWalls")
-    if (wallsSlider) {
-        numberOfWalls.value = (wallsSlider as HTMLFormElement).value;
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].setFromDocument();
     }
 
     clearSettings();

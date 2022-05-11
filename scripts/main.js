@@ -956,7 +956,7 @@ var output = function (input) {
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
-        world = new World(width, height, numberOfEnemies.value, numberOfWalls.value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value);
     };
     input.draw = function () {
         input.clear();
@@ -971,6 +971,12 @@ var DotshotSetting = /** @class */ (function () {
         this.display = function () {
             displaySlider(this.name);
         };
+        this.setFromDocument = function () {
+            var element = document.getElementById(this.name);
+            if (element) {
+                this.value = element.value;
+            }
+        };
         this.name = name;
         this.defaultValue = defaultValue;
         if (this.value == null) {
@@ -983,10 +989,8 @@ var DotshotSetting = /** @class */ (function () {
     return DotshotSetting;
 }());
 var worldSettings = new Array();
-var numberOfEnemies = new DotshotSetting("numberOfEnemies", "10", null);
-worldSettings.push(numberOfEnemies);
-var numberOfWalls = new DotshotSetting("numberOfWalls", "50", null);
-worldSettings.push(numberOfWalls);
+worldSettings.push(new DotshotSetting("numberOfEnemies", "10", null));
+worldSettings.push(new DotshotSetting("numberOfWalls", "50", null));
 var displaySlider = function (name) {
     var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
     var container = document.getElementById("worldSettings");
@@ -999,13 +1003,8 @@ var clearSettings = function () {
     container.innerHTML = "";
 };
 var startNewGame = function () {
-    var enemiesSlider = document.getElementById("numberOfEnemies");
-    if (enemiesSlider) {
-        numberOfEnemies.value = enemiesSlider.value;
-    }
-    var wallsSlider = document.getElementById("numberOfWalls");
-    if (wallsSlider) {
-        numberOfWalls.value = wallsSlider.value;
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].setFromDocument();
     }
     clearSettings();
     for (var i = 0; i < worldSettings.length; i++) {
