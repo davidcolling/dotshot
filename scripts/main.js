@@ -969,7 +969,11 @@ var display = null;
 var NumericalSetting = /** @class */ (function () {
     function NumericalSetting(name, defaultValue, value) {
         this.display = function () {
-            displaySlider(this.name);
+            var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='20' id='" + this.name + "'>";
+            var container = document.getElementById("worldSettings");
+            if (container) {
+                container.innerHTML += output;
+            }
         };
         this.setFromDocument = function () {
             var element = document.getElementById(this.name);
@@ -991,13 +995,6 @@ var NumericalSetting = /** @class */ (function () {
 var worldSettings = new Array();
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
-var displaySlider = function (name) {
-    var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
-    var container = document.getElementById("worldSettings");
-    if (container) {
-        container.innerHTML += output;
-    }
-};
 var clearSettings = function () {
     var container = document.getElementById("worldSettings");
     container.innerHTML = "";
