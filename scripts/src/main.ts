@@ -201,21 +201,18 @@ var output = function (input) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
 
+                // Determine along which axes the wall moves 
                 var dx = Math.random() < .5;
                 var dy = Math.random() < .5;
 
-                var newX;
-                var newY;
                 for (var j = 0; j < 10; j++) {
+                    var newX = randomCoord.x;
+                    var newY = randomCoord.y;
                     if (dx) {
-                        newX = randomCoord.x + j;
-                    } else {
-                        newX = randomCoord.x;
+                        newX += j;
                     }
                     if (dy) {
-                        newY = randomCoord.y + j;
-                    } else {
-                        newY = randomCoord.y;
+                        newY += j;
                     }
 
                     var newCoord = new Coord(newX, newY);
@@ -239,7 +236,7 @@ var output = function (input) {
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         for (var k = 0; k < 360; k += 2) {
-                            // wherever this moveable is able to move in a "straight" line is visible from the starting place
+                            // wherever this Moveable is able to move in a "straight" line is visible from the starting place
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
