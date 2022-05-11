@@ -976,3 +976,7 @@ var output = function (input) {
     };
 };
 var display = new p5(output, "canvas");
+var startNewGame = function () {
+    display.remove();
+    display = new p5(output, "canvas");
+};
