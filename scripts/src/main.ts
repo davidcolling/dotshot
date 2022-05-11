@@ -1289,10 +1289,6 @@ var clearSettings = function() {
 }
 
 var startNewGame = function() {
-    for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].display();
-    }
-
     let enemiesSlider = document.getElementById("numberOfEnemies")
     if (enemiesSlider) {
         numberOfEnemies = (enemiesSlider as HTMLFormElement).value;
@@ -1303,6 +1299,11 @@ var startNewGame = function() {
     }
 
     clearSettings();
+
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].display();
+    }
+
     if (display != null) {
         display.remove();
     }

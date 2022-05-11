@@ -993,9 +993,6 @@ var clearSettings = function () {
     container.innerHTML = "";
 };
 var startNewGame = function () {
-    for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].display();
-    }
     var enemiesSlider = document.getElementById("numberOfEnemies");
     if (enemiesSlider) {
         numberOfEnemies = enemiesSlider.value;
@@ -1005,6 +1002,9 @@ var startNewGame = function () {
         numberOfWalls = wallsSlider.value;
     }
     clearSettings();
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].display();
+    }
     if (display != null) {
         display.remove();
     }
