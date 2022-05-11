@@ -7,11 +7,12 @@
         <script src="scripts/main.js"></script>
     </head>
     <body>
+        <div id="canvas"></div>
         <p id="message">'w' to move; 'r' to shoot; player faces the cursor; desktop only</p>
-        <button onClick="startNewGame()"></button>
+        <button onClick="startNewGame()">New Game</button>
         <form id="worldSettings">
+            <p id="message">number of NPCs</p>
             <input type="range" min="0" max="50" value="20" id="numberOfEnemies">
         </form>
-        <div id="canvas"></div>
     </body>
 </html>
