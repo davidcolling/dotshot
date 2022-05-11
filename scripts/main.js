@@ -947,9 +947,6 @@ var output = function (input) {
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
-        for (var i = 0; i < worldSettings.length; i++) {
-            worldSettings[i].display();
-        }
         if (height > 700) {
             height = 700;
         }
@@ -968,7 +965,7 @@ var output = function (input) {
         }
     };
 };
-var display = new p5(output, "canvas");
+var display = null;
 var DotshotSetting = /** @class */ (function () {
     function DotshotSetting(name, defaultValue) {
         this.display = function () {
@@ -996,6 +993,9 @@ var clearSettings = function () {
     container.innerHTML = "";
 };
 var startNewGame = function () {
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].display();
+    }
     var enemiesSlider = document.getElementById("numberOfEnemies");
     if (enemiesSlider) {
         numberOfEnemies = enemiesSlider.value;
@@ -1005,6 +1005,8 @@ var startNewGame = function () {
         numberOfWalls = wallsSlider.value;
     }
     clearSettings();
-    display.remove();
+    if (display != null) {
+        display.remove();
+    }
     display = new p5(output, "canvas");
 };

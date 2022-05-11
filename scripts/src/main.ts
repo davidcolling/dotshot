@@ -1227,10 +1227,6 @@ var output = function (input) {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
 
-        for (var i = 0; i < worldSettings.length; i++) {
-            worldSettings[i].display();
-        }
-
         if (height > 700) {
             height = 700;
         }
@@ -1259,7 +1255,7 @@ var output = function (input) {
 
 };
 
-var display = new p5(output, "canvas");
+var display = null;
 
 class DotshotSetting {
     name: Text;
@@ -1293,6 +1289,10 @@ var clearSettings = function() {
 }
 
 var startNewGame = function() {
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].display();
+    }
+
     let enemiesSlider = document.getElementById("numberOfEnemies")
     if (enemiesSlider) {
         numberOfEnemies = (enemiesSlider as HTMLFormElement).value;
@@ -1303,7 +1303,9 @@ var startNewGame = function() {
     }
 
     clearSettings();
-    display.remove();
+    if (display != null) {
+        display.remove();
+    }
     display = new p5(output, "canvas");
 }
 
