@@ -956,14 +956,7 @@ var output = function (input) {
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
-        world = new World(width, height, 10);
-        var slider = document.getElementById("numberOfEnemies");
-        if (slider) {
-            console.log(slider.value);
-        }
-        else {
-            console.log("nope");
-        }
+        world = new World(width, height, numberOfEnemies);
     };
     input.draw = function () {
         input.clear();
@@ -976,7 +969,12 @@ var output = function (input) {
     };
 };
 var display = new p5(output, "canvas");
+var numberOfEnemies = 10;
 var startNewGame = function () {
+    var slider = document.getElementById("numberOfEnemies");
+    if (slider) {
+        numberOfEnemies = slider.value;
+    }
     display.remove();
     display = new p5(output, "canvas");
 };

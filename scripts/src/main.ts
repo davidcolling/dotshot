@@ -1243,13 +1243,7 @@ var output = function (input) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, 10)
-        let slider = document.getElementById("numberOfEnemies")
-        if (slider) {
-            console.log((slider as HTMLFormElement).value);
-        } else {
-            console.log("nope");
-        }
+        world = new World(width, height, numberOfEnemies)
     };
 
     input.draw = function () {
@@ -1269,7 +1263,12 @@ var output = function (input) {
 
 var display = new p5(output, "canvas");
 
+var numberOfEnemies = 10;
 var startNewGame = function() {
+    let slider = document.getElementById("numberOfEnemies")
+    if (slider) {
+        numberOfEnemies = (slider as HTMLFormElement).value;
+    }
     display.remove();
     display = new p5(output, "canvas");
 }
