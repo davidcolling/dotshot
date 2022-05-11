@@ -8,8 +8,17 @@ body {
     display:block;
 }
 #message {
-    max-height:10%;
     font-family:Courier;
     font-size:12px;
     color:#ffffff;
 }
+.label {
+    font-family: Futura;
+    font-size:12px;
+    color:#ffffff;
+}
+input {
+    box-shadow: none;
+    border-width:1px;
+}
+

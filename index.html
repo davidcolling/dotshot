@@ -9,11 +9,11 @@
     <body>
         <div id="canvas"></div>
         <p id="message">'w' to move; 'r' to shoot; player faces the cursor; desktop only</p>
-        <button onClick="startNewGame()">New Game</button>
+        <p class="label" onClick="startNewGame()">New Game</p>
         <form id="worldSettings">
-            <p id="message">number of NPCs</p>
+            <p class="label">number of NPCs</p>
             <input type="range" min="0" max="500" value="20" id="numberOfEnemies">
-            <p id="message">number of walls</p>
+            <p class="label">number of walls</p>
             <input type="range" min="0" max="500" value="20" id="numberOfWalls">
         </form>
     </body>
