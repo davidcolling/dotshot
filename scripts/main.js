@@ -947,6 +947,8 @@ var output = function (input) {
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
+        displaySlider('numberOfEnemies');
+        displaySlider('numberOfWalls');
         if (height > 700) {
             height = 700;
         }
@@ -968,6 +970,13 @@ var output = function (input) {
 var display = new p5(output, "canvas");
 var numberOfEnemies = 10;
 var numberOfWalls = 50;
+var displaySlider = function (name) {
+    var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
+    var container = document.getElementById("worldSettings");
+    if (container) {
+        container.innerHTML += output;
+    }
+};
 var startNewGame = function () {
     var enemiesSlider = document.getElementById("numberOfEnemies");
     if (enemiesSlider) {
