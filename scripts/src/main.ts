@@ -176,7 +176,7 @@ var output = function (input) {
         map: Array<Array<GridSquare>>; // hash table used to represent the map
         gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
         
-        constructor(screenWidth, screenHeight) {
+        constructor(screenWidth, screenHeight, numberOfWalls) {
             var gridSquareSize = 8;
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
             var gridHeight = Math.floor(screenHeight / gridSquareSize);
@@ -197,7 +197,7 @@ var output = function (input) {
                 }
             }
             // make walls
-            for (var i = 0; i < 50; i++) { 
+            for (var i = 0; i < numberOfWalls; i++) { 
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 this.map[randomCoord.x][randomCoord.y].isEmpty = false;
 
@@ -546,9 +546,9 @@ var output = function (input) {
         healthBar: HealthBar;
         food: Array<Food>;
 
-        constructor(width, height, numberOfEnemies) {
+        constructor(width, height, numberOfEnemies, numberOfWalls) {
             this.frameCount = 0;
-            this.map = new GridMap(width, height);
+            this.map = new GridMap(width, height, numberOfWalls);
             this.bullets = new Array();
             this.healthBar = new HealthBar(32, this.map);
 
@@ -1243,7 +1243,7 @@ var output = function (input) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, numberOfEnemies)
+        world = new World(width, height, numberOfEnemies, numberOfWalls)
     };
 
     input.draw = function () {
@@ -1258,10 +1258,15 @@ var output = function (input) {
 var display = new p5(output, "canvas");
 
 var numberOfEnemies = 10;
+var numberOfWalls = 50;
 var startNewGame = function() {
-    let slider = document.getElementById("numberOfEnemies")
-    if (slider) {
-        numberOfEnemies = (slider as HTMLFormElement).value;
+    let enemiesSlider = document.getElementById("numberOfEnemies")
+    if (enemiesSlider) {
+        numberOfEnemies = (enemiesSlider as HTMLFormElement).value;
+    }
+    let wallsSlider = document.getElementById("numberOfWalls")
+    if (wallsSlider) {
+        numberOfWalls = (wallsSlider as HTMLFormElement).value;
     }
     display.remove();
     display = new p5(output, "canvas");
