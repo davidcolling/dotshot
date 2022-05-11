@@ -1227,8 +1227,9 @@ var output = function (input) {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
 
-        displaySlider('numberOfEnemies');
-        displaySlider('numberOfWalls');
+        for (var i = 0; i < worldSettings.length; i++) {
+            worldSettings[i].display();
+        }
 
         if (height > 700) {
             height = 700;
@@ -1260,8 +1261,24 @@ var output = function (input) {
 
 var display = new p5(output, "canvas");
 
-var numberOfEnemies = 10;
-var numberOfWalls = 50;
+class DotshotSetting {
+    name: Text;
+    defaultValue: number;
+
+    constructor (name, defaultValue) {
+        this.name = name;
+        this.defaultValue = defaultValue;
+    }
+    display = function() {
+        displaySlider(this.name);
+    }
+}
+var worldSettings = new Array();
+var numberOfEnemies = new DotshotSetting("numberOfEnemies", "10");
+worldSettings.push(numberOfEnemies);
+var numberOfWalls = new DotshotSetting("numberOfWalls", "50");
+worldSettings.push(numberOfWalls);
+
 var displaySlider = function(name) {
     var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
     var container = document.getElementById("worldSettings");
@@ -1269,6 +1286,12 @@ var displaySlider = function(name) {
         container.innerHTML += output;
     }
 }
+
+var clearSettings = function() {
+    var container = document.getElementById("worldSettings");
+    container.innerHTML = "";
+}
+
 var startNewGame = function() {
     let enemiesSlider = document.getElementById("numberOfEnemies")
     if (enemiesSlider) {
@@ -1278,6 +1301,8 @@ var startNewGame = function() {
     if (wallsSlider) {
         numberOfWalls = (wallsSlider as HTMLFormElement).value;
     }
+
+    clearSettings();
     display.remove();
     display = new p5(output, "canvas");
 }
