@@ -1257,7 +1257,7 @@ var output = function (input) {
 
 var display = null;
 
-class DotshotSetting {
+class NumericalSetting {
     name: Text;
     defaultValue: number;
     value: number;
@@ -1281,9 +1281,10 @@ class DotshotSetting {
         }
     }
 }
+
 var worldSettings = new Array();
-worldSettings.push(new DotshotSetting("numberOfEnemies", "10", null));
-worldSettings.push(new DotshotSetting("numberOfWalls", "50", null));
+worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
+worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 
 var displaySlider = function(name) {
     var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";

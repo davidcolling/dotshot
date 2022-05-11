@@ -966,8 +966,8 @@ var output = function (input) {
     };
 };
 var display = null;
-var DotshotSetting = /** @class */ (function () {
-    function DotshotSetting(name, defaultValue, value) {
+var NumericalSetting = /** @class */ (function () {
+    function NumericalSetting(name, defaultValue, value) {
         this.display = function () {
             displaySlider(this.name);
         };
@@ -986,11 +986,11 @@ var DotshotSetting = /** @class */ (function () {
             this.value = value;
         }
     }
-    return DotshotSetting;
+    return NumericalSetting;
 }());
 var worldSettings = new Array();
-worldSettings.push(new DotshotSetting("numberOfEnemies", "10", null));
-worldSettings.push(new DotshotSetting("numberOfWalls", "50", null));
+worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
+worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 var displaySlider = function (name) {
     var output = "<p class='label'>" + name + "</p> <input type='range' min='0' max='500' value='20' id='" + name + "'>";
     var container = document.getElementById("worldSettings");
