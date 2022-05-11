@@ -1244,6 +1244,12 @@ var output = function (input) {
         );
 
         world = new World(width, height, 10)
+        let slider = document.getElementById("numberOfEnemies")
+        if (slider) {
+            console.log((slider as HTMLFormElement).value);
+        } else {
+            console.log("nope");
+        }
     };
 
     input.draw = function () {
