@@ -176,8 +176,7 @@ var output = function (input) {
         map: Array<Array<GridSquare>>; // hash table used to represent the map
         gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
         
-        constructor(screenWidth, screenHeight, numberOfWalls, wallLength) {
-            var gridSquareSize = 8;
+        constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength) {
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
             var gridHeight = Math.floor(screenHeight / gridSquareSize);
             var width = gridSquareSize * gridWidth;
@@ -546,9 +545,9 @@ var output = function (input) {
         healthBar: HealthBar;
         food: Array<Food>;
 
-        constructor(width, height, numberOfEnemies, numberOfWalls, wallLength) {
+        constructor(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize) {
             this.frameCount = 0;
-            this.map = new GridMap(width, height, numberOfWalls, wallLength);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
             this.bullets = new Array();
             this.healthBar = new HealthBar(32, this.map);
 
@@ -1243,7 +1242,7 @@ var output = function (input) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value);
     };
 
     input.draw = function () {
@@ -1290,6 +1289,7 @@ var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 worldSettings.push(new NumericalSetting("wallLength", "10", null));
+worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
 
 var startNewGame = function() {
     for (var i = 0; i < worldSettings.length; i++) {

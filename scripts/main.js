@@ -135,7 +135,7 @@ var output = function (input) {
         return GridSquare;
     }());
     var GridMap = /** @class */ (function () {
-        function GridMap(screenWidth, screenHeight, numberOfWalls, wallLength) {
+        function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength) {
             this.draw = function () {
                 for (var i = 0; i < this.gridWidth; i++) {
                     for (var j = 0; j < this.gridHeight; j++) {
@@ -173,7 +173,6 @@ var output = function (input) {
             this.getGridIndex = function (screenCoord) {
                 return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
             };
-            var gridSquareSize = 8;
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
             var gridHeight = Math.floor(screenHeight / gridSquareSize);
             var width = gridSquareSize * gridWidth;
@@ -359,7 +358,7 @@ var output = function (input) {
     // an observer of when characters lose hp
     // an observer of NPC "sight" for hunting
     var World = /** @class */ (function () {
-        function World(width, height, numberOfEnemies, numberOfWalls, wallLength) {
+        function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize) {
             this.draw = function () {
                 var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
                 // world 
@@ -455,7 +454,7 @@ var output = function (input) {
                 return false;
             };
             this.frameCount = 0;
-            this.map = new GridMap(width, height, numberOfWalls, wallLength);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
             this.bullets = new Array();
             this.healthBar = new HealthBar(32, this.map);
             this.food = new Array();
@@ -956,7 +955,7 @@ var output = function (input) {
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value);
     };
     input.draw = function () {
         input.clear();
@@ -997,6 +996,7 @@ var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 worldSettings.push(new NumericalSetting("wallLength", "10", null));
+worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
 var startNewGame = function () {
     for (var i = 0; i < worldSettings.length; i++) {
         worldSettings[i].setFromDocument();
