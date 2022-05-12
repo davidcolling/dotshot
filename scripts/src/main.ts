@@ -1255,8 +1255,6 @@ var output = function (input) {
 
 };
 
-var display = null;
-
 class NumericalSetting {
     name: Text;
     defaultValue: number;
@@ -1286,6 +1284,7 @@ class NumericalSetting {
     }
 }
 
+var display = null;
 var worldSettings = new Array();
 var firstRun = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
