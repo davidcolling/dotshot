@@ -547,8 +547,21 @@ var output = function (input) {
 
         constructor(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize) {
             this.frameCount = 0;
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
             this.bullets = new Array();
+
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
+            var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
+            // make sure the player starts on the map
+            while (!this.map.isOpen(playerCoordinate)) {
+                if (playerCoordinate.x > 0) {
+                    playerCoordinate.x -= gridSquareSize;
+                } else {
+                    this.map = null;
+                    playerCoordinate = new Coord(width - 20, height - 50);
+                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
+                }
+            }
+            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
             this.healthBar = new HealthBar(32, this.map);
 
             this.food = new Array();
@@ -556,9 +569,7 @@ var output = function (input) {
                 this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
             }
 
-            // make characters
             this.nPCs = new Array();
-            this.player = new Player(5, this.map.width - 20, this.map.height - 50, this.map, this.bullets);
             for (var i = 0; i < numberOfEnemies; i++ ) {
                 this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
