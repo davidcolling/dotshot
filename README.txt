@@ -23,8 +23,6 @@ soon:
         - use the hash table to only
         calculate distances that are
         shown to be vaguely proximal
-    - make ui to access world settings
-    before the game starts
     - Player controls in more 
     directions
 long term:
