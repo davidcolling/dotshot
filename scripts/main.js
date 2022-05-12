@@ -661,7 +661,7 @@ var output = function (input) {
                 input.fill(256, 256);
                 input.circle(this.x, this.y, this.size);
             };
-            _this.isFiring = false;
+            _this.isFiring = true;
             _this.isMoving = false;
             _this.firingAge = 0;
             return _this;

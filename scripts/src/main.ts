@@ -864,7 +864,7 @@ var output = function (input) {
 
         constructor(size, x, y, map, bullets) {
             super(size, x, y, map, bullets, 32);
-            this.isFiring = false; 
+            this.isFiring = true; 
             this.isMoving = false;
             this.firingAge = 0;
         }
