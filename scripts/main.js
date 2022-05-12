@@ -965,7 +965,6 @@ var output = function (input) {
         }
     };
 };
-var display = null;
 var NumericalSetting = /** @class */ (function () {
     function NumericalSetting(name, defaultValue, value) {
         this.display = function () {
@@ -992,16 +991,17 @@ var NumericalSetting = /** @class */ (function () {
     }
     return NumericalSetting;
 }());
+var display = null;
 var worldSettings = new Array();
-var firstRun = true;
+var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 var startNewGame = function () {
     for (var i = 0; i < worldSettings.length; i++) {
         worldSettings[i].setFromDocument();
     }
-    if (firstRun) {
-        firstRun = false;
+    if (firstRunSinceLoad) {
+        firstRunSinceLoad = false;
         for (var i = 0; i < worldSettings.length; i++) {
             worldSettings[i].display();
         }
