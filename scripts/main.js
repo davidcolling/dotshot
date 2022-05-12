@@ -978,7 +978,7 @@ var output = function (input) {
 var NumericalSetting = /** @class */ (function () {
     function NumericalSetting(name, defaultValue, value) {
         this.display = function () {
-            var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='20' id='" + this.name + "'>";
+            var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
             var container = document.getElementById("worldSettings");
             if (container) {
                 container.innerHTML += output;
