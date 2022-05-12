@@ -1287,6 +1287,7 @@ class NumericalSetting {
 }
 
 var worldSettings = new Array();
+var firstRun = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 
@@ -1300,10 +1301,11 @@ var startNewGame = function() {
         worldSettings[i].setFromDocument();
     }
 
-    clearSettings();
-
-    for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].display();
+    if (firstRun) {
+        firstRun = false;
+        for (var i = 0; i < worldSettings.length; i++) {
+            worldSettings[i].display();
+        }
     }
 
     if (display != null) {
