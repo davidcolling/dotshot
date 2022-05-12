@@ -176,7 +176,7 @@ var output = function (input) {
         map: Array<Array<GridSquare>>; // hash table used to represent the map
         gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
         
-        constructor(screenWidth, screenHeight, numberOfWalls) {
+        constructor(screenWidth, screenHeight, numberOfWalls, wallLength) {
             var gridSquareSize = 8;
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
             var gridHeight = Math.floor(screenHeight / gridSquareSize);
@@ -205,7 +205,7 @@ var output = function (input) {
                 var dx = Math.random() < .5;
                 var dy = Math.random() < .5;
 
-                for (var j = 0; j < 10; j++) {
+                for (var j = 0; j < wallLength; j++) {
                     var newX = randomCoord.x;
                     var newY = randomCoord.y;
                     if (dx) {
@@ -546,9 +546,9 @@ var output = function (input) {
         healthBar: HealthBar;
         food: Array<Food>;
 
-        constructor(width, height, numberOfEnemies, numberOfWalls) {
+        constructor(width, height, numberOfEnemies, numberOfWalls, wallLength) {
             this.frameCount = 0;
-            this.map = new GridMap(width, height, numberOfWalls);
+            this.map = new GridMap(width, height, numberOfWalls, wallLength);
             this.bullets = new Array();
             this.healthBar = new HealthBar(32, this.map);
 
@@ -1243,7 +1243,7 @@ var output = function (input) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value);
     };
 
     input.draw = function () {
@@ -1289,6 +1289,7 @@ var worldSettings = new Array();
 var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
+worldSettings.push(new NumericalSetting("wallLength", "10", null));
 
 var startNewGame = function() {
     for (var i = 0; i < worldSettings.length; i++) {
