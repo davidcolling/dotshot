@@ -18,7 +18,7 @@ body {
     color:#ffffff;
 }
 input {
-    box-shadow: none;
-    border-width:1px;
+    width:100%;
 }
+
 
