@@ -14,15 +14,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var output = function (input) {
-    var RGBA = /** @class */ (function () {
-        function RGBA(r, g, b, a) {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
-        }
-        return RGBA;
-    }());
     var HealthBar = /** @class */ (function () {
         function HealthBar(max, map) {
             this.draw = function () {
@@ -86,7 +77,6 @@ var output = function (input) {
             _this.growAge = 0;
             return _this;
         }
-        ;
         return Food;
     }(CenteredShape));
     var GridMapImage = /** @class */ (function () {
@@ -952,8 +942,6 @@ var output = function (input) {
                 break;
         }
     }
-    var world;
-    var defaultStrokeColor = new RGBA(256, 256, 256, 256);
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
@@ -1001,6 +989,17 @@ var NumericalSetting = /** @class */ (function () {
     }
     return NumericalSetting;
 }());
+var RGBA = /** @class */ (function () {
+    function RGBA(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+    return RGBA;
+}());
+var world;
+var defaultStrokeColor;
 var display = null;
 var worldSettings = new Array();
 var firstRunSinceLoad = true;
@@ -1009,6 +1008,13 @@ worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 worldSettings.push(new NumericalSetting("wallLength", "10", null));
 worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
 var startNewGame = function () {
+    var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (isLight) {
+        defaultStrokeColor = new RGBA(256, 256, 256, 256);
+    }
+    else {
+        defaultStrokeColor = new RGBA(0, 0, 0, 256);
+    }
     for (var i = 0; i < worldSettings.length; i++) {
         worldSettings[i].setFromDocument();
     }
