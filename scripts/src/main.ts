@@ -1279,18 +1279,18 @@ class NumericalSetting {
     }
 }
 
-    class RGBA {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-        constructor(r, g, b, a) {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
-        }
+class RGBA {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+    constructor(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
     }
+}
 
 var world;
 var defaultStrokeColor;
