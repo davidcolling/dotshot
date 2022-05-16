@@ -870,7 +870,8 @@ var output = function (input) {
             }
         }
         draw = function () {
-            input.fill(256, 256);
+            var shade = defaultStrokeColor.r
+            input.fill(shade, 256);
             input.circle(
                 this.x, 
                 this.y, 
@@ -932,19 +933,13 @@ var output = function (input) {
             this.food = food;
         }
         draw = function () {
-            input.stroke(256, 256, 256, 256);
-            input.fill(256, 256, 256, 256);
+            var shade = defaultStrokeColor.r;
+            input.fill(shade, 256);
             input.circle(
                 this.x, 
                 this.y, 
                 this.size
             );
-            input.stroke(
-                defaultStrokeColor.r, 
-                defaultStrokeColor.g, 
-                defaultStrokeColor.b, 
-                defaultStrokeColor.a, 
-            );            
         }    
         step = function () {
             if(this.hp <= 0) {

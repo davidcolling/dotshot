@@ -648,7 +648,8 @@ var output = function (input) {
                 }
             };
             _this.draw = function () {
-                input.fill(256, 256);
+                var shade = defaultStrokeColor.r;
+                input.fill(shade, 256);
                 input.circle(this.x, this.y, this.size);
             };
             _this.isFiring = true;
@@ -696,10 +697,9 @@ var output = function (input) {
         function Chicken(x, y, map, food) {
             var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200) || this;
             _this.draw = function () {
-                input.stroke(256, 256, 256, 256);
-                input.fill(256, 256, 256, 256);
+                var shade = defaultStrokeColor.r;
+                input.fill(shade, 256);
                 input.circle(this.x, this.y, this.size);
-                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.step = function () {
                 if (this.hp <= 0) {
