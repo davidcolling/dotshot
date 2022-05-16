@@ -70,7 +70,7 @@ var output = function (input) {
                 }
             };
             _this.draw = function () {
-                input.fill(256, 256);
+                input.fill(defaultStrokeColor.r, 256);
                 input.circle(this.x, this.y, this.size);
             };
             _this.isGrowing = true;
@@ -111,7 +111,8 @@ var output = function (input) {
                         return;
                     }
                     else {
-                        input.fill(256, 256);
+                        var shade = defaultStrokeColor.r;
+                        input.fill(shade, 256);
                         input.rect(this.coord.x, this.coord.y, this.size, this.size);
                     }
                 }
