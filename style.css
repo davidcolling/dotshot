@@ -20,5 +20,15 @@ body {
 input {
     width:100%;
 }
-
+input[type="range"] {
+    -webkit-appearance:none;
+    height:1px;
+    background-image:linear-gradient(#ff0000, #ff0000);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  height:20px;
+  width:1px;
+  background:#ff0000;
+}
 
