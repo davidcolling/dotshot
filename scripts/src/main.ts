@@ -634,6 +634,10 @@ var output = function (input) {
 
         };
 
+        save = function () {
+            return JSON.stringify(this.map);
+        }
+
         drawBullets = function(list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
@@ -1272,6 +1276,13 @@ class NumericalSetting {
         if (element) {
             this.value = (element as HTMLFormElement).value;
         }
+    }
+}
+
+var printMap = function () {
+    var container = document.getElementById("json");
+    if (container) {
+        container.innerHTML = world.save();
     }
 }
 

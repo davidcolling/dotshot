@@ -408,6 +408,9 @@ var output = function (input) {
                     return true;
                 }
             };
+            this.save = function () {
+                return JSON.stringify(this.map);
+            };
             this.drawBullets = function (list) {
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] != null) {
@@ -990,6 +993,12 @@ var NumericalSetting = /** @class */ (function () {
     }
     return NumericalSetting;
 }());
+var printMap = function () {
+    var container = document.getElementById("json");
+    if (container) {
+        container.innerHTML = world.save();
+    }
+};
 var RGBA = /** @class */ (function () {
     function RGBA(r, g, b, a) {
         this.r = r;
