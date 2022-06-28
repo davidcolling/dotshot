@@ -993,10 +993,23 @@ var NumericalSetting = /** @class */ (function () {
     }
     return NumericalSetting;
 }());
-var printMap = function () {
-    var container = document.getElementById("json");
-    if (container) {
-        container.innerHTML = world.save();
+var saveMap = function () {
+    var map = world.save();
+    // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
+    var file = new Blob([map], { type: "string" });
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(file, "map.json");
+    }
+    else {
+        var a = document.createElement("a"), url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = "map.json";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
     }
 };
 var RGBA = /** @class */ (function () {
