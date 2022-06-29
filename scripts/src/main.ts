@@ -228,9 +228,11 @@ var output = function (input) {
                             // wherever this Moveable is able to move in a "straight" line is visible from the starting place
                             var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
                             var currentDistance = 0;
+
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
+                                //check if the tracker entered a new grid cell
                                 if (
                                     coordinateTracker.x != previousCoord.x ||
                                     coordinateTracker.y != previousCoord.y
