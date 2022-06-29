@@ -215,17 +215,29 @@ var output = function (input) {
                 for (var j = 0; j < gridHeight; j++) {
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
+                        var furthestDistance = 0;
                         for (var k = 0; k < 360; k += 2) {
                             // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+                            var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
+                            var currentDistance = 0;
                             var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
+                                if (coordinateTracker.x != previousCoord.x ||
+                                    coordinateTracker.y != previousCoord.y) {
+                                    currentDistance++;
+                                    previousCoord.x = coordinateTracker.x;
+                                    previousCoord.y = coordinateTracker.y;
+                                }
                                 moveCount++;
                                 if (moveCount > 50) {
                                     break;
                                 }
                                 var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
                                 this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                            }
+                            if (currentDistance > furthestDistance) {
+                                furthestDistance = currentDistance;
                             }
                         }
                     }
