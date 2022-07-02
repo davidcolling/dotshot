@@ -1039,7 +1039,6 @@ var world;
 var defaultStrokeColor;
 var display = null;
 var worldSettings = new Array();
-var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 worldSettings.push(new NumericalSetting("wallLength", "10", null));
@@ -1047,6 +1046,9 @@ worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
 var startNewGame = function () {
     if (display != null) {
         display.remove();
+    }
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].setFromDocument();
     }
     document.getElementById("message").textContent = "Loading...";
     display = new p5(output, "canvas");
@@ -1061,12 +1063,6 @@ var loadPage = function () {
         defaultStrokeColor = new RGBA(0, 0, 0, 256);
     }
     for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].setFromDocument();
-    }
-    if (firstRunSinceLoad) {
-        firstRunSinceLoad = false;
-        for (var i = 0; i < worldSettings.length; i++) {
-            worldSettings[i].display();
-        }
+        worldSettings[i].display();
     }
 };

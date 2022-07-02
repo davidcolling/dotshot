@@ -1350,6 +1350,11 @@ var startNewGame = function() {
     if (display != null) {
         display.remove();
     }
+
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].setFromDocument();
+    }
+
     document.getElementById("message").textContent = "Loading...";
     display = new p5(output, "canvas");
 
@@ -1365,12 +1370,7 @@ var loadPage = function() {
     }
 
     for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].setFromDocument();
-    }
-
-    for (var i = 0; i < worldSettings.length; i++) {
         worldSettings[i].display();
     }
-
 }
 
