@@ -241,10 +241,12 @@ var output = function (input) {
                                     previousCoord.x = coordinateTracker.x;
                                     previousCoord.y = coordinateTracker.y;
                                 }
+
                                 moveCount++;
                                 if (moveCount > 50) {
                                     break;
                                 }
+
                                 var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
                                 this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
