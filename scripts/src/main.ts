@@ -1238,6 +1238,9 @@ var output = function (input) {
         }
     }
 
+    document.getElementById("newGame").addEventListener("click", startNewGame);
+
+
     input.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
@@ -1345,6 +1348,16 @@ worldSettings.push(new NumericalSetting("wallLength", "10", null));
 worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
 
 var startNewGame = function() {
+    if (display != null) {
+        display.remove();
+    }
+    document.getElementById("message").textContent = "Loading...";
+    display = new p5(output, "canvas");
+
+    document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
+}
+
+var loadPage = function() {
     var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
     if (isLight) {
         defaultStrokeColor = new RGBA(256, 256, 256, 256);
@@ -1363,12 +1376,5 @@ var startNewGame = function() {
         }
     }
 
-    if (display != null) {
-        display.remove();
-    }
-    display = new p5(output, "canvas");
-
-    document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
 }
-
 
