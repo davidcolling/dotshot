@@ -1341,7 +1341,6 @@ var defaultStrokeColor;
 
 var display = null;
 var worldSettings = new Array();
-var firstRunSinceLoad = true;
 worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
 worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
 worldSettings.push(new NumericalSetting("wallLength", "10", null));
@@ -1369,11 +1368,8 @@ var loadPage = function() {
         worldSettings[i].setFromDocument();
     }
 
-    if (firstRunSinceLoad) {
-        firstRunSinceLoad = false;
-        for (var i = 0; i < worldSettings.length; i++) {
-            worldSettings[i].display();
-        }
+    for (var i = 0; i < worldSettings.length; i++) {
+        worldSettings[i].display();
     }
 
 }
