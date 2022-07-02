@@ -1367,5 +1367,9 @@ var startNewGame = function() {
         display.remove();
     }
     display = new p5(output, "canvas");
+
+    document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only"
+;
 }
+
 
