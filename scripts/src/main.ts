@@ -579,7 +579,7 @@ var output = function (input) {
 
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(5, this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
+                this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
@@ -1084,8 +1084,8 @@ var output = function (input) {
     class Pirate extends NPC {
         weaponCooldownCounter: number;
 
-        constructor(size, x, y, map, bullets, target) {
-            super(size, x, y, map, bullets, 8, target, 1000, 0, 200);
+        constructor(x, y, map, bullets, target) {
+            super(5 , x, y, map, bullets, 8, target, 1000, 0, 200);
             this.weaponCooldownCounter = 0
         }
         draw = function () {
