@@ -484,7 +484,7 @@ var output = function (input) {
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++) {
                 this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
+                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
@@ -746,7 +746,7 @@ var output = function (input) {
     }(NPC));
     var Bomb = /** @class */ (function (_super) {
         __extends(Bomb, _super);
-        function Bomb(x, y, map, target, bullets) {
+        function Bomb(x, y, map, bullets, target) {
             var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
                 input.stroke(128, 0, 0, 256);

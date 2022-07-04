@@ -579,10 +579,10 @@ var output = function (input) {
 
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.player, this.bullets));
-                this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-                this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
+                this.nPCs.push(new Pirate(  this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
+                this.nPCs.push(new Bomb(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
+                this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets));
+                this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food));
             }
         }
 
@@ -990,7 +990,7 @@ var output = function (input) {
         igniteAge: number;
         isGrowing: boolean;
 
-        constructor(x, y, map, target, bullets) {
+        constructor(x, y, map, bullets, target) {
             super(5, x, y, map, bullets, 8, target, 1000, 0, 200);
             this.didIgnite = false;
             this.igniteAge = 0
