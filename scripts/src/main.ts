@@ -154,6 +154,14 @@ var output = function (input) {
                 }
             }
         }
+
+        isVisible = function(coord) {
+            if (this.visibleIndexes == null) {
+                return true;
+            } else {
+                return this.visibleIndexes.map[coord.x][coord.y];
+            }
+        }
     }
 
     class GridMap {
@@ -274,7 +282,7 @@ var output = function (input) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
             for (var i = 0; i < this.gridWidth; i ++) {
                 for (var j = 0; j < this.gridHeight; j ++) {
-                    if (this.map[viewPoint.x][viewPoint.y].visibleIndexes.map[i][j]) {
+                    if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
                         this.map[i][j].draw();
                     } else {
                         input.fill(0, 256);
@@ -632,7 +640,7 @@ var output = function (input) {
                     }
     
                     var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
-                    this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].visibleIndexes.map[npcGridCoord.x][npcGridCoord.y];
+                    this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
                     if (this.nPCs[i].seesPlayer) {
                         this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
                     }
