@@ -219,36 +219,36 @@ var output = function (input) {
                         }
                     }
                 }
-            }
-            // populate visibleIndexes for each GridSquare
-            for (var i = 0; i < gridWidth; i++) {
-                for (var j = 0; j < gridHeight; j++) {
-                    if (this.map[i][j].isEmpty) {
-                        this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
-                        var furthestDistance = 0;
-                        for (var k = 0; k < 360; k += 2) {
-                            // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-                            var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
-                            var currentDistance = 0;
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
-                            var moveCount = 0;
-                            while (coordinateTracker.move(2)) {
-                                //check if the tracker entered a new grid cell
-                                if (coordinateTracker.x != previousCoord.x ||
-                                    coordinateTracker.y != previousCoord.y) {
-                                    currentDistance++;
-                                    previousCoord.x = coordinateTracker.x;
-                                    previousCoord.y = coordinateTracker.y;
+                // populate visibleIndexes for each GridSquare
+                for (var i = 0; i < gridWidth; i++) {
+                    for (var j = 0; j < gridHeight; j++) {
+                        if (this.map[i][j].isEmpty) {
+                            this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
+                            var furthestDistance = 0;
+                            for (var k = 0; k < 360; k += 2) {
+                                // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+                                var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
+                                var currentDistance = 0;
+                                var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
+                                var moveCount = 0;
+                                while (coordinateTracker.move(2)) {
+                                    //check if the tracker entered a new grid cell
+                                    if (coordinateTracker.x != previousCoord.x ||
+                                        coordinateTracker.y != previousCoord.y) {
+                                        currentDistance++;
+                                        previousCoord.x = coordinateTracker.x;
+                                        previousCoord.y = coordinateTracker.y;
+                                    }
+                                    moveCount++;
+                                    if (moveCount > 50) {
+                                        break;
+                                    }
+                                    var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
+                                    this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                                 }
-                                moveCount++;
-                                if (moveCount > 50) {
-                                    break;
+                                if (currentDistance > furthestDistance) {
+                                    furthestDistance = currentDistance;
                                 }
-                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
-                                this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
-                            }
-                            if (currentDistance > furthestDistance) {
-                                furthestDistance = currentDistance;
                             }
                         }
                     }
@@ -472,7 +472,7 @@ var output = function (input) {
             };
             this.frameCount = 0;
             this.bullets = new Array();
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
             // make sure the player starts on the map
             while (!this.map.isOpen(playerCoordinate)) {
