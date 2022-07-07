@@ -472,7 +472,7 @@ var output = function (input) {
             };
             this.frameCount = 0;
             this.bullets = new Array();
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
             // make sure the player starts on the map
             while (!this.map.isOpen(playerCoordinate)) {
