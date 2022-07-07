@@ -164,7 +164,7 @@ var output = function (input) {
         map: Array<Array<GridSquare>>; // hash table used to represent the map
         gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
         
-        constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength) {
+        constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
             var gridWidth = Math.floor(screenWidth / gridSquareSize);
             var gridHeight = Math.floor(screenHeight / gridSquareSize);
             var width = gridSquareSize * gridWidth;
@@ -183,39 +183,40 @@ var output = function (input) {
                     this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
             }
-            // make walls
-            for (var i = 0; i < numberOfWalls; i++) { 
-                var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
-                this.map[randomCoord.x][randomCoord.y].isEmpty = false;
-
-                // Determine along which axes the wall moves 
-                var dx = Math.random() < .5;
-                var dy = Math.random() < .5;
-
-                for (var j = 0; j < wallLength; j++) {
-                    var newX = randomCoord.x;
-                    var newY = randomCoord.y;
-                    if (dx) {
-                        newX += j;
-                    }
-                    if (dy) {
-                        newY += j;
-                    }
-
-                    var newCoord = new Coord(newX, newY);
-
-                    if (
-                        newCoord.x >= gridWidth ||
-                        newCoord.x < 0 ||
-                        newCoord.y >= gridHeight ||
-                        newCoord.y < 0
-                    ) {
-                        break; // don't go off the map
-                    } else {
-                        this.map[newCoord.x][newCoord.y].isEmpty = false;
+            if (!isEmpty) {
+                // make walls
+                for (var i = 0; i < numberOfWalls; i++) { 
+                    var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
+                    this.map[randomCoord.x][randomCoord.y].isEmpty = false;
+    
+                    // Determine along which axes the wall moves 
+                    var dx = Math.random() < .5;
+                    var dy = Math.random() < .5;
+    
+                    for (var j = 0; j < wallLength; j++) {
+                        var newX = randomCoord.x;
+                        var newY = randomCoord.y;
+                        if (dx) {
+                            newX += j;
+                        }
+                        if (dy) {
+                            newY += j;
+                        }
+    
+                        var newCoord = new Coord(newX, newY);
+    
+                        if (
+                            newCoord.x >= gridWidth ||
+                            newCoord.x < 0 ||
+                            newCoord.y >= gridHeight ||
+                            newCoord.y < 0
+                        ) {
+                            break; // don't go off the map
+                        } else {
+                            this.map[newCoord.x][newCoord.y].isEmpty = false;
+                        }
                     }
                 }
-
             }
             // populate visibleIndexes for each GridSquare
             for (var i = 0; i < gridWidth; i++) { 
@@ -557,7 +558,7 @@ var output = function (input) {
             this.frameCount = 0;
             this.bullets = new Array();
 
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
             // make sure the player starts on the map
             while (!this.map.isOpen(playerCoordinate)) {
@@ -566,7 +567,7 @@ var output = function (input) {
                 } else {
                     this.map = null;
                     playerCoordinate = new Coord(width - 20, height - 50);
-                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength);
+                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
                 }
             }
             this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
