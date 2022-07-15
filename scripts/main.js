@@ -910,7 +910,8 @@ var output = function (input) {
                 }
                 this.move(3);
                 if (this.stepCount % 8 == 0) {
-                    this.fire(World.calculateCoordinate(10, this.direction));
+                    var bulletRelative = World.calculateCoordinate(10, this.direction);
+                    this.fire(new Coord(this.x + bulletRelative.x, this.y + bulletRelative.y));
                 }
                 this.stepCount++;
             };
