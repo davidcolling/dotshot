@@ -372,7 +372,7 @@ var output = function (input) {
     // an observer of when characters lose hp
     // an observer of NPC "sight" for hunting
     var World = /** @class */ (function () {
-        function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize) {
+        function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading) {
             this.draw = function () {
                 var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
                 // world 
@@ -380,31 +380,35 @@ var output = function (input) {
                 this.map.draw();
                 this.drawBullets(this.bullets);
                 // player
-                if (this.isShotByAny(this.player, this.bullets)) {
-                    this.player.hp -= 1;
-                    this.healthBar.hp = this.player.hp;
-                }
-                this.player.step();
-                this.player.draw();
-                if (this.player.hp == 0) {
-                    playerIsDead = true;
-                    document.getElementById("message").textContent = "You Lose.";
-                }
-                this.healthBar.draw();
-                for (var i = 0; i < this.food.length; i++) {
-                    if (this.food[i] != null) {
-                        this.food[i].draw();
-                        this.food[i].step();
-                        if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
-                            if (this.player.hp < this.healthBar.max) {
-                                this.food[i] = null;
-                                this.player.hp += 10;
-                                this.healthBar.hp = this.player.hp;
+                if (this.player != null) {
+                    if (this.isShotByAny(this.player, this.bullets)) {
+                        this.player.hp -= 1;
+                        this.healthBar.hp = this.player.hp;
+                    }
+                    this.player.step();
+                    this.player.draw();
+                    if (this.player.hp == 0) {
+                        playerIsDead = true;
+                        document.getElementById("message").textContent = "You Lose.";
+                    }
+                    this.healthBar.draw();
+                    for (var i = 0; i < this.food.length; i++) {
+                        if (this.food[i] != null) {
+                            this.food[i].draw();
+                            this.food[i].step();
+                            if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                                if (this.player.hp < this.healthBar.max) {
+                                    this.food[i] = null;
+                                    this.player.hp += 10;
+                                    this.healthBar.hp = this.player.hp;
+                                }
                             }
                         }
                     }
                 }
-                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+                if (this.player != null) {
+                    var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+                }
                 // NPCs
                 for (var i = 0; i < this.nPCs.length; i++) {
                     if (this.nPCs[i] != null) {
@@ -412,10 +416,12 @@ var output = function (input) {
                         if (this.isShotByAny(this.nPCs[i], this.bullets)) {
                             this.nPCs[i].hp--;
                         }
-                        var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
-                        this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
-                        if (this.nPCs[i].seesPlayer) {
-                            this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                        if (this.player != null) {
+                            var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
+                            this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
+                            if (this.nPCs[i].seesPlayer) {
+                                this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                            }
                         }
                         this.nPCs[i].step();
                         this.nPCs[i].draw();
@@ -472,31 +478,40 @@ var output = function (input) {
             };
             this.frameCount = 0;
             this.bullets = new Array();
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
-            var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
-            // make sure the player starts on the map
-            while (!this.map.isOpen(playerCoordinate)) {
-                if (playerCoordinate.x > 0) {
-                    playerCoordinate.x -= gridSquareSize;
+            if (!loading) {
+                this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+                var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
+                // make sure the player starts on the map
+                while (!this.map.isOpen(playerCoordinate)) {
+                    if (playerCoordinate.x > 0) {
+                        playerCoordinate.x -= gridSquareSize;
+                    }
+                    else {
+                        this.map = null;
+                        playerCoordinate = new Coord(width - 20, height - 50);
+                        this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+                    }
                 }
-                else {
-                    this.map = null;
-                    playerCoordinate = new Coord(width - 20, height - 50);
-                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+                this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
+                this.healthBar = new HealthBar(32, this.map);
+                this.food = new Array();
+                for (var i = 0; i < 5; i++) {
+                    this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+                }
+                this.nPCs = new Array();
+                for (var i = 0; i < numberOfEnemies; i++) {
+                    this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
+                    this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
+                    this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
+                    this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
                 }
             }
-            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
-            this.healthBar = new HealthBar(32, this.map);
-            this.food = new Array();
-            for (var i = 0; i < 5; i++) {
-                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
-            }
-            this.nPCs = new Array();
-            for (var i = 0; i < numberOfEnemies; i++) {
-                this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-                this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
+            else {
+                this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
+                this.player = null;
+                this.healthBar = null;
+                this.food = null;
+                this.nPCs = null;
             }
         }
         // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
@@ -982,7 +997,7 @@ var output = function (input) {
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, true);
     };
     input.draw = function () {
         input.clear();
