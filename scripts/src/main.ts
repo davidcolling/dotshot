@@ -599,7 +599,8 @@ var output = function (input) {
                 this.player = null;
                 this.healthBar = null;
                 this.food = null;
-                this.nPCs = null;
+                this.nPCs = new Array();
+                this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
             }
         }
 
@@ -1147,6 +1148,36 @@ var output = function (input) {
             }
         }
     };
+
+    class LoadingActor extends NPC {
+        stepCount: number;
+
+        constructor(x, y, map, bullets) {
+            super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
+            this.stepCount = 0;
+        }
+        draw = function () {
+            var shade = defaultStrokeColor.r
+            input.fill(shade, 256);
+            input.circle(
+                this.x, 
+                this.y, 
+                this.size
+            );
+        }
+        step = function () {
+            if (this.direction < 360) {
+                this.direction += 3;
+            } else {
+                this.direction = 0;
+            }
+            this.move(3);
+            if (this.stepCount % 8 == 0) {
+                this.fire(World.calculateCoordinate(10, this.direction));
+            }
+            this.stepCount++;
+        }
+    }
 
     class Mine extends NPC {
         constructor(x, y, map, bullets) {

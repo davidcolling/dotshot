@@ -511,7 +511,8 @@ var output = function (input) {
                 this.player = null;
                 this.healthBar = null;
                 this.food = null;
-                this.nPCs = null;
+                this.nPCs = new Array();
+                this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
             }
         }
         // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
@@ -891,6 +892,33 @@ var output = function (input) {
         return Pirate;
     }(NPC));
     ;
+    var LoadingActor = /** @class */ (function (_super) {
+        __extends(LoadingActor, _super);
+        function LoadingActor(x, y, map, bullets) {
+            var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
+            _this.draw = function () {
+                var shade = defaultStrokeColor.r;
+                input.fill(shade, 256);
+                input.circle(this.x, this.y, this.size);
+            };
+            _this.step = function () {
+                if (this.direction < 360) {
+                    this.direction += 3;
+                }
+                else {
+                    this.direction = 0;
+                }
+                this.move(3);
+                if (this.stepCount % 8 == 0) {
+                    this.fire(World.calculateCoordinate(10, this.direction));
+                }
+                this.stepCount++;
+            };
+            _this.stepCount = 0;
+            return _this;
+        }
+        return LoadingActor;
+    }(NPC));
     var Mine = /** @class */ (function (_super) {
         __extends(Mine, _super);
         function Mine(x, y, map, bullets) {
