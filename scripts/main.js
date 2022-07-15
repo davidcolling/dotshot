@@ -1026,7 +1026,7 @@ var output = function (input) {
         input.frameRate(100000);
         input.createCanvas(width, height);
         input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, true);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false);
     };
     input.draw = function () {
         input.clear();
