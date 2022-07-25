@@ -15,10 +15,9 @@ To Do
 soon:
     - clean
         - use Coord everywhere
-        - delete old Map
-            - line intersection 
-            calculation was useful
-            though
+        - Remove class definitions, 
+        event handlers from inside the 
+        drawing function, "outout"
     - make full use of new GridMap
         - use the hash table to only
         calculate distances that are
