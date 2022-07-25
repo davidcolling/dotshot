@@ -20,6 +20,35 @@ var Coord = /** @class */ (function () {
     }
     return Coord;
 }());
+var CenteredShape = /** @class */ (function () {
+    function CenteredShape(size, x, y) {
+        this.draw = function () { };
+        this.size = size;
+        this.x = x;
+        this.y = y;
+    }
+    return CenteredShape;
+}());
+var GridMapImage = /** @class */ (function () {
+    function GridMapImage(width, height) {
+        this.set = function (x, y) {
+            this.map[x][y] = true;
+        };
+        this.unSet = function (x, y) {
+            this.map[x][y] = false;
+        };
+        this.gridWidth = width;
+        this.gridHeight = height;
+        this.map = new Array();
+        for (var i = 0; i < width; i++) {
+            this.map[i] = new Array();
+            for (var j = 0; j < height; j++) {
+                this.map[i][j] = false;
+            }
+        }
+    }
+    return GridMapImage;
+}());
 var output = function (drawWorker) {
     var HealthBar = /** @class */ (function () {
         function HealthBar(max, map) {
@@ -38,15 +67,6 @@ var output = function (drawWorker) {
             this.hp = this.max;
         }
         return HealthBar;
-    }());
-    var CenteredShape = /** @class */ (function () {
-        function CenteredShape(size, x, y) {
-            this.draw = function () { };
-            this.size = size;
-            this.x = x;
-            this.y = y;
-        }
-        return CenteredShape;
     }());
     var Food = /** @class */ (function (_super) {
         __extends(Food, _super);
@@ -79,26 +99,6 @@ var output = function (drawWorker) {
         }
         return Food;
     }(CenteredShape));
-    var GridMapImage = /** @class */ (function () {
-        function GridMapImage(width, height) {
-            this.set = function (x, y) {
-                this.map[x][y] = true;
-            };
-            this.unSet = function (x, y) {
-                this.map[x][y] = false;
-            };
-            this.gridWidth = width;
-            this.gridHeight = height;
-            this.map = new Array();
-            for (var i = 0; i < width; i++) {
-                this.map[i] = new Array();
-                for (var j = 0; j < height; j++) {
-                    this.map[i][j] = false;
-                }
-            }
-        }
-        return GridMapImage;
-    }());
     var GridSquare = /** @class */ (function () {
         function GridSquare(size, coord, isEmpty) {
             this.draw = function () {

@@ -8,6 +8,43 @@ class Coord {
     }
 }
 
+class CenteredShape {
+    size: number;
+    x: number;
+    y: number;
+
+    constructor(size, x, y) {
+        this.size = size;
+        this.x = x;
+        this.y = y;
+    }
+    draw = function (){};
+}
+
+class GridMapImage {
+    gridWidth:number;
+    gridHeight:number;
+    map: Array<Array<boolean>>;
+
+    constructor(width, height) {
+        this.gridWidth = width;
+        this.gridHeight = height;
+        this.map = new Array();
+        for (var i = 0; i < width; i++) {
+            this.map[i] = new Array();
+            for (var j = 0; j < height; j++) {
+                this.map[i][j] = false;
+            }
+        }
+    }
+    set = function(x, y) {
+        this.map[x][y] = true;
+    }
+    unSet = function(x, y) {
+        this.map[x][y] = false;
+    }
+}
+
 var output = function (drawWorker) {
 
     class HealthBar {
@@ -43,23 +80,10 @@ var output = function (drawWorker) {
         }
     }
 
-    class CenteredShape {
-        size: number;
-        x: number;
-        y: number;
-
-        constructor(size, x, y) {
-            this.size = size;
-            this.x = x;
-            this.y = y;
-        }
-        draw = function (){};
-    }
-
     class Food extends CenteredShape {
         isGrowing: boolean;
         growAge: number;
-
+    
         constructor(x, y) {
             super(2, x, y);
             this.isGrowing = true;
@@ -88,30 +112,6 @@ var output = function (drawWorker) {
                 this.y, 
                 this.size
             );
-        }
-    }
-
-    class GridMapImage {
-        gridWidth:number;
-        gridHeight:number;
-        map: Array<Array<boolean>>;
-
-        constructor(width, height) {
-            this.gridWidth = width;
-            this.gridHeight = height;
-            this.map = new Array();
-            for (var i = 0; i < width; i++) {
-                this.map[i] = new Array();
-                for (var j = 0; j < height; j++) {
-                    this.map[i][j] = false;
-                }
-            }
-        }
-        set = function(x, y) {
-            this.map[x][y] = true;
-        }
-        unSet = function(x, y) {
-            this.map[x][y] = false;
         }
     }
 
