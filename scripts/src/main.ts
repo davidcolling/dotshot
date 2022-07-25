@@ -1,4 +1,4 @@
-var output = function (input) {
+var output = function (draw_worker) {
 
     class HealthBar {
         max: number;
@@ -13,17 +13,17 @@ var output = function (input) {
 
         draw  = function() {
             if (this.hp != 0) {
-                input.stroke(256, 0, 0, 256);
-                input.fill(256, 0, 0, 256);
-                input.strokeWeight(5);
-                input.line(
+                draw_worker.stroke(256, 0, 0, 256);
+                draw_worker.fill(256, 0, 0, 256);
+                draw_worker.strokeWeight(5);
+                draw_worker.line(
                     0, 
                     this.map.height - 1, 
                     this.map.width * (this.hp / this.max), 
                     this.map.height - 1
                 );
-                input.strokeWeight(1);
-                input.stroke(
+                draw_worker.strokeWeight(1);
+                draw_worker.stroke(
                     defaultStrokeColor.r, 
                     defaultStrokeColor.g, 
                     defaultStrokeColor.b, 
@@ -82,8 +82,8 @@ var output = function (input) {
             }
         }
         draw = function () {
-            input.fill(defaultStrokeColor.r, 256);
-            input.circle(
+            draw_worker.fill(defaultStrokeColor.r, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
@@ -132,8 +132,8 @@ var output = function (input) {
 
         draw = function () {
             if (this.isHighlighted) {
-                input.fill(256, 0, 0, 256);
-                input.rect(
+                draw_worker.fill(256, 0, 0, 256);
+                draw_worker.rect(
                     this.coord.x,
                     this.coord.y,
                     this.size,
@@ -144,8 +144,8 @@ var output = function (input) {
                     return;
                 } else {
                     var shade = defaultStrokeColor.r;
-                    input.fill(shade, 256);
-                    input.rect(
+                    draw_worker.fill(shade, 256);
+                    draw_worker.rect(
                         this.coord.x,
                         this.coord.y,
                         this.size,
@@ -285,8 +285,8 @@ var output = function (input) {
                     if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
                         this.map[i][j].draw();
                     } else {
-                        input.fill(0, 256);
-                        input.rect(
+                        draw_worker.fill(0, 256);
+                        draw_worker.rect(
                             i * this.gridSquareSize,
                             j * this.gridSquareSize,
                             this.gridSquareSize,
@@ -333,8 +333,8 @@ var output = function (input) {
             this.end2 = end2;
         }
         draw = function () {
-            input.fill(256, 256);
-            input.line(
+            draw_worker.fill(256, 256);
+            draw_worker.line(
                 this.end1.x, 
                 this.end1.y, 
                 this.end2.x, 
@@ -869,8 +869,8 @@ var output = function (input) {
             }
         }
         draw = function () {
-            input.fill(256, 256);
-            input.circle(
+            draw_worker.fill(256, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size,
@@ -905,11 +905,11 @@ var output = function (input) {
             this.firingAge = 0;
         }
         step = function () {
-            this.point(new Coord(input.mouseX, input.mouseY));
+            this.point(new Coord(draw_worker.mouseX, draw_worker.mouseY));
             if (this.isFiring) {
                 this.firingAge++;
                 if (this.firingAge % 4 == 0) {
-                    this.fire(new Coord(input.mouseX, input.mouseY));
+                    this.fire(new Coord(draw_worker.mouseX, draw_worker.mouseY));
                 }
             } else {
                 this.firingAge = 0;
@@ -920,8 +920,8 @@ var output = function (input) {
         }
         draw = function () {
             var shade = defaultStrokeColor.r
-            input.fill(shade, 256);
-            input.circle(
+            draw_worker.fill(shade, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
@@ -983,8 +983,8 @@ var output = function (input) {
         }
         draw = function () {
             var shade = defaultStrokeColor.r;
-            input.fill(shade, 256);
-            input.circle(
+            draw_worker.fill(shade, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
@@ -1021,14 +1021,14 @@ var output = function (input) {
             this.isGrowing = true;
         }
         draw = function () {
-            input.stroke(128, 0, 0, 256);
-            input.fill(128, 0, 0, 256);
-            input.circle(
+            draw_worker.stroke(128, 0, 0, 256);
+            draw_worker.fill(128, 0, 0, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
             );
-            input.stroke(
+            draw_worker.stroke(
                 defaultStrokeColor.r, 
                 defaultStrokeColor.g, 
                 defaultStrokeColor.b, 
@@ -1113,14 +1113,14 @@ var output = function (input) {
             this.weaponCooldownCounter = 0
         }
         draw = function () {
-            input.stroke(256, 0, 0, 256);
-            input.fill(256, 0, 0, 256);
-            input.circle(
+            draw_worker.stroke(256, 0, 0, 256);
+            draw_worker.fill(256, 0, 0, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
             );
-            input.stroke(
+            draw_worker.stroke(
                 defaultStrokeColor.r, 
                 defaultStrokeColor.g, 
                 defaultStrokeColor.b, 
@@ -1158,8 +1158,8 @@ var output = function (input) {
         }
         draw = function () {
             var shade = defaultStrokeColor.r
-            input.fill(shade, 256);
-            input.circle(
+            draw_worker.fill(shade, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
@@ -1185,14 +1185,14 @@ var output = function (input) {
             super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
         }
         draw = function () {
-            input.stroke(128, 128, 128, 256);
-            input.fill(128, 128, 128, 256);
-            input.circle(
+            draw_worker.stroke(128, 128, 128, 256);
+            draw_worker.fill(128, 128, 128, 256);
+            draw_worker.circle(
                 this.x, 
                 this.y, 
                 this.size
             );
-            input.stroke(
+            draw_worker.stroke(
                 defaultStrokeColor.r, 
                 defaultStrokeColor.g, 
                 defaultStrokeColor.b, 
@@ -1296,7 +1296,7 @@ var output = function (input) {
     document.getElementById("newGame").addEventListener("click", startNewGame);
 
 
-    input.setup = function () {
+    draw_worker.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
 
@@ -1307,9 +1307,9 @@ var output = function (input) {
             width = 700;
         }
 
-        input.frameRate(100000);
-        input.createCanvas(width, height);
-        input.stroke(
+        draw_worker.frameRate(100000);
+        draw_worker.createCanvas(width, height);
+        draw_worker.stroke(
             defaultStrokeColor.r, 
             defaultStrokeColor.g, 
             defaultStrokeColor.b, 
@@ -1319,10 +1319,10 @@ var output = function (input) {
         world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false);
     };
 
-    input.draw = function () {
-        input.clear();
+    draw_worker.draw = function () {
+        draw_worker.clear();
         if (!world.draw()) {
-            input.noLoop();
+            draw_worker.noLoop();
         }
     }
 

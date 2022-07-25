@@ -13,17 +13,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var output = function (input) {
+var output = function (draw_worker) {
     var HealthBar = /** @class */ (function () {
         function HealthBar(max, map) {
             this.draw = function () {
                 if (this.hp != 0) {
-                    input.stroke(256, 0, 0, 256);
-                    input.fill(256, 0, 0, 256);
-                    input.strokeWeight(5);
-                    input.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
-                    input.strokeWeight(1);
-                    input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                    draw_worker.stroke(256, 0, 0, 256);
+                    draw_worker.fill(256, 0, 0, 256);
+                    draw_worker.strokeWeight(5);
+                    draw_worker.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
+                    draw_worker.strokeWeight(1);
+                    draw_worker.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
                 }
             };
             this.max = max;
@@ -70,8 +70,8 @@ var output = function (input) {
                 }
             };
             _this.draw = function () {
-                input.fill(defaultStrokeColor.r, 256);
-                input.circle(this.x, this.y, this.size);
+                draw_worker.fill(defaultStrokeColor.r, 256);
+                draw_worker.circle(this.x, this.y, this.size);
             };
             _this.isGrowing = true;
             _this.growAge = 0;
@@ -103,8 +103,8 @@ var output = function (input) {
         function GridSquare(size, coord, isEmpty) {
             this.draw = function () {
                 if (this.isHighlighted) {
-                    input.fill(256, 0, 0, 256);
-                    input.rect(this.coord.x, this.coord.y, this.size, this.size);
+                    draw_worker.fill(256, 0, 0, 256);
+                    draw_worker.rect(this.coord.x, this.coord.y, this.size, this.size);
                 }
                 else {
                     if (this.isEmpty) {
@@ -112,8 +112,8 @@ var output = function (input) {
                     }
                     else {
                         var shade = defaultStrokeColor.r;
-                        input.fill(shade, 256);
-                        input.rect(this.coord.x, this.coord.y, this.size, this.size);
+                        draw_worker.fill(shade, 256);
+                        draw_worker.rect(this.coord.x, this.coord.y, this.size, this.size);
                     }
                 }
             };
@@ -151,8 +151,8 @@ var output = function (input) {
                             this.map[i][j].draw();
                         }
                         else {
-                            input.fill(0, 256);
-                            input.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
+                            draw_worker.fill(0, 256);
+                            draw_worker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
                         }
                     }
                 }
@@ -266,8 +266,8 @@ var output = function (input) {
     var Wall = /** @class */ (function () {
         function Wall(end1, end2) {
             this.draw = function () {
-                input.fill(256, 256);
-                input.line(this.end1.x, this.end1.y, this.end2.x, this.end2.y);
+                draw_worker.fill(256, 256);
+                draw_worker.line(this.end1.x, this.end1.y, this.end2.x, this.end2.y);
             };
             this.end1 = end1;
             this.end2 = end2;
@@ -647,8 +647,8 @@ var output = function (input) {
                 }
             };
             _this.draw = function () {
-                input.fill(256, 256);
-                input.circle(this.x, this.y, this.size);
+                draw_worker.fill(256, 256);
+                draw_worker.circle(this.x, this.y, this.size);
             };
             _this.age = 0;
             _this.target = target;
@@ -676,11 +676,11 @@ var output = function (input) {
         function Player(size, x, y, map, bullets) {
             var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
             _this.step = function () {
-                this.point(new Coord(input.mouseX, input.mouseY));
+                this.point(new Coord(draw_worker.mouseX, draw_worker.mouseY));
                 if (this.isFiring) {
                     this.firingAge++;
                     if (this.firingAge % 4 == 0) {
-                        this.fire(new Coord(input.mouseX, input.mouseY));
+                        this.fire(new Coord(draw_worker.mouseX, draw_worker.mouseY));
                     }
                 }
                 else {
@@ -692,8 +692,8 @@ var output = function (input) {
             };
             _this.draw = function () {
                 var shade = defaultStrokeColor.r;
-                input.fill(shade, 256);
-                input.circle(this.x, this.y, this.size);
+                draw_worker.fill(shade, 256);
+                draw_worker.circle(this.x, this.y, this.size);
             };
             _this.isFiring = true;
             _this.isMoving = false;
@@ -741,8 +741,8 @@ var output = function (input) {
             var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 var shade = defaultStrokeColor.r;
-                input.fill(shade, 256);
-                input.circle(this.x, this.y, this.size);
+                draw_worker.fill(shade, 256);
+                draw_worker.circle(this.x, this.y, this.size);
             };
             _this.step = function () {
                 if (this.hp <= 0) {
@@ -775,10 +775,10 @@ var output = function (input) {
         function Bomb(x, y, map, bullets, target) {
             var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
-                input.stroke(128, 0, 0, 256);
-                input.fill(128, 0, 0, 256);
-                input.circle(this.x, this.y, this.size);
-                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                draw_worker.stroke(128, 0, 0, 256);
+                draw_worker.fill(128, 0, 0, 256);
+                draw_worker.circle(this.x, this.y, this.size);
+                draw_worker.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.step = function () {
                 if (this.didIgnite) {
@@ -860,10 +860,10 @@ var output = function (input) {
         function Pirate(x, y, map, bullets, target) {
             var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
             _this.draw = function () {
-                input.stroke(256, 0, 0, 256);
-                input.fill(256, 0, 0, 256);
-                input.circle(this.x, this.y, this.size);
-                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                draw_worker.stroke(256, 0, 0, 256);
+                draw_worker.fill(256, 0, 0, 256);
+                draw_worker.circle(this.x, this.y, this.size);
+                draw_worker.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.step = function () {
                 this.weaponCooldownCounter++;
@@ -898,8 +898,8 @@ var output = function (input) {
             var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
             _this.draw = function () {
                 var shade = defaultStrokeColor.r;
-                input.fill(shade, 256);
-                input.circle(this.x, this.y, this.size);
+                draw_worker.fill(shade, 256);
+                draw_worker.circle(this.x, this.y, this.size);
             };
             _this.step = function () {
                 if (this.direction < 360) {
@@ -925,10 +925,10 @@ var output = function (input) {
         function Mine(x, y, map, bullets) {
             var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
             _this.draw = function () {
-                input.stroke(128, 128, 128, 256);
-                input.fill(128, 128, 128, 256);
-                input.circle(this.x, this.y, this.size);
-                input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+                draw_worker.stroke(128, 128, 128, 256);
+                draw_worker.fill(128, 128, 128, 256);
+                draw_worker.circle(this.x, this.y, this.size);
+                draw_worker.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
             };
             _this.explode = function () {
                 var directions = Array();
@@ -1014,7 +1014,7 @@ var output = function (input) {
         }
     }
     document.getElementById("newGame").addEventListener("click", startNewGame);
-    input.setup = function () {
+    draw_worker.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
         if (height > 700) {
@@ -1023,15 +1023,15 @@ var output = function (input) {
         if (width > 700) {
             width = 700;
         }
-        input.frameRate(100000);
-        input.createCanvas(width, height);
-        input.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
+        draw_worker.frameRate(100000);
+        draw_worker.createCanvas(width, height);
+        draw_worker.stroke(defaultStrokeColor.r, defaultStrokeColor.g, defaultStrokeColor.b, defaultStrokeColor.a);
         world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false);
     };
-    input.draw = function () {
-        input.clear();
+    draw_worker.draw = function () {
+        draw_worker.clear();
         if (!world.draw()) {
-            input.noLoop();
+            draw_worker.noLoop();
         }
     };
 };
