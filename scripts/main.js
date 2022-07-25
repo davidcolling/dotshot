@@ -29,6 +29,38 @@ var CenteredShape = /** @class */ (function () {
     }
     return CenteredShape;
 }());
+var Food = /** @class */ (function (_super) {
+    __extends(Food, _super);
+    function Food(x, y, drawWorker) {
+        var _this = _super.call(this, 2, x, y) || this;
+        _this.step = function () {
+            this.growAge++;
+            if (this.growAge % 3 == 0) {
+                if (this.size == 4) {
+                    this.isGrowing = false;
+                }
+                if (this.size == 1) {
+                    this.isGrowing = true;
+                }
+                if (this.isGrowing) {
+                    this.size++;
+                }
+                else {
+                    this.size--;
+                }
+            }
+        };
+        _this.draw = function () {
+            this.drawWorker.fill(defaultStrokeColor.r, 256);
+            this.drawWorker.circle(this.x, this.y, this.size);
+        };
+        _this.isGrowing = true;
+        _this.growAge = 0;
+        _this.drawWorker = drawWorker;
+        return _this;
+    }
+    return Food;
+}(CenteredShape));
 var GridMapImage = /** @class */ (function () {
     function GridMapImage(width, height) {
         this.set = function (x, y) {
@@ -108,37 +140,6 @@ var output = function (drawWorker) {
         }
         return HealthBar;
     }());
-    var Food = /** @class */ (function (_super) {
-        __extends(Food, _super);
-        function Food(x, y) {
-            var _this = _super.call(this, 2, x, y) || this;
-            _this.step = function () {
-                this.growAge++;
-                if (this.growAge % 3 == 0) {
-                    if (this.size == 4) {
-                        this.isGrowing = false;
-                    }
-                    if (this.size == 1) {
-                        this.isGrowing = true;
-                    }
-                    if (this.isGrowing) {
-                        this.size++;
-                    }
-                    else {
-                        this.size--;
-                    }
-                }
-            };
-            _this.draw = function () {
-                drawWorker.fill(defaultStrokeColor.r, 256);
-                drawWorker.circle(this.x, this.y, this.size);
-            };
-            _this.isGrowing = true;
-            _this.growAge = 0;
-            return _this;
-        }
-        return Food;
-    }(CenteredShape));
     var GridSquare = /** @class */ (function () {
         function GridSquare(size, coord, isEmpty) {
             this.draw = function () {
@@ -433,7 +434,7 @@ var output = function (drawWorker) {
                 this.healthBar = new HealthBar(32, this.map);
                 this.food = new Array();
                 for (var i = 0; i < 5; i++) {
-                    this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+                    this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height, drawWorker));
                 }
                 this.nPCs = new Array();
                 for (var i = 0; i < numberOfEnemies; i++) {
@@ -683,7 +684,7 @@ var output = function (drawWorker) {
             };
             _this.step = function () {
                 if (this.hp <= 0) {
-                    this.food.push(new Food(this.x, this.y));
+                    this.food.push(new Food(this.x, this.y, drawWorker));
                 }
                 if (this.seesPlayer) {
                     if (this.fleeAge < this.fleeLife) {

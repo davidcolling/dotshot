@@ -21,6 +21,43 @@ class CenteredShape {
     draw = function (){};
 }
 
+class Food extends CenteredShape {
+    isGrowing: boolean;
+    growAge: number;
+    drawWorker: Object;
+
+    constructor(x, y, drawWorker) {
+        super(2, x, y);
+        this.isGrowing = true;
+        this.growAge = 0;
+        this.drawWorker = drawWorker;
+    }
+    step = function () {
+        this.growAge++;
+        if (this.growAge % 3 == 0) {
+            if (this.size == 4) {
+                this.isGrowing = false;
+            }
+            if (this.size == 1) {
+                this.isGrowing = true;
+            }
+            if (this.isGrowing) {
+                this.size++;
+            } else {
+                this.size--;
+            }
+        }
+    }
+    draw = function () {
+        this.drawWorker.fill(defaultStrokeColor.r, 256);
+        this.drawWorker.circle(
+            this.x, 
+            this.y, 
+            this.size
+        );
+    }
+}
+
 class GridMapImage {
     gridWidth:number;
     gridHeight:number;
@@ -119,41 +156,6 @@ var output = function (drawWorker) {
                     defaultStrokeColor.a, 
                 );            
             }
-        }
-    }
-
-    class Food extends CenteredShape {
-        isGrowing: boolean;
-        growAge: number;
-    
-        constructor(x, y) {
-            super(2, x, y);
-            this.isGrowing = true;
-            this.growAge = 0;
-        }
-        step = function () {
-            this.growAge++;
-            if (this.growAge % 3 == 0) {
-                if (this.size == 4) {
-                    this.isGrowing = false;
-                }
-                if (this.size == 1) {
-                    this.isGrowing = true;
-                }
-                if (this.isGrowing) {
-                    this.size++;
-                } else {
-                    this.size--;
-                }
-            }
-        }
-        draw = function () {
-            drawWorker.fill(defaultStrokeColor.r, 256);
-            drawWorker.circle(
-                this.x, 
-                this.y, 
-                this.size
-            );
         }
     }
 
@@ -403,7 +405,7 @@ var output = function (drawWorker) {
     
                 this.food = new Array();
                 for (var i = 0; i < 5; i++) {
-                    this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+                    this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height, drawWorker));
                 }
     
                 this.nPCs = new Array();
@@ -810,7 +812,7 @@ var output = function (drawWorker) {
         }    
         step = function () {
             if(this.hp <= 0) {
-                this.food.push(new Food(this.x, this.y));
+                this.food.push(new Food(this.x, this.y, drawWorker));
             }
             if (this.seesPlayer) {
                 if (this.fleeAge < this.fleeLife) {
