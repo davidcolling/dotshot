@@ -13,6 +13,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var Coord = /** @class */ (function () {
+    function Coord(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return Coord;
+}());
 var output = function (drawWorker) {
     var HealthBar = /** @class */ (function () {
         function HealthBar(max, map) {
@@ -40,13 +47,6 @@ var output = function (drawWorker) {
             this.y = y;
         }
         return CenteredShape;
-    }());
-    var Coord = /** @class */ (function () {
-        function Coord(x, y) {
-            this.x = x;
-            this.y = y;
-        }
-        return Coord;
     }());
     var Food = /** @class */ (function (_super) {
         __extends(Food, _super);
@@ -389,7 +389,6 @@ var output = function (drawWorker) {
                     this.player.draw();
                     if (this.player.hp == 0) {
                         playerIsDead = true;
-                        document.getElementById("message").textContent = "You Lose.";
                     }
                     this.healthBar.draw();
                     for (var i = 0; i < this.food.length; i++) {

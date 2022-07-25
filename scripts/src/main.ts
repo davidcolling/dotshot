@@ -1,3 +1,13 @@
+class Coord {
+    x: number;
+    y: number;
+
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 var output = function (drawWorker) {
 
     class HealthBar {
@@ -44,16 +54,6 @@ var output = function (drawWorker) {
             this.y = y;
         }
         draw = function (){};
-    }
-
-    class Coord {
-        x: number;
-        y: number;
-
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-        }
     }
 
     class Food extends CenteredShape {
@@ -622,7 +622,6 @@ var output = function (drawWorker) {
                 this.player.draw();
                 if (this.player.hp == 0) {
                     playerIsDead = true;
-                    document.getElementById("message").textContent = "You Lose.";
                 }
                 this.healthBar.draw();
                 for (var i = 0; i < this.food.length; i ++) {
