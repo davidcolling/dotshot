@@ -45,6 +45,48 @@ class GridMapImage {
     }
 }
 
+document.addEventListener('keydown', recordKey);
+function recordKey(e) {
+    switch (e.key) {
+        case "r":
+            world.player.isFiring = true;
+            break;
+        case "Shift":
+            world.player.isFiring = true;
+            break;
+        case "w":
+            world.player.isMoving = true;
+            break;
+        case " ":
+            world.player.isMoving = true;
+            break;
+        case "ArrowUp":
+            world.player.isMoving = true;
+            break;
+    }
+}
+
+document.addEventListener('keyup', stopKey);
+function stopKey(e) {
+    switch (e.key) {
+        case "r":
+            world.player.isFiring = false;
+            break;
+        case "Shift":
+            world.player.isFiring = false;
+            break;
+        case "w":
+            world.player.isMoving = false;
+            break;
+        case " ":
+            world.player.isMoving = false;
+            break;
+        case "ArrowUp":
+            world.player.isMoving = false;
+            break;
+    }
+}
+
 var output = function (drawWorker) {
 
     class HealthBar {
@@ -1025,49 +1067,6 @@ var output = function (drawWorker) {
             }
         }
     };
-
-
-    document.addEventListener('keydown', recordKey);
-    function recordKey(e) {
-        switch (e.key) {
-            case "r":
-                world.player.isFiring = true;
-                break;
-            case "Shift":
-                world.player.isFiring = true;
-                break;
-            case "w":
-                world.player.isMoving = true;
-                break;
-            case " ":
-                world.player.isMoving = true;
-                break;
-            case "ArrowUp":
-                world.player.isMoving = true;
-                break;
-        }
-    }
-
-    document.addEventListener('keyup', stopKey);
-    function stopKey(e) {
-        switch (e.key) {
-            case "r":
-                world.player.isFiring = false;
-                break;
-            case "Shift":
-                world.player.isFiring = false;
-                break;
-            case "w":
-                world.player.isMoving = false;
-                break;
-            case " ":
-                world.player.isMoving = false;
-                break;
-            case "ArrowUp":
-                world.player.isMoving = false;
-                break;
-        }
-    }
 
     document.getElementById("newGame").addEventListener("click", startNewGame);
 
