@@ -81,6 +81,41 @@ var GridMapImage = /** @class */ (function () {
     }
     return GridMapImage;
 }());
+var GridSquare = /** @class */ (function () {
+    function GridSquare(size, coord, isEmpty, drawWorker) {
+        this.draw = function () {
+            if (this.isHighlighted) {
+                this.drawWorker.fill(256, 0, 0, 256);
+                this.drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+            }
+            else {
+                if (this.isEmpty) {
+                    return;
+                }
+                else {
+                    var shade = defaultStrokeColor.r;
+                    this.drawWorker.fill(shade, 256);
+                    this.drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+                }
+            }
+        };
+        this.isVisible = function (coord) {
+            if (this.visibleIndexes == null) {
+                return true;
+            }
+            else {
+                return this.visibleIndexes.map[coord.x][coord.y];
+            }
+        };
+        this.size = size;
+        this.isEmpty = isEmpty;
+        this.coord = coord;
+        this.visibleIndexes = null;
+        this.isHightlighted = false;
+        this.drawWorker = drawWorker;
+    }
+    return GridSquare;
+}());
 document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
@@ -140,40 +175,6 @@ var output = function (drawWorker) {
         }
         return HealthBar;
     }());
-    var GridSquare = /** @class */ (function () {
-        function GridSquare(size, coord, isEmpty) {
-            this.draw = function () {
-                if (this.isHighlighted) {
-                    drawWorker.fill(256, 0, 0, 256);
-                    drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
-                }
-                else {
-                    if (this.isEmpty) {
-                        return;
-                    }
-                    else {
-                        var shade = defaultStrokeColor.r;
-                        drawWorker.fill(shade, 256);
-                        drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
-                    }
-                }
-            };
-            this.isVisible = function (coord) {
-                if (this.visibleIndexes == null) {
-                    return true;
-                }
-                else {
-                    return this.visibleIndexes.map[coord.x][coord.y];
-                }
-            };
-            this.size = size;
-            this.isEmpty = isEmpty;
-            this.coord = coord;
-            this.visibleIndexes = null;
-            this.isHightlighted = false;
-        }
-        return GridSquare;
-    }());
     var GridMap = /** @class */ (function () {
         function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
             this.draw = function () {
@@ -228,7 +229,7 @@ var output = function (drawWorker) {
                 this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true, drawWorker);
                 }
             }
             if (!isEmpty) {

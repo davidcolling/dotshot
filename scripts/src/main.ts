@@ -82,6 +82,57 @@ class GridMapImage {
     }
 }
 
+class GridSquare {
+    size: number;
+    isEmpty: boolean; // is the square wall or open space?
+    coord: Coord;
+    visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
+    isHightlighted: boolean; // for ad-hoc debugging
+    drawWorker: Object;
+
+    constructor(size, coord, isEmpty, drawWorker) {
+        this.size = size;
+        this.isEmpty = isEmpty;
+        this.coord = coord;
+        this.visibleIndexes = null;
+        this.isHightlighted = false;
+        this.drawWorker = drawWorker;
+    }
+
+    draw = function () {
+        if (this.isHighlighted) {
+            this.drawWorker.fill(256, 0, 0, 256);
+            this.drawWorker.rect(
+                this.coord.x,
+                this.coord.y,
+                this.size,
+                this.size
+            );
+        } else {
+            if (this.isEmpty) {
+                return;
+            } else {
+                var shade = defaultStrokeColor.r;
+                this.drawWorker.fill(shade, 256);
+                this.drawWorker.rect(
+                    this.coord.x,
+                    this.coord.y,
+                    this.size,
+                    this.size
+                );
+            }
+        }
+    }
+
+    isVisible = function(coord) {
+        if (this.visibleIndexes == null) {
+            return true;
+        } else {
+            return this.visibleIndexes.map[coord.x][coord.y];
+        }
+    }
+}
+
 document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
@@ -159,55 +210,6 @@ var output = function (drawWorker) {
         }
     }
 
-    class GridSquare {
-        size: number;
-        isEmpty: boolean; // is the square wall or open space?
-        coord: Coord;
-        visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
-        isHightlighted: boolean; // for ad-hoc debugging
-
-        constructor(size, coord, isEmpty) {
-            this.size = size;
-            this.isEmpty = isEmpty;
-            this.coord = coord;
-            this.visibleIndexes = null;
-            this.isHightlighted = false;
-        }
-
-        draw = function () {
-            if (this.isHighlighted) {
-                drawWorker.fill(256, 0, 0, 256);
-                drawWorker.rect(
-                    this.coord.x,
-                    this.coord.y,
-                    this.size,
-                    this.size
-                );
-            } else {
-                if (this.isEmpty) {
-                    return;
-                } else {
-                    var shade = defaultStrokeColor.r;
-                    drawWorker.fill(shade, 256);
-                    drawWorker.rect(
-                        this.coord.x,
-                        this.coord.y,
-                        this.size,
-                        this.size
-                    );
-                }
-            }
-        }
-
-        isVisible = function(coord) {
-            if (this.visibleIndexes == null) {
-                return true;
-            } else {
-                return this.visibleIndexes.map[coord.x][coord.y];
-            }
-        }
-    }
-
     class GridMap {
         width: number; // number of p5 screen units wide game map is
         height: number;
@@ -232,7 +234,7 @@ var output = function (drawWorker) {
                 this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j ++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true, drawWorker);
                 }
             }
             if (!isEmpty) {
