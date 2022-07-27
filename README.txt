@@ -15,9 +15,6 @@ To Do
 soon:
     - clean
         - use Coord everywhere
-        - Remove class definitions, 
-        event handlers from inside the 
-        drawing function, "outout"
     - make full use of new GridMap
         - use the hash table to only
         calculate distances that are
