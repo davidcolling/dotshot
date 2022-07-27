@@ -116,46 +116,6 @@ var GridSquare = /** @class */ (function () {
     }
     return GridSquare;
 }());
-document.addEventListener('keydown', recordKey);
-function recordKey(e) {
-    switch (e.key) {
-        case "r":
-            world.player.isFiring = true;
-            break;
-        case "Shift":
-            world.player.isFiring = true;
-            break;
-        case "w":
-            world.player.isMoving = true;
-            break;
-        case " ":
-            world.player.isMoving = true;
-            break;
-        case "ArrowUp":
-            world.player.isMoving = true;
-            break;
-    }
-}
-document.addEventListener('keyup', stopKey);
-function stopKey(e) {
-    switch (e.key) {
-        case "r":
-            world.player.isFiring = false;
-            break;
-        case "Shift":
-            world.player.isFiring = false;
-            break;
-        case "w":
-            world.player.isMoving = false;
-            break;
-        case " ":
-            world.player.isMoving = false;
-            break;
-        case "ArrowUp":
-            world.player.isMoving = false;
-            break;
-    }
-}
 var HealthBar = /** @class */ (function () {
     function HealthBar(max, map, drawWorker) {
         this.draw = function () {
@@ -916,7 +876,6 @@ var Mine = /** @class */ (function (_super) {
 }(NPC));
 ;
 var output = function (drawWorker) {
-    document.getElementById("newGame").addEventListener("click", startNewGame);
     drawWorker.setup = function () {
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
@@ -938,6 +897,46 @@ var output = function (drawWorker) {
         }
     };
 };
+document.addEventListener('keydown', recordKey);
+function recordKey(e) {
+    switch (e.key) {
+        case "r":
+            world.player.isFiring = true;
+            break;
+        case "Shift":
+            world.player.isFiring = true;
+            break;
+        case "w":
+            world.player.isMoving = true;
+            break;
+        case " ":
+            world.player.isMoving = true;
+            break;
+        case "ArrowUp":
+            world.player.isMoving = true;
+            break;
+    }
+}
+document.addEventListener('keyup', stopKey);
+function stopKey(e) {
+    switch (e.key) {
+        case "r":
+            world.player.isFiring = false;
+            break;
+        case "Shift":
+            world.player.isFiring = false;
+            break;
+        case "w":
+            world.player.isMoving = false;
+            break;
+        case " ":
+            world.player.isMoving = false;
+            break;
+        case "ArrowUp":
+            world.player.isMoving = false;
+            break;
+    }
+}
 var NumericalSetting = /** @class */ (function () {
     function NumericalSetting(name, defaultValue, value) {
         this.display = function () {
@@ -1023,3 +1022,4 @@ var loadPage = function () {
         worldSettings[i].display();
     }
 };
+document.getElementById("newGame").addEventListener("click", startNewGame);
