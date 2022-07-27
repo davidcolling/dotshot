@@ -179,26 +179,28 @@ class HealthBar {
     max: number;
     hp: number;
     map: GridMap;
+    drawWorker: Object;
 
-    constructor(max, map) {
+    constructor(max, map, drawWorker) {
         this.max = max;
         this.map = map
         this.hp = this.max;
+        this.drawWorker = drawWorker;
     }
 
     draw  = function() {
         if (this.hp != 0) {
-            drawWorker.stroke(256, 0, 0, 256);
-            drawWorker.fill(256, 0, 0, 256);
-            drawWorker.strokeWeight(5);
-            drawWorker.line(
+            this.drawWorker.stroke(256, 0, 0, 256);
+            this.drawWorker.fill(256, 0, 0, 256);
+            this.drawWorker.strokeWeight(5);
+            this.drawWorker.line(
                 0, 
                 this.map.height - 1, 
                 this.map.width * (this.hp / this.max), 
                 this.map.height - 1
             );
-            drawWorker.strokeWeight(1);
-            drawWorker.stroke(
+            this.drawWorker.strokeWeight(1);
+            this.drawWorker.stroke(
                 defaultStrokeColor.r, 
                 defaultStrokeColor.g, 
                 defaultStrokeColor.b, 
@@ -215,8 +217,9 @@ class GridMap {
     gridHeight:number;
     map: Array<Array<GridSquare>>; // hash table used to represent the map
     gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
+    drawWorker: Object
     
-    constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
+    constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty, drawWorker) {
         var gridWidth = Math.floor(screenWidth / gridSquareSize);
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
         var width = gridSquareSize * gridWidth;
@@ -226,6 +229,7 @@ class GridMap {
         this.height = height;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
+        this.drawWorker = drawWorker;
         this.map = Array();
         // make empty map
         for (var i = 0; i < gridWidth ; i ++) { 
@@ -281,7 +285,7 @@ class GridMap {
                             var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
                             var currentDistance = 0;
 
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this, drawWorker);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
@@ -329,8 +333,8 @@ class GridMap {
                 if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
                     this.map[i][j].draw();
                 } else {
-                    drawWorker.fill(0, 256);
-                    drawWorker.rect(
+                    this.drawWorker.fill(0, 256);
+                    this.drawWorker.rect(
                         i * this.gridSquareSize,
                         j * this.gridSquareSize,
                         this.gridSquareSize,
@@ -382,13 +386,14 @@ class World {
     player: Player;
     healthBar: HealthBar;
     food: Array<Food>;
+    drawWorker: Object;
 
-    constructor(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading) {
+    constructor(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading, drawWorker) {
         this.frameCount = 0;
         this.bullets = new Array();
 
         if (!loading) {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false, drawWorker);
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
             // make sure the player starts on the map
             while (!this.map.isOpen(playerCoordinate)) {
@@ -397,11 +402,12 @@ class World {
                 } else {
                     this.map = null;
                     playerCoordinate = new Coord(width - 20, height - 50);
-                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false, drawWorker);
                 }
             }
-            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
-            this.healthBar = new HealthBar(32, this.map);
+            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets, drawWorker);
+            this.drawWorker = drawWorker;
+            this.healthBar = new HealthBar(32, this.map, this.drawWorker);
 
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
@@ -410,18 +416,18 @@ class World {
 
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(  this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets));
-                this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food));
+                this.nPCs.push(new Pirate(  this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player, drawWorker));
+                this.nPCs.push(new Bomb(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player, drawWorker));
+                this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets, drawWorker));
+                this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food, drawWorker));
             }
         } else {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true, drawWorker);
             this.player = null;
             this.healthBar = null;
             this.food = null;
             this.nPCs = new Array();
-            this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
+            this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets, drawWorker));
         }
     }
 
@@ -632,11 +638,13 @@ class World {
 class Moveable extends CenteredShape {
     direction: number;
     map: GridMap;
+    drawWorker: Object;
 
-    constructor(size, x, y, direction, map) {
+    constructor(size, x, y, direction, map, drawWorker) {
         super(size, x, y);
         this.direction = direction;
         this.map = map;
+        this.drawWorker = drawWorker;
     }
     point = function (target) {
         this.direction = World.calculateDirection(this.x, this.y, target.x, target.y);
@@ -665,8 +673,8 @@ class Bullet extends Moveable {
     target: Coord;
     hasPassedTarget: boolean;
 
-    constructor(x, y, target, map) {
-        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
+    constructor(x, y, target, map, drawWorker) {
+        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, drawWorker);
         this.age = 0;
         this.target = target;
         this.hasPassedTarget = false;
@@ -689,8 +697,8 @@ class Bullet extends Moveable {
         }
     }
     draw = function () {
-        drawWorker.fill(256, 256);
-        drawWorker.circle(
+        this.drawWorker.fill(256, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size,
@@ -702,13 +710,13 @@ class Character extends Moveable {
     hp: number;
     bullets: Array<Bullet>;
 
-    constructor(size, x, y, map, bullets, maxHP) {
-        super(size, x, y, Math.random() * 360, map);
+    constructor(size, x, y, map, bullets, maxHP, drawWorker) {
+        super(size, x, y, Math.random() * 360, map, drawWorker);
         this.hp = maxHP;
         this.bullets = bullets;
     }
     fire = function(target) {
-        this.bullets.push(new Bullet(this.x, this.y, target, this.map));
+        this.bullets.push(new Bullet(this.x, this.y, target, this.map, this.drawWorker));
     }
     step = function() {}
 }
@@ -718,18 +726,18 @@ class Player extends Character {
     isMoving: boolean;
     firingAge: number;
 
-    constructor(size, x, y, map, bullets) {
-        super(size, x, y, map, bullets, 32);
+    constructor(size, x, y, map, bullets, drawWorker) {
+        super(size, x, y, map, bullets, 32, drawWorker);
         this.isFiring = true; 
         this.isMoving = false;
         this.firingAge = 0;
     }
     step = function () {
-        this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+        this.point(new Coord(this.drawWorker.mouseX, this.drawWorker.mouseY));
         if (this.isFiring) {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {
-                this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+                this.fire(new Coord(this.drawWorker.mouseX, this.drawWorker.mouseY));
             }
         } else {
             this.firingAge = 0;
@@ -740,8 +748,8 @@ class Player extends Character {
     }
     draw = function () {
         var shade = defaultStrokeColor.r
-        drawWorker.fill(shade, 256);
-        drawWorker.circle(
+        this.drawWorker.fill(shade, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
@@ -759,8 +767,8 @@ class NPC extends Character {
     seesPlayer:boolean;
     lastSeenPlayerCoord: Coord;
 
-   constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
-        super(size, x, y, map, bullets, maxHP);
+   constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife, drawWorker) {
+        super(size, x, y, map, bullets, maxHP, drawWorker);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
@@ -794,8 +802,8 @@ class Chicken extends NPC {
     fleeLife: number;
     food: Array<Food>;
 
-    constructor(x, y, map, food) {
-        super(5, x, y, map, null, 8, null, 1000, 0, 200);
+    constructor(x, y, map, food, drawWorker) {
+        super(5, x, y, map, null, 8, null, 1000, 0, 200, drawWorker);
         this.isRunning = false;
         this.fleeAge = 0;
         this.fleeLife = 20;
@@ -803,8 +811,8 @@ class Chicken extends NPC {
     }
     draw = function () {
         var shade = defaultStrokeColor.r;
-        drawWorker.fill(shade, 256);
-        drawWorker.circle(
+        this.drawWorker.fill(shade, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
@@ -812,7 +820,7 @@ class Chicken extends NPC {
     }    
     step = function () {
         if(this.hp <= 0) {
-            this.food.push(new Food(this.x, this.y, drawWorker));
+            this.food.push(new Food(this.x, this.y, this.drawWorker));
         }
         if (this.seesPlayer) {
             if (this.fleeAge < this.fleeLife) {
@@ -834,21 +842,21 @@ class Bomb extends NPC {
     igniteAge: number;
     isGrowing: boolean;
 
-    constructor(x, y, map, bullets, target) {
-        super(5, x, y, map, bullets, 8, target, 1000, 0, 200);
+    constructor(x, y, map, bullets, target, drawWorker) {
+        super(5, x, y, map, bullets, 8, target, 1000, 0, 200, drawWorker);
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
     }
     draw = function () {
-        drawWorker.stroke(128, 0, 0, 256);
-        drawWorker.fill(128, 0, 0, 256);
-        drawWorker.circle(
+        this.drawWorker.stroke(128, 0, 0, 256);
+        this.drawWorker.fill(128, 0, 0, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
         );
-        drawWorker.stroke(
+        this.drawWorker.stroke(
             defaultStrokeColor.r, 
             defaultStrokeColor.g, 
             defaultStrokeColor.b, 
@@ -928,19 +936,19 @@ class Bomb extends NPC {
 class Pirate extends NPC {
     weaponCooldownCounter: number;
 
-    constructor(x, y, map, bullets, target) {
-        super(5 , x, y, map, bullets, 8, target, 1000, 0, 200);
+    constructor(x, y, map, bullets, target, drawWorker) {
+        super(5 , x, y, map, bullets, 8, target, 1000, 0, 200, drawWorker);
         this.weaponCooldownCounter = 0
     }
     draw = function () {
-        drawWorker.stroke(256, 0, 0, 256);
-        drawWorker.fill(256, 0, 0, 256);
-        drawWorker.circle(
+        this.drawWorker.stroke(256, 0, 0, 256);
+        this.drawWorker.fill(256, 0, 0, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
         );
-        drawWorker.stroke(
+        this.drawWorker.stroke(
             defaultStrokeColor.r, 
             defaultStrokeColor.g, 
             defaultStrokeColor.b, 
@@ -972,14 +980,14 @@ class Pirate extends NPC {
 class LoadingActor extends NPC {
     stepCount: number;
 
-    constructor(x, y, map, bullets) {
-        super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
+    constructor(x, y, map, bullets, drawWorker) {
+        super(5, x, y, map, bullets, 1, null, 1000, 0, 200, drawWorker);
         this.stepCount = 0;
     }
     draw = function () {
         var shade = defaultStrokeColor.r
-        drawWorker.fill(shade, 256);
-        drawWorker.circle(
+        this.drawWorker.fill(shade, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
@@ -1001,18 +1009,18 @@ class LoadingActor extends NPC {
 }
 
 class Mine extends NPC {
-    constructor(x, y, map, bullets) {
-        super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
+    constructor(x, y, map, bullets, drawWorker) {
+        super(5, x, y, map, bullets, 1, null, 1000, 0, 200, drawWorker);
     }
     draw = function () {
-        drawWorker.stroke(128, 128, 128, 256);
-        drawWorker.fill(128, 128, 128, 256);
-        drawWorker.circle(
+        this.drawWorker.stroke(128, 128, 128, 256);
+        this.drawWorker.fill(128, 128, 128, 256);
+        this.drawWorker.circle(
             this.x, 
             this.y, 
             this.size
         );
-        drawWorker.stroke(
+        this.drawWorker.stroke(
             defaultStrokeColor.r, 
             defaultStrokeColor.g, 
             defaultStrokeColor.b, 
@@ -1095,7 +1103,7 @@ var output = function (drawWorker) {
             defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false);
+        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false, drawWorker);
     };
 
     drawWorker.draw = function () {
