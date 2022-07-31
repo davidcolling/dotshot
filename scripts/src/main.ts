@@ -62,7 +62,7 @@ class Food extends CenteredShape {
         }
     }
     draw = function () {
-        this.drawWorker.fill(defaultStrokeColor.r, 256);
+        this.drawWorker.fill(game.defaultStrokeColor.r, 256);
         this.drawWorker.circle(
             this.x, 
             this.y, 
@@ -125,7 +125,7 @@ class GridSquare {
             if (this.isEmpty) {
                 return;
             } else {
-                var shade = defaultStrokeColor.r;
+                var shade = game.defaultStrokeColor.r;
                 this.drawWorker.fill(shade, 256);
                 this.drawWorker.rect(
                     this.coord.x,
@@ -172,10 +172,10 @@ class HealthBar {
             );
             this.drawWorker.strokeWeight(1);
             this.drawWorker.stroke(
-                defaultStrokeColor.r, 
-                defaultStrokeColor.g, 
-                defaultStrokeColor.b, 
-                defaultStrokeColor.a, 
+                game.defaultStrokeColor.r, 
+                game.defaultStrokeColor.g, 
+                game.defaultStrokeColor.b, 
+                game.defaultStrokeColor.a, 
             );            
         }
     }
@@ -718,7 +718,7 @@ class Player extends Character {
         }
     }
     draw = function () {
-        var shade = defaultStrokeColor.r
+        var shade = game.defaultStrokeColor.r
         this.drawWorker.fill(shade, 256);
         this.drawWorker.circle(
             this.x, 
@@ -781,7 +781,7 @@ class Chicken extends NPC {
         this.food = food;
     }
     draw = function () {
-        var shade = defaultStrokeColor.r;
+        var shade = game.defaultStrokeColor.r;
         this.drawWorker.fill(shade, 256);
         this.drawWorker.circle(
             this.x, 
@@ -828,10 +828,10 @@ class Bomb extends NPC {
             this.size
         );
         this.drawWorker.stroke(
-            defaultStrokeColor.r, 
-            defaultStrokeColor.g, 
-            defaultStrokeColor.b, 
-            defaultStrokeColor.a, 
+            game.defaultStrokeColor.r, 
+            game.defaultStrokeColor.g, 
+            game.defaultStrokeColor.b, 
+            game.defaultStrokeColor.a, 
         );            
     }
     step = function () {
@@ -920,10 +920,10 @@ class Pirate extends NPC {
             this.size
         );
         this.drawWorker.stroke(
-            defaultStrokeColor.r, 
-            defaultStrokeColor.g, 
-            defaultStrokeColor.b, 
-            defaultStrokeColor.a, 
+            game.defaultStrokeColor.r, 
+            game.defaultStrokeColor.g, 
+            game.defaultStrokeColor.b, 
+            game.defaultStrokeColor.a, 
         );            
     }
     step = function () {
@@ -956,7 +956,7 @@ class LoadingActor extends NPC {
         this.stepCount = 0;
     }
     draw = function () {
-        var shade = defaultStrokeColor.r
+        var shade = game.defaultStrokeColor.r
         this.drawWorker.fill(shade, 256);
         this.drawWorker.circle(
             this.x, 
@@ -992,10 +992,10 @@ class Mine extends NPC {
             this.size
         );
         this.drawWorker.stroke(
-            defaultStrokeColor.r, 
-            defaultStrokeColor.g, 
-            defaultStrokeColor.b, 
-            defaultStrokeColor.a, 
+            game.defaultStrokeColor.r, 
+            game.defaultStrokeColor.g, 
+            game.defaultStrokeColor.b, 
+            game.defaultStrokeColor.a, 
         );            
     }
     explode = function () {
@@ -1064,18 +1064,18 @@ var output = function (drawWorker) {
         drawWorker.frameRate(100000);
         drawWorker.createCanvas(width, height);
         drawWorker.stroke(
-            defaultStrokeColor.r, 
-            defaultStrokeColor.g, 
-            defaultStrokeColor.b, 
-            defaultStrokeColor.a, 
+            game.defaultStrokeColor.r, 
+            game.defaultStrokeColor.g, 
+            game.defaultStrokeColor.b, 
+            game.defaultStrokeColor.a, 
         );
 
-        world = new World(width, height, worldSettings[0].value, worldSettings[1].value, worldSettings[2].value, worldSettings[3].value, false, drawWorker);
+        game.world = new World(width, height, game.worldSettings[0].value, game.worldSettings[1].value, game.worldSettings[2].value, game.worldSettings[3].value, false, drawWorker);
     };
 
     drawWorker.draw = function () {
         drawWorker.clear();
-        if (!world.draw()) {
+        if (!game.world.draw()) {
             drawWorker.noLoop();
         }
     }
@@ -1086,19 +1086,19 @@ document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
         case "r":
-            world.player.isFiring = true;
+            game.world.player.isFiring = true;
             break;
         case "Shift":
-            world.player.isFiring = true;
+            game.world.player.isFiring = true;
             break;
         case "w":
-            world.player.isMoving = true;
+            game.world.player.isMoving = true;
             break;
         case " ":
-            world.player.isMoving = true;
+            game.world.player.isMoving = true;
             break;
         case "ArrowUp":
-            world.player.isMoving = true;
+            game.world.player.isMoving = true;
             break;
     }
 }
@@ -1107,21 +1107,85 @@ document.addEventListener('keyup', stopKey);
 function stopKey(e) {
     switch (e.key) {
         case "r":
-            world.player.isFiring = false;
+            game.world.player.isFiring = false;
             break;
         case "Shift":
-            world.player.isFiring = false;
+            game.world.player.isFiring = false;
             break;
         case "w":
-            world.player.isMoving = false;
+            game.world.player.isMoving = false;
             break;
         case " ":
-            world.player.isMoving = false;
+            game.world.player.isMoving = false;
             break;
         case "ArrowUp":
-            world.player.isMoving = false;
+            game.world.player.isMoving = false;
             break;
     }
+}
+
+class HTMLDotshotUI {
+    world: World;
+    defaultStrokeColor: RGBA;
+    display: Object;
+    worldSettings: Array<NumericalSetting>;
+
+    constructor () {
+        this.worldSettings = new Array();
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
+        this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
+    }
+
+    loadPage = function() {
+        var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (isLight) {
+            this.defaultStrokeColor = new RGBA(256, 256, 256, 256);
+        } else {
+            this.defaultStrokeColor = new RGBA(0, 0, 0, 256);
+        }
+    
+        for (var i = 0; i < this.worldSettings.length; i++) {
+            this.worldSettings[i].display();
+        }
+    }
+
+    startNewGame = function() {
+        if (this.display != null) {
+            this.display.remove();
+        }
+    
+        for (var i = 0; i < this.worldSettings.length; i++) {
+            this.worldSettings[i].setFromDocument();
+        }
+    
+        document.getElementById("message").textContent = "Loading...";
+        this.display = new p5(output, "canvas");
+    
+        document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
+    }
+
+    saveMap = function () {
+        var map = this.world.save();
+    
+        // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
+        var file = new Blob([map], {type: "string"});
+        if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(file, "map.json");
+        } else { 
+            var a = document.createElement("a"), url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = "map.json";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+
 }
 
 class NumericalSetting {
@@ -1153,64 +1217,5 @@ class NumericalSetting {
     }
 }
 
-var saveMap = function () {
-    var map = world.save();
-
-    // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
-    var file = new Blob([map], {type: "string"});
-    if (window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveOrOpenBlob(file, "map.json");
-    } else { 
-        var a = document.createElement("a"), url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = "map.json";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    }
-
-}
-
-var world;
-var defaultStrokeColor;
-
-var display = null;
-var worldSettings = new Array();
-worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
-worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
-worldSettings.push(new NumericalSetting("wallLength", "10", null));
-worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
-
-var startNewGame = function() {
-    if (display != null) {
-        display.remove();
-    }
-
-    for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].setFromDocument();
-    }
-
-    document.getElementById("message").textContent = "Loading...";
-    display = new p5(output, "canvas");
-
-    document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
-}
-
-var loadPage = function() {
-    var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (isLight) {
-        defaultStrokeColor = new RGBA(256, 256, 256, 256);
-    } else {
-        defaultStrokeColor = new RGBA(0, 0, 0, 256);
-    }
-
-    for (var i = 0; i < worldSettings.length; i++) {
-        worldSettings[i].display();
-    }
-}
-
-document.getElementById("newGame").addEventListener("click", startNewGame);
+var game = new HTMLDotshotUI();
 
