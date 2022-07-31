@@ -1082,48 +1082,6 @@ var output = function (drawWorker) {
 
 };
 
-document.addEventListener('keydown', recordKey);
-function recordKey(e) {
-    switch (e.key) {
-        case "r":
-            game.world.player.isFiring = true;
-            break;
-        case "Shift":
-            game.world.player.isFiring = true;
-            break;
-        case "w":
-            game.world.player.isMoving = true;
-            break;
-        case " ":
-            game.world.player.isMoving = true;
-            break;
-        case "ArrowUp":
-            game.world.player.isMoving = true;
-            break;
-    }
-}
-
-document.addEventListener('keyup', stopKey);
-function stopKey(e) {
-    switch (e.key) {
-        case "r":
-            game.world.player.isFiring = false;
-            break;
-        case "Shift":
-            game.world.player.isFiring = false;
-            break;
-        case "w":
-            game.world.player.isMoving = false;
-            break;
-        case " ":
-            game.world.player.isMoving = false;
-            break;
-        case "ArrowUp":
-            game.world.player.isMoving = false;
-            break;
-    }
-}
-
 class HTMLDotshotUI {
     world: World;
     defaultStrokeColor: RGBA;
@@ -1214,6 +1172,48 @@ class NumericalSetting {
         if (element) {
             this.value = (element as HTMLFormElement).value;
         }
+    }
+}
+
+document.addEventListener('keydown', recordKey);
+function recordKey(e) {
+    switch (e.key) {
+        case "r":
+            game.world.player.isFiring = true;
+            break;
+        case "Shift":
+            game.world.player.isFiring = true;
+            break;
+        case "w":
+            game.world.player.isMoving = true;
+            break;
+        case " ":
+            game.world.player.isMoving = true;
+            break;
+        case "ArrowUp":
+            game.world.player.isMoving = true;
+            break;
+    }
+}
+
+document.addEventListener('keyup', stopKey);
+function stopKey(e) {
+    switch (e.key) {
+        case "r":
+            game.world.player.isFiring = false;
+            break;
+        case "Shift":
+            game.world.player.isFiring = false;
+            break;
+        case "w":
+            game.world.player.isMoving = false;
+            break;
+        case " ":
+            game.world.player.isMoving = false;
+            break;
+        case "ArrowUp":
+            game.world.player.isMoving = false;
+            break;
     }
 }
 
