@@ -1,3 +1,16 @@
+class RGBA {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+    constructor(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+}
+
 class Coord {
     x: number;
     y: number;
@@ -1159,19 +1172,6 @@ var saveMap = function () {
         }, 0);
     }
 
-}
-
-class RGBA {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-    constructor(r, g, b, a) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
-    }
 }
 
 var world;

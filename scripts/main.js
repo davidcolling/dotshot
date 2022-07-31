@@ -13,6 +13,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var RGBA = /** @class */ (function () {
+    function RGBA(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+    return RGBA;
+}());
 var Coord = /** @class */ (function () {
     function Coord(x, y) {
         this.x = x;
@@ -982,15 +991,6 @@ var saveMap = function () {
         }, 0);
     }
 };
-var RGBA = /** @class */ (function () {
-    function RGBA(r, g, b, a) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
-    }
-    return RGBA;
-}());
 var world;
 var defaultStrokeColor;
 var display = null;
