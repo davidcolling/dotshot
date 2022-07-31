@@ -1049,39 +1049,6 @@ class Mine extends NPC {
     }
 };
 
-var output = function (drawWorker) {
-    drawWorker.setup = function () {
-        var height = window.innerHeight * 0.9;
-        var width = window.innerWidth * 0.98;
-
-        if (height > 700) {
-            height = 700;
-        }
-        if (width > 700) {
-            width = 700;
-        }
-
-        drawWorker.frameRate(100000);
-        drawWorker.createCanvas(width, height);
-        drawWorker.stroke(
-            game.defaultStrokeColor.r, 
-            game.defaultStrokeColor.g, 
-            game.defaultStrokeColor.b, 
-            game.defaultStrokeColor.a, 
-        );
-
-        game.world = new World(width, height, game.worldSettings[0].value, game.worldSettings[1].value, game.worldSettings[2].value, game.worldSettings[3].value, false, drawWorker);
-    };
-
-    drawWorker.draw = function () {
-        drawWorker.clear();
-        if (!game.world.draw()) {
-            drawWorker.noLoop();
-        }
-    }
-
-};
-
 class HTMLDotshotUI {
     world: World;
     defaultStrokeColor: RGBA;
@@ -1216,6 +1183,39 @@ function stopKey(e) {
             break;
     }
 }
+
+var output = function (drawWorker) {
+    drawWorker.setup = function () {
+        var height = window.innerHeight * 0.9;
+        var width = window.innerWidth * 0.98;
+
+        if (height > 700) {
+            height = 700;
+        }
+        if (width > 700) {
+            width = 700;
+        }
+
+        drawWorker.frameRate(100000);
+        drawWorker.createCanvas(width, height);
+        drawWorker.stroke(
+            game.defaultStrokeColor.r, 
+            game.defaultStrokeColor.g, 
+            game.defaultStrokeColor.b, 
+            game.defaultStrokeColor.a, 
+        );
+
+        game.world = new World(width, height, game.worldSettings[0].value, game.worldSettings[1].value, game.worldSettings[2].value, game.worldSettings[3].value, false, drawWorker);
+    };
+
+    drawWorker.draw = function () {
+        drawWorker.clear();
+        if (!game.world.draw()) {
+            drawWorker.noLoop();
+        }
+    }
+
+};
 
 var game = new HTMLDotshotUI();
 
