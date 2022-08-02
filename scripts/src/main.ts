@@ -370,6 +370,9 @@ class World {
         if (!loading) {
             this.map = map;
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
+            while (!map.isOpen(playerCoordinate)) {
+                playerCoordinate.x--;
+            }
             this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
             this.healthBar = new HealthBar(32, this.map);
 
