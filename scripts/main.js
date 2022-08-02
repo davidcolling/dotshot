@@ -916,11 +916,7 @@ var HTMLDotshotUI = /** @class */ (function () {
                 }, 0);
             }
         };
-        this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
-        this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
+        // determine dimensions 
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
         if (height > 700) {
@@ -931,6 +927,7 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         this.height = height;
         this.width = width;
+        // determine light/dark colorscheme
         var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (isLight) {
             this.defaultStrokeColor = new RGBA(256, 256, 256, 256);
@@ -938,6 +935,12 @@ var HTMLDotshotUI = /** @class */ (function () {
         else {
             this.defaultStrokeColor = new RGBA(0, 0, 0, 256);
         }
+        // Create and display settings
+        this.worldSettings = new Array();
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
+        this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
