@@ -29,29 +29,19 @@ var Coord = /** @class */ (function () {
     }
     return Coord;
 }());
-var Drawable = /** @class */ (function () {
-    function Drawable() {
-        this.draw = function (drawWorker, strokeColor) {
-        };
-    }
-    return Drawable;
-}());
-var CenteredShape = /** @class */ (function (_super) {
-    __extends(CenteredShape, _super);
-    function CenteredShape(size, x, y) {
-        var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) { };
-        _this.size = size;
-        _this.x = x;
-        _this.y = y;
-        return _this;
+var CenteredShape = /** @class */ (function () {
+    function CenteredShape(size, x, y, world) {
+        this.draw = function () { };
+        this.size = size;
+        this.x = x;
+        this.y = y;
     }
     return CenteredShape;
-}(Drawable));
+}());
 var Food = /** @class */ (function (_super) {
     __extends(Food, _super);
-    function Food(x, y) {
-        var _this = _super.call(this, 2, x, y) || this;
+    function Food(x, y, world) {
+        var _this = _super.call(this, 2, x, y, world) || this;
         _this.step = function () {
             this.growAge++;
             if (this.growAge % 3 == 0) {
@@ -69,9 +59,9 @@ var Food = /** @class */ (function (_super) {
                 }
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.fill(strokeColor.r, 256);
-            drawWorker.circle(this.x, this.y, this.size);
+        _this.draw = function () {
+            this.world.drawWorker.fill(game.defaultStrokeColor.r, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
         };
         _this.isGrowing = true;
         _this.growAge = 0;
@@ -99,27 +89,25 @@ var GridMapImage = /** @class */ (function () {
     }
     return GridMapImage;
 }());
-var GridSquare = /** @class */ (function (_super) {
-    __extends(GridSquare, _super);
-    function GridSquare(size, coord, isEmpty) {
-        var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
+var GridSquare = /** @class */ (function () {
+    function GridSquare(size, coord, isEmpty, world) {
+        this.draw = function () {
             if (this.isHighlighted) {
-                drawWorker.fill(256, 0, 0, 256);
-                drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+                this.world.drawWorker.fill(256, 0, 0, 256);
+                this.world.drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
             }
             else {
                 if (this.isEmpty) {
                     return;
                 }
                 else {
-                    var shade = strokeColor.r;
-                    drawWorker.fill(shade, 256);
-                    drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+                    var shade = game.defaultStrokeColor.r;
+                    this.world.drawWorker.fill(shade, 256);
+                    this.world.drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
                 }
             }
         };
-        _this.isVisible = function (coord) {
+        this.isVisible = function (coord) {
             if (this.visibleIndexes == null) {
                 return true;
             }
@@ -127,63 +115,59 @@ var GridSquare = /** @class */ (function (_super) {
                 return this.visibleIndexes.map[coord.x][coord.y];
             }
         };
-        _this.size = size;
-        _this.isEmpty = isEmpty;
-        _this.coord = coord;
-        _this.visibleIndexes = null;
-        _this.isHightlighted = false;
-        return _this;
+        this.size = size;
+        this.isEmpty = isEmpty;
+        this.coord = coord;
+        this.visibleIndexes = null;
+        this.isHightlighted = false;
+        this.world = world;
     }
     return GridSquare;
-}(Drawable));
-var HealthBar = /** @class */ (function (_super) {
-    __extends(HealthBar, _super);
-    function HealthBar(max, map) {
-        var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
+}());
+var HealthBar = /** @class */ (function () {
+    function HealthBar(max, map, world) {
+        this.draw = function () {
             if (this.hp != 0) {
-                drawWorker.stroke(256, 0, 0, 256);
-                drawWorker.fill(256, 0, 0, 256);
-                drawWorker.strokeWeight(5);
-                drawWorker.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
-                drawWorker.strokeWeight(1);
-                drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+                this.world.drawWorker.stroke(256, 0, 0, 256);
+                this.world.drawWorker.fill(256, 0, 0, 256);
+                this.world.drawWorker.strokeWeight(5);
+                this.world.drawWorker.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
+                this.world.drawWorker.strokeWeight(1);
+                this.world.drawWorker.stroke(game.defaultStrokeColor.r, game.defaultStrokeColor.g, game.defaultStrokeColor.b, game.defaultStrokeColor.a);
             }
         };
-        _this.max = max;
-        _this.map = map;
-        _this.hp = _this.max;
-        return _this;
+        this.max = max;
+        this.map = map;
+        this.hp = this.max;
+        this.world = world;
     }
     return HealthBar;
-}(Drawable));
-var GridMap = /** @class */ (function (_super) {
-    __extends(GridMap, _super);
-    function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
-        var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
+}());
+var GridMap = /** @class */ (function () {
+    function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty, world) {
+        this.draw = function () {
             for (var i = 0; i < this.gridWidth; i++) {
                 for (var j = 0; j < this.gridHeight; j++) {
-                    this.map[i][j].draw(drawWorker, strokeColor);
+                    this.map[i][j].draw();
                 }
             }
         };
         // blocks out gridSquares that aren't visible from the viewpoint
-        _this.drawVisible = function (viewPointScreenCoord, drawWorker) {
+        this.drawVisible = function (viewPointScreenCoord) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
             for (var i = 0; i < this.gridWidth; i++) {
                 for (var j = 0; j < this.gridHeight; j++) {
                     if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                        this.map[i][j].draw(drawWorker);
+                        this.map[i][j].draw();
                     }
                     else {
-                        drawWorker.fill(0, 256);
-                        drawWorker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
+                        this.world.drawWorker.fill(0, 256);
+                        this.world.drawWorker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
                     }
                 }
             }
         };
-        _this.isOpen = function (screenCoord) {
+        this.isOpen = function (screenCoord) {
             if (0 < screenCoord.x &&
                 screenCoord.x < this.width &&
                 0 < screenCoord.y &&
@@ -195,32 +179,33 @@ var GridMap = /** @class */ (function (_super) {
                 return false;
             }
         };
-        _this.getGridIndex = function (screenCoord) {
+        this.getGridIndex = function (screenCoord) {
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
         };
         var gridWidth = Math.floor(screenWidth / gridSquareSize);
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
         var width = gridSquareSize * gridWidth;
         var height = gridSquareSize * gridHeight;
-        _this.gridSquareSize = gridSquareSize;
-        _this.width = width;
-        _this.height = height;
-        _this.gridWidth = gridWidth;
-        _this.gridHeight = gridHeight;
-        _this.map = Array();
+        this.gridSquareSize = gridSquareSize;
+        this.width = width;
+        this.height = height;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.world;
+        this.map = Array();
         // make empty map
         for (var i = 0; i < gridWidth; i++) {
-            _this.map[i] = new Array();
+            this.map[i] = new Array();
             for (var j = 0; j < gridHeight; j++) {
                 var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                _this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
+                this.map[i][j] = new GridSquare(gridSquareSize, coord, true, world);
             }
         }
         if (!isEmpty) {
             // make walls
             for (var i = 0; i < numberOfWalls; i++) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
-                _this.map[randomCoord.x][randomCoord.y].isEmpty = false;
+                this.map[randomCoord.x][randomCoord.y].isEmpty = false;
                 // Determine along which axes the wall moves 
                 var dx = Math.random() < .5;
                 var dy = Math.random() < .5;
@@ -241,21 +226,21 @@ var GridMap = /** @class */ (function (_super) {
                         break; // don't go off the map
                     }
                     else {
-                        _this.map[newCoord.x][newCoord.y].isEmpty = false;
+                        this.map[newCoord.x][newCoord.y].isEmpty = false;
                     }
                 }
             }
             // populate visibleIndexes for each GridSquare
             for (var i = 0; i < gridWidth; i++) {
                 for (var j = 0; j < gridHeight; j++) {
-                    if (_this.map[i][j].isEmpty) {
-                        _this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
+                    if (this.map[i][j].isEmpty) {
+                        this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight);
                         var furthestDistance = 0;
                         for (var k = 0; k < 360; k += 2) {
                             // wherever this Moveable is able to move in a "straight" line is visible from the starting place
                             var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
                             var currentDistance = 0;
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, _this);
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this, world);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
@@ -270,7 +255,7 @@ var GridMap = /** @class */ (function (_super) {
                                     break;
                                 }
                                 var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
-                                _this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                                this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
                             if (currentDistance > furthestDistance) {
                                 furthestDistance = currentDistance;
@@ -280,7 +265,6 @@ var GridMap = /** @class */ (function (_super) {
                 }
             }
         }
-        return _this;
     }
     GridMap.getGridIndex = function (screenCoord, gridSquareSize) {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
@@ -289,7 +273,7 @@ var GridMap = /** @class */ (function (_super) {
         return indexCoord;
     };
     return GridMap;
-}(Drawable));
+}());
 // facade and factory of all game objects: bullets, map, characters (player and npc)
 // an unenforced singleton
 // on observer of when bullets should be collected from characters
@@ -297,12 +281,12 @@ var GridMap = /** @class */ (function (_super) {
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
 var World = /** @class */ (function () {
-    function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading, strokeColor) {
+    function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading) {
         this.draw = function () {
             var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
             // world 
             this.frameCount++;
-            this.map.draw(this.drawWorker, this.strokeColor);
+            this.map.draw();
             this.drawBullets(this.bullets);
             // player
             if (this.player != null) {
@@ -310,15 +294,15 @@ var World = /** @class */ (function () {
                     this.player.hp -= 1;
                     this.healthBar.hp = this.player.hp;
                 }
-                this.player.control(this.drawWorker);
-                this.player.draw(this.drawWorker, this.strokeColor);
+                this.player.step();
+                this.player.draw();
                 if (this.player.hp == 0) {
                     playerIsDead = true;
                 }
-                this.healthBar.draw(this.drawWorker, this.strokeColor);
+                this.healthBar.draw();
                 for (var i = 0; i < this.food.length; i++) {
                     if (this.food[i] != null) {
-                        this.food[i].draw(this.drawWorker, this.strokeColor);
+                        this.food[i].draw();
                         this.food[i].step();
                         if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                             if (this.player.hp < this.healthBar.max) {
@@ -348,7 +332,7 @@ var World = /** @class */ (function () {
                         }
                     }
                     this.nPCs[i].step();
-                    this.nPCs[i].draw(this.drawWorker, this.strokeColor);
+                    this.nPCs[i].draw();
                     if (this.nPCs[i].hp <= 0) {
                         this.nPCs[i] = null;
                     }
@@ -367,7 +351,7 @@ var World = /** @class */ (function () {
         this.drawBullets = function (list) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i] != null) {
-                    list[i].draw(this.drawWorker, this.strokeColor);
+                    list[i].draw();
                     if (!list[i].step()) {
                         list[i] = null;
                     }
@@ -401,11 +385,10 @@ var World = /** @class */ (function () {
             return false;
         };
         this.frameCount = 0;
-        this.bullets = new Array();
         this.drawWorker = null;
-        this.strokeColor = strokeColor;
+        this.bullets = new Array();
         if (!loading) {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false, this);
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
             // make sure the player starts on the map
             while (!this.map.isOpen(playerCoordinate)) {
@@ -415,30 +398,30 @@ var World = /** @class */ (function () {
                 else {
                     this.map = null;
                     playerCoordinate = new Coord(width - 20, height - 50);
-                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false, this);
                 }
             }
-            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
-            this.healthBar = new HealthBar(32, this.map);
+            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets, this);
+            this.healthBar = new HealthBar(32, this.map, this);
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
-                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height, this));
             }
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++) {
-                this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
-                this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
+                this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player, this));
+                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player, this));
+                this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets, this));
+                this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food, this));
             }
         }
         else {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
+            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true, this);
             this.player = null;
             this.healthBar = null;
             this.food = null;
             this.nPCs = new Array();
-            this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
+            this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets, this));
         }
     }
     // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
@@ -522,8 +505,8 @@ var World = /** @class */ (function () {
 }());
 var Moveable = /** @class */ (function (_super) {
     __extends(Moveable, _super);
-    function Moveable(size, x, y, direction, map) {
-        var _this = _super.call(this, size, x, y) || this;
+    function Moveable(size, x, y, direction, map, world) {
+        var _this = _super.call(this, size, x, y, world) || this;
         _this.point = function (target) {
             this.direction = World.calculateDirection(this.x, this.y, target.x, target.y);
         };
@@ -543,17 +526,17 @@ var Moveable = /** @class */ (function (_super) {
                 return false;
             }
         };
-        _this.draw = function (drawWorker, strokeColor) { };
         _this.direction = direction;
         _this.map = map;
+        _this.world = world;
         return _this;
     }
     return Moveable;
 }(CenteredShape));
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
-    function Bullet(x, y, target, map) {
-        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
+    function Bullet(x, y, target, map, world) {
+        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map, world) || this;
         _this.step = function () {
             if (!this.hasPassedTarget) {
                 var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
@@ -573,9 +556,9 @@ var Bullet = /** @class */ (function (_super) {
                 return false;
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.fill(256, 256);
-            drawWorker.circle(this.x, this.y, this.size);
+        _this.draw = function () {
+            this.world.drawWorker.fill(256, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
         };
         _this.age = 0;
         _this.target = target;
@@ -586,10 +569,10 @@ var Bullet = /** @class */ (function (_super) {
 }(Moveable));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
-    function Character(size, x, y, map, bullets, maxHP) {
-        var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
+    function Character(size, x, y, map, bullets, maxHP, world) {
+        var _this = _super.call(this, size, x, y, Math.random() * 360, map, world) || this;
         _this.fire = function (target) {
-            this.bullets.push(new Bullet(this.x, this.y, target, this.map));
+            this.bullets.push(new Bullet(this.x, this.y, target, this.map, this.world));
         };
         _this.step = function () { };
         _this.hp = maxHP;
@@ -598,25 +581,16 @@ var Character = /** @class */ (function (_super) {
     }
     return Character;
 }(Moveable));
-var Steerable = /** @class */ (function (_super) {
-    __extends(Steerable, _super);
-    function Steerable() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.control = function (drawWorker) { };
-        return _this;
-    }
-    return Steerable;
-}(Character));
 var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
-    function Player(size, x, y, map, bullets) {
-        var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
-        _this.control = function (drawWorker) {
-            this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+    function Player(size, x, y, map, bullets, world) {
+        var _this = _super.call(this, size, x, y, map, bullets, 32, world) || this;
+        _this.step = function () {
+            this.point(new Coord(this.world.drawWorker.mouseX, this.world.drawWorker.mouseY));
             if (this.isFiring) {
                 this.firingAge++;
                 if (this.firingAge % 4 == 0) {
-                    this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+                    this.fire(new Coord(this.world.drawWorker.mouseX, this.world.drawWorker.mouseY));
                 }
             }
             else {
@@ -626,10 +600,10 @@ var Player = /** @class */ (function (_super) {
                 this.move(3);
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
+        _this.draw = function () {
+            var shade = game.defaultStrokeColor.r;
+            this.world.drawWorker.fill(shade, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
         };
         _this.isFiring = true;
         _this.isMoving = false;
@@ -637,11 +611,11 @@ var Player = /** @class */ (function (_super) {
         return _this;
     }
     return Player;
-}(Steerable));
+}(Character));
 var NPC = /** @class */ (function (_super) {
     __extends(NPC, _super);
-    function NPC(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
-        var _this = _super.call(this, size, x, y, map, bullets, maxHP) || this;
+    function NPC(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife, world) {
+        var _this = _super.call(this, size, x, y, map, bullets, maxHP, world) || this;
         _this.idle = function () {
             if (!(this.idleAge < this.idleLife)) {
                 this.idleAge = 0;
@@ -673,16 +647,16 @@ var NPC = /** @class */ (function (_super) {
 }(Character));
 var Chicken = /** @class */ (function (_super) {
     __extends(Chicken, _super);
-    function Chicken(x, y, map, food) {
-        var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
+    function Chicken(x, y, map, food, world) {
+        var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200, world) || this;
+        _this.draw = function () {
+            var shade = game.defaultStrokeColor.r;
+            this.world.drawWorker.fill(shade, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
         };
         _this.step = function () {
             if (this.hp <= 0) {
-                this.food.push(new Food(this.x, this.y));
+                this.food.push(new Food(this.x, this.y, this.world));
             }
             if (this.seesPlayer) {
                 if (this.fleeAge < this.fleeLife) {
@@ -708,13 +682,13 @@ var Chicken = /** @class */ (function (_super) {
 }(NPC));
 var Bomb = /** @class */ (function (_super) {
     __extends(Bomb, _super);
-    function Bomb(x, y, map, bullets, target) {
-        var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(128, 0, 0, 256);
-            drawWorker.fill(128, 0, 0, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    function Bomb(x, y, map, bullets, target, world) {
+        var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200, world) || this;
+        _this.draw = function () {
+            this.world.drawWorker.stroke(128, 0, 0, 256);
+            this.world.drawWorker.fill(128, 0, 0, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
+            this.world.drawWorker.stroke(game.defaultStrokeColor.r, game.defaultStrokeColor.g, game.defaultStrokeColor.b, game.defaultStrokeColor.a);
         };
         _this.step = function () {
             if (this.didIgnite) {
@@ -793,13 +767,13 @@ var Bomb = /** @class */ (function (_super) {
 ;
 var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
-    function Pirate(x, y, map, bullets, target) {
-        var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(256, 0, 0, 256);
-            drawWorker.fill(256, 0, 0, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    function Pirate(x, y, map, bullets, target, world) {
+        var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200, world) || this;
+        _this.draw = function () {
+            this.world.drawWorker.stroke(256, 0, 0, 256);
+            this.world.drawWorker.fill(256, 0, 0, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
+            this.world.drawWorker.stroke(game.defaultStrokeColor.r, game.defaultStrokeColor.g, game.defaultStrokeColor.b, game.defaultStrokeColor.a);
         };
         _this.step = function () {
             this.weaponCooldownCounter++;
@@ -830,12 +804,12 @@ var Pirate = /** @class */ (function (_super) {
 ;
 var LoadingActor = /** @class */ (function (_super) {
     __extends(LoadingActor, _super);
-    function LoadingActor(x, y, map, bullets) {
-        var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
+    function LoadingActor(x, y, map, bullets, world) {
+        var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200, world) || this;
+        _this.draw = function () {
+            var shade = game.defaultStrokeColor.r;
+            this.world.drawWorker.fill(shade, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
         };
         _this.step = function () {
             if (this.direction < 360) {
@@ -858,13 +832,13 @@ var LoadingActor = /** @class */ (function (_super) {
 }(NPC));
 var Mine = /** @class */ (function (_super) {
     __extends(Mine, _super);
-    function Mine(x, y, map, bullets) {
-        var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(128, 128, 128, 256);
-            drawWorker.fill(128, 128, 128, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    function Mine(x, y, map, bullets, world) {
+        var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200, world) || this;
+        _this.draw = function () {
+            this.world.drawWorker.stroke(128, 128, 128, 256);
+            this.world.drawWorker.fill(128, 128, 128, 256);
+            this.world.drawWorker.circle(this.x, this.y, this.size);
+            this.world.drawWorker.stroke(game.defaultStrokeColor.r, game.defaultStrokeColor.g, game.defaultStrokeColor.b, game.defaultStrokeColor.a);
         };
         _this.explode = function () {
             var directions = Array();
@@ -919,7 +893,7 @@ var HTMLDotshotUI = /** @class */ (function () {
                 this.worldSettings[i].setFromDocument();
             }
             document.getElementById("message").textContent = "Loading...";
-            this.world = new World(this.width, this.height, this.worldSettings[0].value, this.worldSettings[1].value, this.worldSettings[2].value, this.worldSettings[3].value, false, this.defaultStrokeColor);
+            this.world = new World(this.width, this.height, this.worldSettings[0].value, this.worldSettings[1].value, this.worldSettings[2].value, this.worldSettings[3].value, false);
             this.display = new p5(output, "canvas");
             document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
         };
