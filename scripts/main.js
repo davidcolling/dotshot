@@ -297,7 +297,7 @@ var GridMap = /** @class */ (function (_super) {
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
 var World = /** @class */ (function () {
-    function World(width, height, numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, loading, strokeColor) {
+    function World(width, height, numberOfEnemies, map, loading, strokeColor) {
         this.draw = function () {
             var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
             // world 
@@ -405,19 +405,8 @@ var World = /** @class */ (function () {
         this.drawWorker = null;
         this.strokeColor = strokeColor;
         if (!loading) {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
+            this.map = map;
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
-            // make sure the player starts on the map
-            while (!this.map.isOpen(playerCoordinate)) {
-                if (playerCoordinate.x > 0) {
-                    playerCoordinate.x -= gridSquareSize;
-                }
-                else {
-                    this.map = null;
-                    playerCoordinate = new Coord(width - 20, height - 50);
-                    this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, false);
-                }
-            }
             this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
             this.healthBar = new HealthBar(32, this.map);
             this.food = new Array();
@@ -433,7 +422,7 @@ var World = /** @class */ (function () {
             }
         }
         else {
-            this.map = new GridMap(width, height, gridSquareSize, numberOfWalls, wallLength, true);
+            this.map = new GridMap(width, height, 0, 0, 0, true);
             this.player = null;
             this.healthBar = null;
             this.food = null;
@@ -919,7 +908,8 @@ var HTMLDotshotUI = /** @class */ (function () {
                 this.worldSettings[i].setFromDocument();
             }
             document.getElementById("message").textContent = "Loading...";
-            this.world = new World(this.width, this.height, this.worldSettings[0].value, this.worldSettings[1].value, this.worldSettings[2].value, this.worldSettings[3].value, false, this.defaultStrokeColor);
+            var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
+            this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
             this.display = new p5(output, "canvas");
             document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
         };
