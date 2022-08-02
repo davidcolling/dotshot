@@ -886,18 +886,6 @@ var Mine = /** @class */ (function (_super) {
 ;
 var HTMLDotshotUI = /** @class */ (function () {
     function HTMLDotshotUI() {
-        this.loadPage = function () {
-            var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
-            if (isLight) {
-                this.defaultStrokeColor = new RGBA(256, 256, 256, 256);
-            }
-            else {
-                this.defaultStrokeColor = new RGBA(0, 0, 0, 256);
-            }
-            for (var i = 0; i < this.worldSettings.length; i++) {
-                this.worldSettings[i].display();
-            }
-        };
         this.startNewGame = function () {
             if (this.display != null) {
                 this.display.remove();
@@ -943,6 +931,16 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         this.height = height;
         this.width = width;
+        var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (isLight) {
+            this.defaultStrokeColor = new RGBA(256, 256, 256, 256);
+        }
+        else {
+            this.defaultStrokeColor = new RGBA(0, 0, 0, 256);
+        }
+        for (var i = 0; i < this.worldSettings.length; i++) {
+            this.worldSettings[i].display();
+        }
     }
     return HTMLDotshotUI;
 }());
@@ -1026,4 +1024,7 @@ var output = function (drawWorker) {
         }
     };
 };
-var game = new HTMLDotshotUI();
+var game;
+var loadPage = function () {
+    game = new HTMLDotshotUI();
+};

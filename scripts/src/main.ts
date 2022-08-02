@@ -1074,9 +1074,6 @@ class HTMLDotshotUI {
         this.height = height;
         this.width = width;
 
-    }
-
-    loadPage = function() {
         var isLight = window.matchMedia("(prefers-color-scheme: dark)").matches;
         if (isLight) {
             this.defaultStrokeColor = new RGBA(256, 256, 256, 256);
@@ -1220,5 +1217,8 @@ var output = function (drawWorker) {
 
 };
 
-var game = new HTMLDotshotUI();
+var game;
+var loadPage = function() {
+    game = new HTMLDotshotUI();
+}
 
