@@ -933,6 +933,16 @@ var HTMLDotshotUI = /** @class */ (function () {
         this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
         this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
         this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
+        var height = window.innerHeight * 0.9;
+        var width = window.innerWidth * 0.98;
+        if (height > 700) {
+            height = 700;
+        }
+        if (width > 700) {
+            width = 700;
+        }
+        this.height = height;
+        this.width = width;
     }
     return HTMLDotshotUI;
 }());
@@ -1004,18 +1014,10 @@ function stopKey(e) {
 }
 var output = function (drawWorker) {
     drawWorker.setup = function () {
-        var height = window.innerHeight * 0.9;
-        var width = window.innerWidth * 0.98;
-        if (height > 700) {
-            height = 700;
-        }
-        if (width > 700) {
-            width = 700;
-        }
         drawWorker.frameRate(100000);
-        drawWorker.createCanvas(width, height);
+        drawWorker.createCanvas(game.width, game.height);
         drawWorker.stroke(game.defaultStrokeColor.r, game.defaultStrokeColor.g, game.defaultStrokeColor.b, game.defaultStrokeColor.a);
-        game.world = new World(width, height, game.worldSettings[0].value, game.worldSettings[1].value, game.worldSettings[2].value, game.worldSettings[3].value, false, drawWorker);
+        game.world = new World(game.width, game.height, game.worldSettings[0].value, game.worldSettings[1].value, game.worldSettings[2].value, game.worldSettings[3].value, false, drawWorker);
     };
     drawWorker.draw = function () {
         drawWorker.clear();
