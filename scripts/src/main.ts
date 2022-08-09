@@ -40,6 +40,26 @@ class CenteredShape extends Drawable {
     draw = function (drawWorker, strokeColor) {}
 }
 
+class Ping extends CenteredShape {
+    age: number;
+    constructor(x, y) {
+        super(1, x, y);
+        this.age = 0;
+    }
+    step = function () {
+        this.age++;
+        this.size++;
+    }
+    draw = function (drawWorker, strokeColor) {
+        drawWorker.fill(strokeColor.r, 0);
+        drawWorker.circle(
+            this.x, 
+            this.y, 
+            this.size
+        );
+    }
+}
+
 class Food extends CenteredShape {
     isGrowing: boolean;
     growAge: number;
@@ -358,6 +378,7 @@ class World {
     player: Player;
     healthBar: HealthBar;
     food: Array<Food>;
+    pings: Array<Ping>;
     drawWorker: Object;
     strokeColor: RGBA;
 
@@ -366,6 +387,8 @@ class World {
         this.bullets = new Array();
         this.drawWorker = null;
         this.strokeColor = strokeColor;
+
+        this.pings = new Array();
 
         if (!loading) {
             this.map = map;
@@ -431,6 +454,9 @@ class World {
                     }
                 }
             }
+            if (this.frameCount % 32 == 0) {
+                this.pings.push(new Ping(this.player.x, this.player.y));
+            }
         }
 
         if (this.player != null) {
@@ -460,6 +486,18 @@ class World {
                     this.nPCs[i] = null;
                 }
 
+            }
+        }
+
+        // pings 
+        for (var i = 0; i < this.pings.length; i++) {
+            if (this.pings[i] != null) {
+                this.pings[i].step();
+                this.pings[i].draw(this.drawWorker, this.strokeColor);
+    
+                if ( this.pings[i].age > 16 ) {
+                    this.pings[i] = null;
+                }
             }
         }
 

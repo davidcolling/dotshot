@@ -48,6 +48,23 @@ var CenteredShape = /** @class */ (function (_super) {
     }
     return CenteredShape;
 }(Drawable));
+var Ping = /** @class */ (function (_super) {
+    __extends(Ping, _super);
+    function Ping(x, y) {
+        var _this = _super.call(this, 1, x, y) || this;
+        _this.step = function () {
+            this.age++;
+            this.size++;
+        };
+        _this.draw = function (drawWorker, strokeColor) {
+            drawWorker.fill(strokeColor.r, 0);
+            drawWorker.circle(this.x, this.y, this.size);
+        };
+        _this.age = 0;
+        return _this;
+    }
+    return Ping;
+}(CenteredShape));
 var Food = /** @class */ (function (_super) {
     __extends(Food, _super);
     function Food(x, y) {
@@ -329,6 +346,9 @@ var World = /** @class */ (function () {
                         }
                     }
                 }
+                if (this.frameCount % 32 == 0) {
+                    this.pings.push(new Ping(this.player.x, this.player.y));
+                }
             }
             if (this.player != null) {
                 var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
@@ -351,6 +371,16 @@ var World = /** @class */ (function () {
                     this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                     if (this.nPCs[i].hp <= 0) {
                         this.nPCs[i] = null;
+                    }
+                }
+            }
+            // pings 
+            for (var i = 0; i < this.pings.length; i++) {
+                if (this.pings[i] != null) {
+                    this.pings[i].step();
+                    this.pings[i].draw(this.drawWorker, this.strokeColor);
+                    if (this.pings[i].age > 16) {
+                        this.pings[i] = null;
                     }
                 }
             }
@@ -404,6 +434,7 @@ var World = /** @class */ (function () {
         this.bullets = new Array();
         this.drawWorker = null;
         this.strokeColor = strokeColor;
+        this.pings = new Array();
         if (!loading) {
             this.map = map;
             var playerCoordinate = new Coord(this.map.width - 20, this.map.height - 50);
