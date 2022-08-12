@@ -323,11 +323,11 @@ var World = /** @class */ (function () {
             this.drawBullets(this.bullets);
             // player
             if (this.player != null) {
+                this.player.control(this.drawWorker);
                 if (this.isShotByAny(this.player, this.bullets)) {
-                    this.player.hp -= 1;
+                    this.player.takeDamage(1);
                     this.healthBar.hp = this.player.hp;
                 }
-                this.player.control(this.drawWorker);
                 this.player.draw(this.drawWorker, this.strokeColor);
                 if (this.player.hp == 0) {
                     playerIsDead = true;
@@ -619,17 +619,12 @@ var Character = /** @class */ (function (_super) {
         _this.bullets = bullets;
         return _this;
     }
+    Character.prototype.takeDamage = function (amount) {
+        this.hp -= amount;
+    };
+    ;
     return Character;
 }(Moveable));
-var Steerable = /** @class */ (function (_super) {
-    __extends(Steerable, _super);
-    function Steerable() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.control = function (drawWorker) { };
-        return _this;
-    }
-    return Steerable;
-}(Character));
 var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, x, y, map, bullets) {
@@ -648,19 +643,27 @@ var Player = /** @class */ (function (_super) {
             if (this.isMoving) {
                 this.move(3);
             }
+            if (this.size != this.initialSize) {
+                this.size = this.initialSize;
+            }
         };
         _this.draw = function (drawWorker, strokeColor) {
             var shade = strokeColor.r;
             drawWorker.fill(shade, 256);
             drawWorker.circle(this.x, this.y, this.size);
         };
+        _this.takeDamage = function (amount) {
+            _super.prototype.takeDamage.call(_this, amount);
+            _this.size = 30;
+        };
+        _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
         _this.firingAge = 0;
         return _this;
     }
     return Player;
-}(Steerable));
+}(Character));
 var NPC = /** @class */ (function (_super) {
     __extends(NPC, _super);
     function NPC(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {

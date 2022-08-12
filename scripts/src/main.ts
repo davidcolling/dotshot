@@ -431,11 +431,11 @@ class World {
 
         // player
         if (this.player != null) {
+            this.player.control(this.drawWorker);
             if (this.isShotByAny(this.player, this.bullets)) {
-                this.player.hp -= 1;
+                this.player.takeDamage(1);
                 this.healthBar.hp = this.player.hp;
             }
-            this.player.control(this.drawWorker);
             this.player.draw(this.drawWorker, this.strokeColor);
             if (this.player.hp == 0) {
                 playerIsDead = true;
@@ -723,19 +723,20 @@ class Character extends Moveable {
         this.bullets.push(new Bullet(this.x, this.y, target, this.map));
     }
     step = function() {}
+    takeDamage(amount):void {
+        this.hp -= amount;
+    };
 }
 
-class Steerable extends Character {
-    control = function (drawWorker) {}
-}
-
-class Player extends Steerable {
+class Player extends Character{
     isFiring: boolean;
     isMoving: boolean;
     firingAge: number;
+    initialSize:number;
 
     constructor(size, x, y, map, bullets) {
         super(size, x, y, map, bullets, 32);
+        this.initialSize = size;
         this.isFiring = true; 
         this.isMoving = false;
         this.firingAge = 0;
@@ -753,6 +754,9 @@ class Player extends Steerable {
         if (this.isMoving) {
             this.move(3);
         }
+        if (this.size != this.initialSize) {
+            this.size = this.initialSize;
+        }
     }
     draw = function (drawWorker, strokeColor) {
         var shade = strokeColor.r
@@ -762,6 +766,10 @@ class Player extends Steerable {
             this.y, 
             this.size
         );
+    }
+    takeDamage = (amount) => {
+        super.takeDamage(amount);
+        this.size = 30;
     }
     
 }
