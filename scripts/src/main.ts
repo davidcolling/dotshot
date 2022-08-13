@@ -22,8 +22,7 @@ class Coord {
 }
 
 class Drawable {
-    draw = function (drawWorker, strokeColor) {
-    }
+    draw(drawWorker, strokeColor):void {}
 }
 
 class CenteredShape extends Drawable {
@@ -37,7 +36,7 @@ class CenteredShape extends Drawable {
         this.x = x;
         this.y = y;
     }
-    draw = function (drawWorker, strokeColor) {}
+    draw(drawWorker, strokeColor):void {}
 }
 
 class Ping extends CenteredShape {
@@ -50,7 +49,7 @@ class Ping extends CenteredShape {
         this.age++;
         this.size++;
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.fill(strokeColor.r, 0);
         drawWorker.circle(
             this.x, 
@@ -85,7 +84,7 @@ class Food extends CenteredShape {
             }
         }
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.fill(strokeColor.r, 256);
         drawWorker.circle(
             this.x, 
@@ -124,7 +123,7 @@ class GridSquare extends Drawable {
     isEmpty: boolean; // is the square wall or open space?
     coord: Coord;
     visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
-    isHightlighted: boolean; // for ad-hoc debugging
+    isHighlighted: boolean; // for ad-hoc debugging
 
     constructor(size, coord, isEmpty) {
         super();
@@ -132,10 +131,10 @@ class GridSquare extends Drawable {
         this.isEmpty = isEmpty;
         this.coord = coord;
         this.visibleIndexes = null;
-        this.isHightlighted = false;
+        this.isHighlighted = false;
     }
 
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         if (this.isHighlighted) {
             drawWorker.fill(256, 0, 0, 256);
             drawWorker.rect(
@@ -181,7 +180,7 @@ class HealthBar extends Drawable {
         this.hp = this.max;
     }
 
-    draw  = function(drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         if (this.hp != 0) {
             drawWorker.stroke(256, 0, 0, 256);
             drawWorker.fill(256, 0, 0, 256);
@@ -309,7 +308,7 @@ class GridMap extends Drawable {
         }
     }
 
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         for (var i = 0; i < this.gridWidth; i ++) {
             for (var j = 0; j < this.gridHeight; j ++) {
                 this.map[i][j].draw(drawWorker, strokeColor);
@@ -670,7 +669,6 @@ class Moveable extends CenteredShape {
             return false;
         }
     };
-    draw = function (drawWorker, strokeColor) {};
 }
 
 class Bullet extends Moveable {
@@ -701,7 +699,7 @@ class Bullet extends Moveable {
             return false;
         }
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.fill(256, 256);
         drawWorker.circle(
             this.x, 
@@ -761,7 +759,7 @@ class Player extends Character{
             this.move(3);
         }
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
         drawWorker.circle(
@@ -828,7 +826,7 @@ class Chicken extends NPC {
         this.fleeLife = 20;
         this.food = food;
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         drawWorker.circle(
@@ -867,7 +865,7 @@ class Bomb extends NPC {
         this.igniteAge = 0
         this.isGrowing = true;
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
         drawWorker.circle(
@@ -959,7 +957,7 @@ class Pirate extends NPC {
         super(5 , x, y, map, bullets, 8, target, 1000, 0, 200);
         this.weaponCooldownCounter = 0
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
         drawWorker.circle(
@@ -1003,7 +1001,7 @@ class LoadingActor extends NPC {
         super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
         this.stepCount = 0;
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
         drawWorker.circle(
@@ -1031,7 +1029,7 @@ class Mine extends NPC {
     constructor(x, y, map, bullets) {
         super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
     }
-    draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor):void {
         drawWorker.stroke(128, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
         drawWorker.circle(

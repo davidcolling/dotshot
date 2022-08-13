@@ -31,21 +31,20 @@ var Coord = /** @class */ (function () {
 }());
 var Drawable = /** @class */ (function () {
     function Drawable() {
-        this.draw = function (drawWorker, strokeColor) {
-        };
     }
+    Drawable.prototype.draw = function (drawWorker, strokeColor) { };
     return Drawable;
 }());
 var CenteredShape = /** @class */ (function (_super) {
     __extends(CenteredShape, _super);
     function CenteredShape(size, x, y) {
         var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) { };
         _this.size = size;
         _this.x = x;
         _this.y = y;
         return _this;
     }
+    CenteredShape.prototype.draw = function (drawWorker, strokeColor) { };
     return CenteredShape;
 }(Drawable));
 var Ping = /** @class */ (function (_super) {
@@ -56,13 +55,13 @@ var Ping = /** @class */ (function (_super) {
             this.age++;
             this.size++;
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.fill(strokeColor.r, 0);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.age = 0;
         return _this;
     }
+    Ping.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.fill(strokeColor.r, 0);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return Ping;
 }(CenteredShape));
 var Food = /** @class */ (function (_super) {
@@ -86,14 +85,14 @@ var Food = /** @class */ (function (_super) {
                 }
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.fill(strokeColor.r, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.isGrowing = true;
         _this.growAge = 0;
         return _this;
     }
+    Food.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.fill(strokeColor.r, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return Food;
 }(CenteredShape));
 var GridMapImage = /** @class */ (function () {
@@ -120,22 +119,6 @@ var GridSquare = /** @class */ (function (_super) {
     __extends(GridSquare, _super);
     function GridSquare(size, coord, isEmpty) {
         var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            if (this.isHighlighted) {
-                drawWorker.fill(256, 0, 0, 256);
-                drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
-            }
-            else {
-                if (this.isEmpty) {
-                    return;
-                }
-                else {
-                    var shade = strokeColor.r;
-                    drawWorker.fill(shade, 256);
-                    drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
-                }
-            }
-        };
         _this.isVisible = function (coord) {
             if (this.visibleIndexes == null) {
                 return true;
@@ -148,43 +131,52 @@ var GridSquare = /** @class */ (function (_super) {
         _this.isEmpty = isEmpty;
         _this.coord = coord;
         _this.visibleIndexes = null;
-        _this.isHightlighted = false;
+        _this.isHighlighted = false;
         return _this;
     }
+    GridSquare.prototype.draw = function (drawWorker, strokeColor) {
+        if (this.isHighlighted) {
+            drawWorker.fill(256, 0, 0, 256);
+            drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+        }
+        else {
+            if (this.isEmpty) {
+                return;
+            }
+            else {
+                var shade = strokeColor.r;
+                drawWorker.fill(shade, 256);
+                drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+            }
+        }
+    };
     return GridSquare;
 }(Drawable));
 var HealthBar = /** @class */ (function (_super) {
     __extends(HealthBar, _super);
     function HealthBar(max, map) {
         var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            if (this.hp != 0) {
-                drawWorker.stroke(256, 0, 0, 256);
-                drawWorker.fill(256, 0, 0, 256);
-                drawWorker.strokeWeight(5);
-                drawWorker.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
-                drawWorker.strokeWeight(1);
-                drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-            }
-        };
         _this.max = max;
         _this.map = map;
         _this.hp = _this.max;
         return _this;
     }
+    HealthBar.prototype.draw = function (drawWorker, strokeColor) {
+        if (this.hp != 0) {
+            drawWorker.stroke(256, 0, 0, 256);
+            drawWorker.fill(256, 0, 0, 256);
+            drawWorker.strokeWeight(5);
+            drawWorker.line(0, this.map.height - 1, this.map.width * (this.hp / this.max), this.map.height - 1);
+            drawWorker.strokeWeight(1);
+            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+        }
+    };
     return HealthBar;
 }(Drawable));
 var GridMap = /** @class */ (function (_super) {
     __extends(GridMap, _super);
     function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
         var _this = _super.call(this) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            for (var i = 0; i < this.gridWidth; i++) {
-                for (var j = 0; j < this.gridHeight; j++) {
-                    this.map[i][j].draw(drawWorker, strokeColor);
-                }
-            }
-        };
         // blocks out gridSquares that aren't visible from the viewpoint
         _this.drawVisible = function (viewPointScreenCoord, drawWorker) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
@@ -299,6 +291,13 @@ var GridMap = /** @class */ (function (_super) {
         }
         return _this;
     }
+    GridMap.prototype.draw = function (drawWorker, strokeColor) {
+        for (var i = 0; i < this.gridWidth; i++) {
+            for (var j = 0; j < this.gridHeight; j++) {
+                this.map[i][j].draw(drawWorker, strokeColor);
+            }
+        }
+    };
     GridMap.getGridIndex = function (screenCoord, gridSquareSize) {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
         var indexY = Math.floor(screenCoord.y / gridSquareSize);
@@ -567,7 +566,6 @@ var Moveable = /** @class */ (function (_super) {
                 return false;
             }
         };
-        _this.draw = function (drawWorker, strokeColor) { };
         _this.direction = direction;
         _this.map = map;
         return _this;
@@ -597,15 +595,15 @@ var Bullet = /** @class */ (function (_super) {
                 return false;
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.fill(256, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.age = 0;
         _this.target = target;
         _this.hasPassedTarget = false;
         return _this;
     }
+    Bullet.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.fill(256, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return Bullet;
 }(Moveable));
 var Character = /** @class */ (function (_super) {
@@ -650,17 +648,17 @@ var Player = /** @class */ (function (_super) {
                 this.move(3);
             }
         };
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
         _this.firingAge = 0;
         return _this;
     }
+    Player.prototype.draw = function (drawWorker, strokeColor) {
+        var shade = strokeColor.r;
+        drawWorker.fill(shade, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     Player.prototype.takeDamage = function (amount) {
         _super.prototype.takeDamage.call(this, amount);
         this.size = 30;
@@ -704,11 +702,6 @@ var Chicken = /** @class */ (function (_super) {
     __extends(Chicken, _super);
     function Chicken(x, y, map, food) {
         var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.step = function () {
             if (this.hp <= 0) {
                 this.food.push(new Food(this.x, this.y));
@@ -733,18 +726,17 @@ var Chicken = /** @class */ (function (_super) {
         _this.food = food;
         return _this;
     }
+    Chicken.prototype.draw = function (drawWorker, strokeColor) {
+        var shade = strokeColor.r;
+        drawWorker.fill(shade, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return Chicken;
 }(NPC));
 var Bomb = /** @class */ (function (_super) {
     __extends(Bomb, _super);
     function Bomb(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(128, 0, 0, 256);
-            drawWorker.fill(128, 0, 0, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-        };
         _this.step = function () {
             if (this.didIgnite) {
                 this.igniteAge++;
@@ -817,6 +809,12 @@ var Bomb = /** @class */ (function (_super) {
         _this.isGrowing = true;
         return _this;
     }
+    Bomb.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.stroke(128, 0, 0, 256);
+        drawWorker.fill(128, 0, 0, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+        drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    };
     return Bomb;
 }(NPC));
 ;
@@ -824,12 +822,6 @@ var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
     function Pirate(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(256, 0, 0, 256);
-            drawWorker.fill(256, 0, 0, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-        };
         _this.step = function () {
             this.weaponCooldownCounter++;
             this.decideDraw();
@@ -854,6 +846,12 @@ var Pirate = /** @class */ (function (_super) {
         _this.weaponCooldownCounter = 0;
         return _this;
     }
+    Pirate.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.stroke(256, 0, 0, 256);
+        drawWorker.fill(256, 0, 0, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+        drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    };
     return Pirate;
 }(NPC));
 ;
@@ -861,11 +859,6 @@ var LoadingActor = /** @class */ (function (_super) {
     __extends(LoadingActor, _super);
     function LoadingActor(x, y, map, bullets) {
         var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            var shade = strokeColor.r;
-            drawWorker.fill(shade, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-        };
         _this.step = function () {
             if (this.direction < 360) {
                 this.direction += 3;
@@ -883,18 +876,17 @@ var LoadingActor = /** @class */ (function (_super) {
         _this.stepCount = 0;
         return _this;
     }
+    LoadingActor.prototype.draw = function (drawWorker, strokeColor) {
+        var shade = strokeColor.r;
+        drawWorker.fill(shade, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return LoadingActor;
 }(NPC));
 var Mine = /** @class */ (function (_super) {
     __extends(Mine, _super);
     function Mine(x, y, map, bullets) {
         var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.draw = function (drawWorker, strokeColor) {
-            drawWorker.stroke(128, 128, 128, 256);
-            drawWorker.fill(128, 128, 128, 256);
-            drawWorker.circle(this.x, this.y, this.size);
-            drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-        };
         _this.explode = function () {
             var directions = Array();
             directions.push(new Coord(this.x, this.y - 300));
@@ -935,6 +927,12 @@ var Mine = /** @class */ (function (_super) {
         };
         return _this;
     }
+    Mine.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.stroke(128, 128, 128, 256);
+        drawWorker.fill(128, 128, 128, 256);
+        drawWorker.circle(this.x, this.y, this.size);
+        drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    };
     return Mine;
 }(NPC));
 ;
