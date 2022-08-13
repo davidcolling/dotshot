@@ -432,6 +432,7 @@ class World {
         // player
         if (this.player != null) {
             this.player.control(this.drawWorker);
+            this.player.step();
             if (this.isShotByAny(this.player, this.bullets)) {
                 this.player.takeDamage(1);
                 this.healthBar.hp = this.player.hp;
@@ -741,6 +742,11 @@ class Player extends Character{
         this.isMoving = false;
         this.firingAge = 0;
     }
+    step = function () {
+        if (this.size != this.initalSize) {
+            this.size = this.initialSize;
+        }
+    }
     control = function (drawWorker) {
         this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
         if (this.isFiring) {
@@ -753,9 +759,6 @@ class Player extends Character{
         }
         if (this.isMoving) {
             this.move(3);
-        }
-        if (this.size != this.initialSize) {
-            this.size = this.initialSize;
         }
     }
     draw = function (drawWorker, strokeColor) {

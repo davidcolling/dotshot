@@ -324,6 +324,7 @@ var World = /** @class */ (function () {
             // player
             if (this.player != null) {
                 this.player.control(this.drawWorker);
+                this.player.step();
                 if (this.isShotByAny(this.player, this.bullets)) {
                     this.player.takeDamage(1);
                     this.healthBar.hp = this.player.hp;
@@ -629,6 +630,11 @@ var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, x, y, map, bullets) {
         var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
+        _this.step = function () {
+            if (this.size != this.initalSize) {
+                this.size = this.initialSize;
+            }
+        };
         _this.control = function (drawWorker) {
             this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
             if (this.isFiring) {
@@ -642,9 +648,6 @@ var Player = /** @class */ (function (_super) {
             }
             if (this.isMoving) {
                 this.move(3);
-            }
-            if (this.size != this.initialSize) {
-                this.size = this.initialSize;
             }
         };
         _this.draw = function (drawWorker, strokeColor) {
