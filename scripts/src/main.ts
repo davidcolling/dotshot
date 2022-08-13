@@ -770,7 +770,7 @@ class Player extends Character{
             this.size
         );
     }
-    takeDamage = (amount) => {
+    takeDamage(amount):void {
         super.takeDamage(amount);
         this.size = 30;
     }

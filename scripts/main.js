@@ -655,16 +655,16 @@ var Player = /** @class */ (function (_super) {
             drawWorker.fill(shade, 256);
             drawWorker.circle(this.x, this.y, this.size);
         };
-        _this.takeDamage = function (amount) {
-            _super.prototype.takeDamage.call(_this, amount);
-            _this.size = 30;
-        };
         _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
         _this.firingAge = 0;
         return _this;
     }
+    Player.prototype.takeDamage = function (amount) {
+        _super.prototype.takeDamage.call(this, amount);
+        this.size = 30;
+    };
     return Player;
 }(Character));
 var NPC = /** @class */ (function (_super) {
