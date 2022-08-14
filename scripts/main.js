@@ -44,7 +44,9 @@ var CenteredShape = /** @class */ (function (_super) {
         _this.y = y;
         return _this;
     }
-    CenteredShape.prototype.draw = function (drawWorker, strokeColor) { };
+    CenteredShape.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.circle(this.x, this.y, this.size);
+    };
     return CenteredShape;
 }(Drawable));
 var Ping = /** @class */ (function (_super) {
@@ -60,7 +62,7 @@ var Ping = /** @class */ (function (_super) {
     }
     Ping.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(strokeColor.r, 0);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return Ping;
 }(CenteredShape));
@@ -91,7 +93,7 @@ var Food = /** @class */ (function (_super) {
     }
     Food.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(strokeColor.r, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return Food;
 }(CenteredShape));
@@ -602,7 +604,7 @@ var Bullet = /** @class */ (function (_super) {
     }
     Bullet.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(256, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return Bullet;
 }(Moveable));
@@ -657,7 +659,7 @@ var Player = /** @class */ (function (_super) {
     Player.prototype.draw = function (drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     Player.prototype.takeDamage = function (amount) {
         _super.prototype.takeDamage.call(this, amount);
@@ -729,7 +731,7 @@ var Chicken = /** @class */ (function (_super) {
     Chicken.prototype.draw = function (drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return Chicken;
 }(NPC));
@@ -812,7 +814,7 @@ var Bomb = /** @class */ (function (_super) {
     Bomb.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
     return Bomb;
@@ -849,7 +851,7 @@ var Pirate = /** @class */ (function (_super) {
     Pirate.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
     return Pirate;
@@ -879,7 +881,7 @@ var LoadingActor = /** @class */ (function (_super) {
     LoadingActor.prototype.draw = function (drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return LoadingActor;
 }(NPC));
@@ -930,7 +932,7 @@ var Mine = /** @class */ (function (_super) {
     Mine.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(128, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
-        drawWorker.circle(this.x, this.y, this.size);
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
     return Mine;

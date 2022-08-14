@@ -36,7 +36,13 @@ class CenteredShape extends Drawable {
         this.x = x;
         this.y = y;
     }
-    draw(drawWorker, strokeColor):void {}
+    draw(drawWorker, strokeColor):void {
+        drawWorker.circle(
+            this.x,
+            this.y,
+            this.size
+        );
+    }
 }
 
 class Ping extends CenteredShape {
@@ -51,11 +57,7 @@ class Ping extends CenteredShape {
     }
     draw(drawWorker, strokeColor):void {
         drawWorker.fill(strokeColor.r, 0);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
     }
 }
 
@@ -86,11 +88,7 @@ class Food extends CenteredShape {
     }
     draw(drawWorker, strokeColor):void {
         drawWorker.fill(strokeColor.r, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
     }
 }
 
@@ -701,11 +699,7 @@ class Bullet extends Moveable {
     }
     draw(drawWorker, strokeColor):void {
         drawWorker.fill(256, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size,
-        );
+        super.draw(drawWorker, strokeColor); 
     }
 }
 
@@ -762,11 +756,7 @@ class Player extends Character{
     draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
     }
     takeDamage(amount):void {
         super.takeDamage(amount);
@@ -829,11 +819,7 @@ class Chicken extends NPC {
     draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
     }    
     step = function () {
         if(this.hp <= 0) {
@@ -868,11 +854,7 @@ class Bomb extends NPC {
     draw(drawWorker, strokeColor):void {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
         drawWorker.stroke(
             strokeColor.r, 
             strokeColor.g, 
@@ -960,11 +942,7 @@ class Pirate extends NPC {
     draw(drawWorker, strokeColor):void {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
         drawWorker.stroke(
             strokeColor.r, 
             strokeColor.g, 
@@ -1004,11 +982,7 @@ class LoadingActor extends NPC {
     draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
     }
     step = function () {
         if (this.direction < 360) {
@@ -1032,11 +1006,7 @@ class Mine extends NPC {
     draw(drawWorker, strokeColor):void {
         drawWorker.stroke(128, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
-        drawWorker.circle(
-            this.x, 
-            this.y, 
-            this.size
-        );
+        super.draw(drawWorker, strokeColor); 
         drawWorker.stroke(
             strokeColor.r, 
             strokeColor.g, 
