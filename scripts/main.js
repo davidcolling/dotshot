@@ -475,7 +475,7 @@ var World = /** @class */ (function () {
             }
         }
         else {
-            this.map = new GridMap(width, height, 10, 0, 0, true);
+            this.map = new GridMap(width, height, 0, 0, 0, true);
             this.player = null;
             this.healthBar = null;
             this.food = null;
@@ -965,8 +965,8 @@ var HTMLDotshotUI = /** @class */ (function () {
                 this.worldSettings[i].setFromDocument();
             }
             document.getElementById("message").textContent = "Loading...";
-            // var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
-            this.world = new World(this.width, this.height, 0, null, true, this.defaultStrokeColor);
+            var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
+            this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
             this.display = new p5(output, "canvas");
             document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
         };
