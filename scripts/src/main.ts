@@ -207,6 +207,7 @@ class GridMap extends Drawable {
     gridHeight:number;
     map: Array<Array<GridSquare>>; // hash table used to represent the map
     gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
+    isEmpty: boolean;
     
     constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
         super();
@@ -214,21 +215,22 @@ class GridMap extends Drawable {
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
         var width = gridSquareSize * gridWidth;
         var height = gridSquareSize * gridHeight;
-        this.gridSquareSize = gridSquareSize;
         this.width = width;
         this.height = height;
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
-        this.map = Array();
-        // make empty map
-        for (var i = 0; i < gridWidth ; i ++) { 
-            this.map[i] = new Array();
-            for (var j = 0; j < gridHeight; j ++) {
-                var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
-            }
-        }
+        this.isEmpty = isEmpty;
         if (!isEmpty) {
+            this.gridSquareSize = gridSquareSize;
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
+            this.map = Array();
+            // make empty map
+            for (var i = 0; i < gridWidth ; i ++) { 
+                this.map[i] = new Array();
+                for (var j = 0; j < gridHeight; j ++) {
+                    var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
+                }
+            }
             // make walls
             for (var i = 0; i < numberOfWalls; i++) { 
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
@@ -303,48 +305,61 @@ class GridMap extends Drawable {
                     }
                 }
             }
+        } else {
+            this.gridSquareSize = null;
+            this.gridWidth = null;
+            this.gridHeight = null;
+            this.map = null;
         }
     }
 
     draw(drawWorker, strokeColor):void {
-        for (var i = 0; i < this.gridWidth; i ++) {
-            for (var j = 0; j < this.gridHeight; j ++) {
-                this.map[i][j].draw(drawWorker, strokeColor);
+        if (!this.isEmpty) {
+            for (var i = 0; i < this.gridWidth; i ++) {
+                for (var j = 0; j < this.gridHeight; j ++) {
+                    this.map[i][j].draw(drawWorker, strokeColor);
+                }
             }
         }
     }
 
     // blocks out gridSquares that aren't visible from the viewpoint
     drawVisible = function (viewPointScreenCoord, drawWorker) {
-        var viewPoint = this.getGridIndex(viewPointScreenCoord);
-        for (var i = 0; i < this.gridWidth; i ++) {
-            for (var j = 0; j < this.gridHeight; j ++) {
-                if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                    this.map[i][j].draw(drawWorker);
-                } else {
-                    drawWorker.fill(0, 256);
-                    drawWorker.rect(
-                        i * this.gridSquareSize,
-                        j * this.gridSquareSize,
-                        this.gridSquareSize,
-                        this.gridSquareSize
-                    );
+        if( !this.isEmpty) {
+            var viewPoint = this.getGridIndex(viewPointScreenCoord);
+            for (var i = 0; i < this.gridWidth; i ++) {
+                for (var j = 0; j < this.gridHeight; j ++) {
+                    if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
+                        this.map[i][j].draw(drawWorker);
+                    } else {
+                        drawWorker.fill(0, 256);
+                        drawWorker.rect(
+                            i * this.gridSquareSize,
+                            j * this.gridSquareSize,
+                            this.gridSquareSize,
+                            this.gridSquareSize
+                        );
+                    }
                 }
             }
         }
     }
 
     isOpen = function (screenCoord) {
-        if (
-            0 < screenCoord.x &&
-            screenCoord.x < this.width &&
-            0 < screenCoord.y &&
-            screenCoord.y < this.height
-        ) {
-            var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
-            return this.map[gridIndex.x][gridIndex.y].isEmpty;
+        if(!this.isEmpty) {
+            if (
+                0 < screenCoord.x &&
+                screenCoord.x < this.width &&
+                0 < screenCoord.y &&
+                screenCoord.y < this.height
+            ) {
+                var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
+                return this.map[gridIndex.x][gridIndex.y].isEmpty;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -356,7 +371,8 @@ class GridMap extends Drawable {
     }
 
     getGridIndex = function (screenCoord) {
-        return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
+        if (!this.isEmpty) 
+            return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     }
     
 }
@@ -1119,7 +1135,7 @@ class HTMLDotshotUI {
         var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
         this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
         this.display = new p5(output, "canvas");
-    
+
         document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
     }
 
