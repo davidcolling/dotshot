@@ -49,6 +49,25 @@ var CenteredShape = /** @class */ (function (_super) {
     };
     return CenteredShape;
 }(Drawable));
+var NPcSpawner = /** @class */ (function (_super) {
+    __extends(NPcSpawner, _super);
+    function NPcSpawner(x, y, world) {
+        var _this = _super.call(this, 6, x, y) || this;
+        _this.counter = 0;
+        _this.world = world;
+        return _this;
+    }
+    NPcSpawner.prototype.step = function () {
+        this.counter++;
+        if (this.counter % 100 == 0) {
+            this.world.nPCs.push(new Pirate(this.x, this.y, this.world.map, this.world.bullets, this.world.player));
+        }
+    };
+    NPcSpawner.prototype.draw = function (drawWorker, strokeColor) {
+        drawWorker.circle(this.x, this.y, this.size);
+    };
+    return NPcSpawner;
+}(CenteredShape));
 var Ping = /** @class */ (function (_super) {
     __extends(Ping, _super);
     function Ping(x, y) {
@@ -393,6 +412,12 @@ var World = /** @class */ (function () {
                     }
                 }
             }
+            for (var i = 0; i < this.spawners.length; i++) {
+                if (this.spawners[i] != null) {
+                    this.spawners[i].draw(this.drawWorker, this.strokeColor);
+                    this.spawners[i].step();
+                }
+            }
             // pings 
             for (var i = 0; i < this.pings.length; i++) {
                 if (this.pings[i] != null) {
@@ -473,6 +498,8 @@ var World = /** @class */ (function () {
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
+            this.spawners = new Array();
+            this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
         }
         else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
@@ -947,7 +974,7 @@ var Mine = /** @class */ (function (_super) {
         return _this;
     }
     Mine.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.stroke(128, 128, 128, 256);
+        drawWorker.stroke(130, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);

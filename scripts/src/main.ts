@@ -45,6 +45,31 @@ class CenteredShape extends Drawable {
     }
 }
 
+class NPcSpawner extends CenteredShape {
+    counter:number;
+    world: World;
+
+    constructor(x, y, world) {
+        super(6, x, y);
+        this.counter = 0;
+        this.world = world
+    }
+    step():void {
+        this.counter++;
+        if (this.counter % 100 == 0) {
+            this.world.nPCs.push(new Pirate(this.x, this.y,  this.world.map, this.world.bullets, this.world.player));
+        }
+    }
+    draw(drawWorker, strokeColor):void {
+        drawWorker.circle(
+            this.x,
+            this.y,
+            this.size
+        );
+    }
+
+}
+
 class Ping extends CenteredShape {
     age: number;
     constructor(x, y) {
@@ -394,6 +419,7 @@ class World {
     pings: Array<Ping>;
     drawWorker: Object;
     strokeColor: RGBA;
+    spawners: Array<NPcSpawner>;
 
     constructor(width, height, numberOfEnemies, map, loading, strokeColor) {
         this.frameCount = 0;
@@ -424,6 +450,10 @@ class World {
                 this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets));
                 this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food));
             }
+
+            this.spawners = new Array();
+            this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+
         } else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
             this.player = null;
@@ -500,6 +530,13 @@ class World {
                     this.nPCs[i] = null;
                 }
 
+            }
+        }
+
+        for (var i = 0; i < this.spawners.length; i++) {
+            if( this.spawners[i] != null ) {
+                this.spawners[i].draw(this.drawWorker, this.strokeColor);
+                this.spawners[i].step();
             }
         }
 
@@ -1020,7 +1057,7 @@ class Mine extends NPC {
         super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
     }
     draw(drawWorker, strokeColor):void {
-        drawWorker.stroke(128, 128, 128, 256);
+        drawWorker.stroke(130, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
         super.draw(drawWorker, strokeColor); 
         drawWorker.stroke(
