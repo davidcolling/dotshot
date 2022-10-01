@@ -52,14 +52,14 @@ var CenteredShape = /** @class */ (function (_super) {
 var NPcSpawner = /** @class */ (function (_super) {
     __extends(NPcSpawner, _super);
     function NPcSpawner(x, y, world) {
-        var _this = _super.call(this, 6, x, y) || this;
+        var _this = _super.call(this, 8, x, y) || this;
         _this.counter = 0;
         _this.world = world;
         return _this;
     }
     NPcSpawner.prototype.step = function () {
         this.counter++;
-        if (this.counter % 100 == 0) {
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.x, this.world.player.y, this.x, this.y))) == 0) {
             this.world.nPCs.push(new Pirate(this.x, this.y, this.world.map, this.world.bullets, this.world.player));
         }
     };

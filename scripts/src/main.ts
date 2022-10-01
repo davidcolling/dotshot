@@ -50,13 +50,13 @@ class NPcSpawner extends CenteredShape {
     world: World;
 
     constructor(x, y, world) {
-        super(6, x, y);
+        super(8, x, y);
         this.counter = 0;
         this.world = world
     }
     step():void {
         this.counter++;
-        if (this.counter % 100 == 0) {
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.x, this.world.player.y, this.x, this.y))) == 0) {
             this.world.nPCs.push(new Pirate(this.x, this.y,  this.world.map, this.world.bullets, this.world.player));
         }
     }
