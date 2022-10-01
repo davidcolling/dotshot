@@ -87,6 +87,18 @@ var Gun = /** @class */ (function (_super) {
     };
     return Gun;
 }(Weapon));
+var DoubleBarrelGun = /** @class */ (function (_super) {
+    __extends(DoubleBarrelGun, _super);
+    function DoubleBarrelGun(bullets, owner) {
+        return _super.call(this, bullets, owner) || this;
+    }
+    DoubleBarrelGun.prototype.fire = function (target) {
+        _super.prototype.fire.call(this, target);
+        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map));
+    };
+    return DoubleBarrelGun;
+}(Weapon));
 var Ping = /** @class */ (function (_super) {
     __extends(Ping, _super);
     function Ping(x, y) {
@@ -677,13 +689,14 @@ var Character = /** @class */ (function (_super) {
     function Character(size, x, y, map, bullets, maxHP) {
         var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
         _this.fire = function (target) {
-            this.weapons[0].fire(target);
+            this.weapons[this.currentWeapon].fire(target);
         };
         _this.step = function () { };
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
         _this.weapons.push(new Gun(bullets, _this));
+        _this.currentWeapon = 0;
         return _this;
     }
     Character.prototype.takeDamage = function (amount) {
@@ -716,6 +729,7 @@ var Player = /** @class */ (function (_super) {
                 this.move(3);
             }
         };
+        _this.weapons.push(new DoubleBarrelGun(bullets, _this));
         _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
@@ -1114,6 +1128,13 @@ function recordKey(e) {
         case "ArrowUp":
             game.world.player.isMoving = true;
             break;
+        case "1":
+            game.world.player.currentWeapon = 0;
+            break;
+        case "2":
+            if (game.world.player.weapons.length > 1) {
+                game.world.player.currentWeapon = 1;
+            }
     }
 }
 document.addEventListener('keyup', stopKey);

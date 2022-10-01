@@ -93,6 +93,18 @@ class Gun extends Weapon {
     }
 }
 
+class DoubleBarrelGun extends Weapon {
+    constructor(bullets, owner) {
+        super(bullets, owner);
+    }
+
+    fire(target):void {
+        super.fire(target);
+        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map));
+    }
+}
+
 class Ping extends CenteredShape {
     age: number;
     constructor(x, y) {
@@ -784,6 +796,7 @@ class Character extends Moveable {
     hp: number;
     bullets: Array<Bullet>;
     weapons: Array<Weapon>;
+    currentWeapon:number;
 
     constructor(size, x, y, map, bullets, maxHP) {
         super(size, x, y, Math.random() * 360, map);
@@ -791,9 +804,10 @@ class Character extends Moveable {
         this.bullets = bullets;
         this.weapons = new Array();
         this.weapons.push(new Gun(bullets, this));
+        this.currentWeapon = 0;
     }
     fire = function(target) {
-        this.weapons[0].fire(target);
+        this.weapons[this.currentWeapon].fire(target);
     }
     step = function() {}
     takeDamage(amount):void {
@@ -810,6 +824,7 @@ class Player extends Character{
 
     constructor(size, x, y, map, bullets) {
         super(size, x, y, map, bullets, 32);
+        this.weapons.push(new DoubleBarrelGun(bullets, this));
         this.initialSize = size;
         this.isFiring = true; 
         this.isMoving = false;
@@ -1274,6 +1289,13 @@ function recordKey(e) {
         case "ArrowUp":
             game.world.player.isMoving = true;
             break;
+        case "1":
+            game.world.player.currentWeapon = 0;
+            break;
+        case "2":
+            if (game.world.player.weapons.length > 1) {
+                game.world.player.currentWeapon = 1;
+            }
     }
 }
 
