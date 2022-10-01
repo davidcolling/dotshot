@@ -409,6 +409,8 @@ var World = /** @class */ (function () {
                     this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                     if (this.nPCs[i].hp <= 0) {
                         this.nPCs[i] = null;
+                        this.player.enemiesKilled++;
+                        console.log(this.player.enemiesKilled);
                     }
                 }
             }
@@ -698,6 +700,7 @@ var Player = /** @class */ (function (_super) {
         _this.isFiring = true;
         _this.isMoving = false;
         _this.firingAge = 0;
+        _this.enemiesKilled = 0;
         return _this;
     }
     Player.prototype.draw = function (drawWorker, strokeColor) {

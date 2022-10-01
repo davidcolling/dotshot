@@ -528,6 +528,7 @@ class World {
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
                     this.nPCs[i] = null;
+                    this.player.enemiesKilled++;
                 }
 
             }
@@ -779,6 +780,7 @@ class Player extends Character{
     isMoving: boolean;
     firingAge: number;
     initialSize:number;
+    enemiesKilled: number;
 
     constructor(size, x, y, map, bullets) {
         super(size, x, y, map, bullets, 32);
@@ -786,6 +788,7 @@ class Player extends Character{
         this.isFiring = true; 
         this.isMoving = false;
         this.firingAge = 0;
+        this.enemiesKilled = 0;
     }
     step = function () {
         if (this.size != this.initalSize) {
