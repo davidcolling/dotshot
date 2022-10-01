@@ -68,6 +68,25 @@ var NPcSpawner = /** @class */ (function (_super) {
     };
     return NPcSpawner;
 }(CenteredShape));
+var Weapon = /** @class */ (function () {
+    function Weapon(bullets, owner) {
+        this.bullets = bullets;
+        this.owner = owner;
+    }
+    Weapon.prototype.fire = function (target) { };
+    return Weapon;
+}());
+var Gun = /** @class */ (function (_super) {
+    __extends(Gun, _super);
+    function Gun(bullets, owner) {
+        return _super.call(this, bullets, owner) || this;
+    }
+    Gun.prototype.fire = function (target) {
+        _super.prototype.fire.call(this, target);
+        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map));
+    };
+    return Gun;
+}(Weapon));
 var Ping = /** @class */ (function (_super) {
     __extends(Ping, _super);
     function Ping(x, y) {
@@ -410,7 +429,6 @@ var World = /** @class */ (function () {
                     if (this.nPCs[i].hp <= 0) {
                         this.nPCs[i] = null;
                         this.player.enemiesKilled++;
-                        console.log(this.player.enemiesKilled);
                     }
                 }
             }
@@ -659,11 +677,13 @@ var Character = /** @class */ (function (_super) {
     function Character(size, x, y, map, bullets, maxHP) {
         var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
         _this.fire = function (target) {
-            this.bullets.push(new Bullet(this.x, this.y, target, this.map));
+            this.weapons[0].fire(target);
         };
         _this.step = function () { };
         _this.hp = maxHP;
         _this.bullets = bullets;
+        _this.weapons = new Array();
+        _this.weapons.push(new Gun(bullets, _this));
         return _this;
     }
     Character.prototype.takeDamage = function (amount) {

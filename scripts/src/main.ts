@@ -70,6 +70,29 @@ class NPcSpawner extends CenteredShape {
 
 }
 
+class Weapon {
+    bullets: Array<Bullet>;
+    owner: Character;
+
+    constructor(bullets, owner) {
+        this.bullets = bullets;
+        this.owner = owner;
+    }
+
+    fire(target):void {}
+}
+
+class Gun extends Weapon {
+    constructor(bullets, owner) {
+        super(bullets, owner);
+    }
+
+    fire(target):void {
+        super.fire(target);
+        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map));
+    }
+}
+
 class Ping extends CenteredShape {
     age: number;
     constructor(x, y) {
@@ -760,14 +783,17 @@ class Bullet extends Moveable {
 class Character extends Moveable {
     hp: number;
     bullets: Array<Bullet>;
+    weapons: Array<Weapon>;
 
     constructor(size, x, y, map, bullets, maxHP) {
         super(size, x, y, Math.random() * 360, map);
         this.hp = maxHP;
         this.bullets = bullets;
+        this.weapons = new Array();
+        this.weapons.push(new Gun(bullets, this));
     }
     fire = function(target) {
-        this.bullets.push(new Bullet(this.x, this.y, target, this.map));
+        this.weapons[0].fire(target);
     }
     step = function() {}
     takeDamage(amount):void {
