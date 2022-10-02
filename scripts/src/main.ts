@@ -492,7 +492,7 @@ class World {
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
                 this.nPCs.push(new Pirate(  this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
+                this.nPCs.push(new Spewer(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
                 this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets));
                 this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food));
             }
@@ -974,7 +974,7 @@ class Chicken extends NPC {
     }
 }
 
-class Bomb extends NPC {
+class Spewer extends NPC {
     didIgnite: boolean;
     igniteAge: number;
     isGrowing: boolean;
