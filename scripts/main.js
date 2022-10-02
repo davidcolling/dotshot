@@ -87,6 +87,17 @@ var Gun = /** @class */ (function (_super) {
     };
     return Gun;
 }(Weapon));
+var ExplodingBulletGun = /** @class */ (function (_super) {
+    __extends(ExplodingBulletGun, _super);
+    function ExplodingBulletGun(bullets, owner) {
+        return _super.call(this, bullets, owner) || this;
+    }
+    ExplodingBulletGun.prototype.fire = function (target) {
+        _super.prototype.fire.call(this, target);
+        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.bullets));
+    };
+    return ExplodingBulletGun;
+}(Weapon));
 var DoubleBarrelGun = /** @class */ (function (_super) {
     __extends(DoubleBarrelGun, _super);
     function DoubleBarrelGun(bullets, owner) {
@@ -654,36 +665,59 @@ var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(x, y, target, map) {
         var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
-        _this.step = function () {
-            if (!this.hasPassedTarget) {
-                var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
-                if (distance > 10) {
-                    this.point(this.target);
-                }
-                else {
-                    this.hasPassedTarget = true;
-                }
-            }
-            this.move(6);
-            this.age++;
-            if (this.age < 80) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
         _this.age = 0;
         _this.target = target;
         _this.hasPassedTarget = false;
         return _this;
     }
+    Bullet.prototype.step = function () {
+        if (!this.hasPassedTarget) {
+            var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
+            if (distance > 10) {
+                this.point(this.target);
+            }
+            else {
+                this.hasPassedTarget = true;
+            }
+        }
+        this.move(6);
+        this.age++;
+        if (this.age < 80) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
     Bullet.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(256, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return Bullet;
 }(Moveable));
+var ExplodingBullet = /** @class */ (function (_super) {
+    __extends(ExplodingBullet, _super);
+    function ExplodingBullet(x, y, target, map, bullets) {
+        var _this = _super.call(this, x, y, target, map) || this;
+        _this.bullets = bullets;
+        return _this;
+    }
+    ExplodingBullet.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.age > 30) {
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map));
+            return false;
+        }
+        return true;
+    };
+    ExplodingBullet.prototype.draw = function (drawWorker, strokeColor) {
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
+    };
+    return ExplodingBullet;
+}(Bullet));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
     function Character(size, x, y, map, bullets, maxHP) {
@@ -730,6 +764,7 @@ var Player = /** @class */ (function (_super) {
             }
         };
         _this.weapons.push(new DoubleBarrelGun(bullets, _this));
+        _this.weapons.push(new ExplodingBulletGun(bullets, _this));
         _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
@@ -1135,6 +1170,12 @@ function recordKey(e) {
             if (game.world.player.weapons.length > 1) {
                 game.world.player.currentWeapon = 1;
             }
+            break;
+        case "3":
+            if (game.world.player.weapons.length > 2) {
+                game.world.player.currentWeapon = 2;
+            }
+            break;
     }
 }
 document.addEventListener('keyup', stopKey);

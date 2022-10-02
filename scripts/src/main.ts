@@ -93,6 +93,17 @@ class Gun extends Weapon {
     }
 }
 
+class ExplodingBulletGun extends Weapon {
+    constructor(bullets, owner) {
+        super(bullets, owner);
+    }
+
+    fire(target):void {
+        super.fire(target);
+        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.bullets));
+    }
+}
+
 class DoubleBarrelGun extends Weapon {
     constructor(bullets, owner) {
         super(bullets, owner);
@@ -769,7 +780,7 @@ class Bullet extends Moveable {
         this.target = target;
         this.hasPassedTarget = false;
     }
-    step = function () {
+    step():boolean {
         if (!this.hasPassedTarget) {
             var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
             if (distance > 10) {
@@ -789,6 +800,31 @@ class Bullet extends Moveable {
     draw(drawWorker, strokeColor):void {
         drawWorker.fill(256, 256);
         super.draw(drawWorker, strokeColor); 
+    }
+}
+
+class ExplodingBullet extends Bullet {
+    bullets: Array<Bullet>;
+
+    constructor(x, y, target, map, bullets) {
+        super(x, y, target, map);
+        this.bullets = bullets;
+    }
+    step():boolean {
+        super.step();
+
+        if (this.age > 30) {
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map));
+            return false;
+        }
+
+        return true;
+    }
+    draw(drawWorker, strokeColor):void {
+        super.draw(drawWorker, strokeColor);
     }
 }
 
@@ -825,6 +861,7 @@ class Player extends Character{
     constructor(size, x, y, map, bullets) {
         super(size, x, y, map, bullets, 32);
         this.weapons.push(new DoubleBarrelGun(bullets, this));
+        this.weapons.push(new ExplodingBulletGun(bullets, this));
         this.initialSize = size;
         this.isFiring = true; 
         this.isMoving = false;
@@ -1296,6 +1333,12 @@ function recordKey(e) {
             if (game.world.player.weapons.length > 1) {
                 game.world.player.currentWeapon = 1;
             }
+            break;
+        case "3":
+            if (game.world.player.weapons.length > 2) {
+                game.world.player.currentWeapon = 2;
+            }
+            break;           
     }
 }
 
