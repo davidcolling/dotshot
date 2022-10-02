@@ -116,6 +116,19 @@ class DoubleBarrelGun extends Weapon {
     }
 }
 
+class Cannon extends Weapon {
+    constructor(bullets, owner) {
+        super(bullets, owner);
+    }
+
+    fire(target):void {
+        super.fire(target);
+        var b = new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map);
+        b.size = 5; // should this be allowed? i like private fields and getters.
+        this.bullets.push(b);
+    }
+}
+
 class Ping extends CenteredShape {
     age: number;
     constructor(x, y) {
@@ -862,6 +875,7 @@ class Player extends Character{
         super(size, x, y, map, bullets, 32);
         this.weapons.push(new DoubleBarrelGun(bullets, this));
         this.weapons.push(new ExplodingBulletGun(bullets, this));
+        this.weapons.push(new Cannon(bullets, this));
         this.initialSize = size;
         this.isFiring = true; 
         this.isMoving = false;
@@ -1338,7 +1352,13 @@ function recordKey(e) {
             if (game.world.player.weapons.length > 2) {
                 game.world.player.currentWeapon = 2;
             }
-            break;           
+            break;   
+        case "4":
+            if (game.world.player.weapons.length > 3) {
+                game.world.player.currentWeapon = 3;
+            }
+            break; 
+              
     }
 }
 

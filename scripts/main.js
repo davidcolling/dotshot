@@ -110,6 +110,19 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     };
     return DoubleBarrelGun;
 }(Weapon));
+var Cannon = /** @class */ (function (_super) {
+    __extends(Cannon, _super);
+    function Cannon(bullets, owner) {
+        return _super.call(this, bullets, owner) || this;
+    }
+    Cannon.prototype.fire = function (target) {
+        _super.prototype.fire.call(this, target);
+        var b = new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map);
+        b.size = 5; // should this be allowed? i like private fields and getters.
+        this.bullets.push(b);
+    };
+    return Cannon;
+}(Weapon));
 var Ping = /** @class */ (function (_super) {
     __extends(Ping, _super);
     function Ping(x, y) {
@@ -537,7 +550,7 @@ var World = /** @class */ (function () {
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++) {
                 this.nPCs.push(new Pirate(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
-                this.nPCs.push(new Bomb(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
+                this.nPCs.push(new Spewer(this.map.width * Math.random(), (this.map.height / 2) * Math.random(), this.map, this.bullets, this.player));
                 this.nPCs.push(new Mine(this.map.width * Math.random(), (this.map.height) * Math.random(), this.map, this.bullets));
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
@@ -765,6 +778,7 @@ var Player = /** @class */ (function (_super) {
         };
         _this.weapons.push(new DoubleBarrelGun(bullets, _this));
         _this.weapons.push(new ExplodingBulletGun(bullets, _this));
+        _this.weapons.push(new Cannon(bullets, _this));
         _this.initialSize = size;
         _this.isFiring = true;
         _this.isMoving = false;
@@ -851,9 +865,9 @@ var Chicken = /** @class */ (function (_super) {
     };
     return Chicken;
 }(NPC));
-var Bomb = /** @class */ (function (_super) {
-    __extends(Bomb, _super);
-    function Bomb(x, y, map, bullets, target) {
+var Spewer = /** @class */ (function (_super) {
+    __extends(Spewer, _super);
+    function Spewer(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
         _this.step = function () {
             if (this.didIgnite) {
@@ -927,13 +941,13 @@ var Bomb = /** @class */ (function (_super) {
         _this.isGrowing = true;
         return _this;
     }
-    Bomb.prototype.draw = function (drawWorker, strokeColor) {
+    Spewer.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
-    return Bomb;
+    return Spewer;
 }(NPC));
 ;
 var Pirate = /** @class */ (function (_super) {
@@ -1174,6 +1188,11 @@ function recordKey(e) {
         case "3":
             if (game.world.player.weapons.length > 2) {
                 game.world.player.currentWeapon = 2;
+            }
+            break;
+        case "4":
+            if (game.world.player.weapons.length > 3) {
+                game.world.player.currentWeapon = 3;
             }
             break;
     }
