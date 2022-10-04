@@ -520,16 +520,6 @@ var World = /** @class */ (function () {
             }
             return difference;
         };
-        this.isShotByAny = function (obj, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] != null) {
-                    if (this.isShotBy(obj, arr[i])) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        };
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -566,6 +556,17 @@ var World = /** @class */ (function () {
             this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
         }
     }
+    World.prototype.isShotByAny = function (obj, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] != null) {
+                if (this.isShotBy(obj, arr[i])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    ;
     // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
     // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
     // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David

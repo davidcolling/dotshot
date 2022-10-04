@@ -683,7 +683,7 @@ class World {
         return difference
     }
 
-    isShotByAny = function(obj, arr) {
+    isShotByAny(obj, arr):boolean {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
