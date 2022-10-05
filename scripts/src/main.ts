@@ -919,7 +919,9 @@ class Player extends Character{
     }
     takeDamage(amount):void {
         super.takeDamage(amount);
-        this.size = 30;
+	if (amount > 0) {
+            this.size = 30;
+	}
     }
     
 }

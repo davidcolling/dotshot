@@ -804,7 +804,9 @@ var Player = /** @class */ (function (_super) {
     };
     Player.prototype.takeDamage = function (amount) {
         _super.prototype.takeDamage.call(this, amount);
-        this.size = 30;
+        if (amount > 0) {
+            this.size = 30;
+        }
     };
     return Player;
 }(Character));
