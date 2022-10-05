@@ -682,7 +682,7 @@ class World {
     }
 
     collectDamage(obj, arr):number {
-    var totalDamage = 0;
+        var totalDamage = 0;
 
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
