@@ -117,9 +117,7 @@ var Cannon = /** @class */ (function (_super) {
     }
     Cannon.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        var b = new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map);
-        b.size = 5; // should this be allowed? i like private fields and getters.
-        this.bullets.push(b);
+        this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map));
     };
     return Cannon;
 }(Weapon));
@@ -417,7 +415,7 @@ var World = /** @class */ (function () {
             if (this.player != null) {
                 this.player.control(this.drawWorker);
                 this.player.step();
-                var damage = this.isShotByAny(this.player, this.bullets);
+                var damage = this.collectDamage(this.player, this.bullets);
                 this.player.takeDamage(damage);
                 if (damage) {
                     this.healthBar.hp = this.player.hp;
@@ -451,7 +449,7 @@ var World = /** @class */ (function () {
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
                     //check for shots
-                    var damage = this.isShotByAny(this.nPCs[i], this.bullets);
+                    var damage = this.collectDamage(this.nPCs[i], this.bullets);
                     this.nPCs[i].takeDamage(damage);
                     if (this.player != null) {
                         var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
@@ -556,7 +554,7 @@ var World = /** @class */ (function () {
             this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
         }
     }
-    World.prototype.isShotByAny = function (obj, arr) {
+    World.prototype.collectDamage = function (obj, arr) {
         var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
@@ -733,6 +731,16 @@ var ExplodingBullet = /** @class */ (function (_super) {
         _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
     return ExplodingBullet;
+}(Bullet));
+var CannonBall = /** @class */ (function (_super) {
+    __extends(CannonBall, _super);
+    function CannonBall(x, y, target, map) {
+        var _this = _super.call(this, x, y, target, map) || this;
+        _this.size = 7;
+        _this.maxForce = 10;
+        return _this;
+    }
+    return CannonBall;
 }(Bullet));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);

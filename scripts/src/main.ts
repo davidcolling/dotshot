@@ -123,9 +123,7 @@ class Cannon extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        var b = new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map);
-        b.size = 5; // should this be allowed? i like private fields and getters.
-        this.bullets.push(b);
+        this.bullets.push(new CannonBall(this.owner.x+5, this.owner.y, target, this.owner.map));
     }
 }
 
@@ -844,6 +842,14 @@ class ExplodingBullet extends Bullet {
     draw(drawWorker, strokeColor):void {
         super.draw(drawWorker, strokeColor);
     }
+}
+
+class CannonBall extends Bullet {
+	constructor(x, y, target, map) {
+		super(x, y, target, map);
+		this.size = 7;
+		this.maxForce = 10;
+	}
 }
 
 class Character extends Moveable {
