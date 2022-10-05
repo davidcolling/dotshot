@@ -687,7 +687,7 @@ class World {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-            totalDamage += arr[i].maxForce;
+                    totalDamage += arr[i].maxForce;
                 }
             }
         }
