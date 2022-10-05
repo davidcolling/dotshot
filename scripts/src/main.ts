@@ -535,7 +535,7 @@ class World {
         if (this.player != null) {
             this.player.control(this.drawWorker);
             this.player.step();
-	    var damage = this.isShotByAny(this.player, this.bullets);
+	    var damage = this.collectDamage(this.player, this.bullets);
             this.player.takeDamage(damage);
 	    if (damage) {
                 this.healthBar.hp = this.player.hp;
@@ -571,7 +571,7 @@ class World {
             if (this.nPCs[i] != null) {
 
                 //check for shots
-                var damage = this.isShotByAny(this.nPCs[i], this.bullets);
+                var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
 
                 if (this.player != null) {
@@ -683,7 +683,7 @@ class World {
         return difference
     }
 
-    isShotByAny(obj, arr):number {
+    collectDamage(obj, arr):number {
 	var totalDamage = 0;
 
         for (var i = 0; i < arr.length; i++) {
