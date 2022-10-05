@@ -533,9 +533,9 @@ class World {
         if (this.player != null) {
             this.player.control(this.drawWorker);
             this.player.step();
-	    var damage = this.collectDamage(this.player, this.bullets);
+            var damage = this.collectDamage(this.player, this.bullets);
             this.player.takeDamage(damage);
-	    if (damage) {
+            if (damage) {
                 this.healthBar.hp = this.player.hp;
             }
             this.player.draw(this.drawWorker, this.strokeColor);
@@ -682,12 +682,12 @@ class World {
     }
 
     collectDamage(obj, arr):number {
-	var totalDamage = 0;
+    var totalDamage = 0;
 
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-			totalDamage += arr[i].maxForce;
+            totalDamage += arr[i].maxForce;
                 }
             }
         }
@@ -791,7 +791,7 @@ class Bullet extends Moveable {
 
     constructor(x, y, target, map) {
         super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
-	this.maxForce = 1;
+    this.maxForce = 1;
         this.age = 0;
         this.target = target;
         this.hasPassedTarget = false;
@@ -845,11 +845,11 @@ class ExplodingBullet extends Bullet {
 }
 
 class CannonBall extends Bullet {
-	constructor(x, y, target, map) {
-		super(x, y, target, map);
-		this.size = 7;
-		this.maxForce = 10;
-	}
+    constructor(x, y, target, map) {
+        super(x, y, target, map);
+        this.size = 7;
+        this.maxForce = 10;
+    }
 }
 
 class Character extends Moveable {
@@ -919,9 +919,9 @@ class Player extends Character{
     }
     takeDamage(amount):void {
         super.takeDamage(amount);
-	if (amount > 0) {
+    if (amount > 0) {
             this.size = 30;
-	}
+    }
     }
     
 }
