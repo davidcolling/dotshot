@@ -73,13 +73,21 @@ class NPcSpawner extends CenteredShape {
 class Weapon {
     bullets: Array<Bullet>;
     owner: Character;
+    counter:  number;
+    lastCount: number;
 
     constructor(bullets, owner) {
         this.bullets = bullets;
         this.owner = owner;
+        this.counter = 0;
+        this.lastCount = 0;
     }
 
     fire(target):void {}
+
+    step():void {
+        this.counter++;
+    }
 }
 
 class Gun extends Weapon {
@@ -117,13 +125,22 @@ class DoubleBarrelGun extends Weapon {
 }
 
 class Cannon extends Weapon {
+    hasShot:boolean;
+
     constructor(bullets, owner) {
         super(bullets, owner);
+        this.hasShot = false;
     }
 
     fire(target):void {
-        super.fire(target);
-        this.bullets.push(new CannonBall(this.owner.x+5, this.owner.y, target, this.owner.map, this.owner));
+        if (!this.hasShot || this.counter - this.lastCount > 35) {
+            if (!this.hasShot) {
+                this.hasShot = true;
+            }
+            super.fire(target);
+            this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+            this.lastCount = this.counter;
+        }
     }
 }
 
@@ -873,7 +890,13 @@ class Character extends Moveable {
     fire = function(target) {
         this.weapons[this.currentWeapon].fire(target);
     }
-    step = function() {}
+    step():void {
+        for (var i = 0; i < this.weapons.length; i++) {
+            if (null != this.weapons[i]){
+                this.weapons[i].step();
+            }
+        }
+    }
     takeDamage(amount):void {
         this.hp -= amount;
     };
@@ -897,8 +920,9 @@ class Player extends Character{
         this.firingAge = 0;
         this.enemiesKilled = 0;
     }
-    step = function () {
-        if (this.size != this.initalSize) {
+    step():void {
+        super.step();
+        if (this.size != this.initialSize) {
             this.size = this.initialSize;
         }
     }
@@ -986,7 +1010,8 @@ class Chicken extends NPC {
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
     }    
-    step = function () {
+    step():void {
+        super.step();
         if(this.hp <= 0) {
             this.food.push(new Food(this.x, this.y));
         }
@@ -1027,7 +1052,8 @@ class Spewer extends NPC {
             strokeColor.a, 
         );            
     }
-    step = function () {
+    step():void {
+        super.step();
         if (this.didIgnite) {
             this.igniteAge++;
             if (this.igniteAge > 100) {
@@ -1115,7 +1141,8 @@ class Pirate extends NPC {
             strokeColor.a, 
         );            
     }
-    step = function () {
+    step():void {
+        super.step();
         this.weaponCooldownCounter++;
         this.decideDraw();
     }
@@ -1149,7 +1176,8 @@ class LoadingActor extends NPC {
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
     }
-    step = function () {
+    step():void {   
+        super.step();
         if (this.direction < 360) {
             this.direction += 3;
         } else {
@@ -1223,7 +1251,8 @@ class Mine extends NPC {
     }
     idle = function () { }
     attack = function () { }
-    step = function () {
+    step():void {
+        super.step();
         if (this.hp <= 0) {
             this.explode();
         }

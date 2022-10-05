@@ -72,8 +72,13 @@ var Weapon = /** @class */ (function () {
     function Weapon(bullets, owner) {
         this.bullets = bullets;
         this.owner = owner;
+        this.counter = 0;
+        this.lastCount = 0;
     }
     Weapon.prototype.fire = function (target) { };
+    Weapon.prototype.step = function () {
+        this.counter++;
+    };
     return Weapon;
 }());
 var Gun = /** @class */ (function (_super) {
@@ -113,11 +118,19 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
 var Cannon = /** @class */ (function (_super) {
     __extends(Cannon, _super);
     function Cannon(bullets, owner) {
-        return _super.call(this, bullets, owner) || this;
+        var _this = _super.call(this, bullets, owner) || this;
+        _this.hasShot = false;
+        return _this;
     }
     Cannon.prototype.fire = function (target) {
-        _super.prototype.fire.call(this, target);
-        this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+        if (!this.hasShot || this.counter - this.lastCount > 35) {
+            if (!this.hasShot) {
+                this.hasShot = true;
+            }
+            _super.prototype.fire.call(this, target);
+            this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+            this.lastCount = this.counter;
+        }
     };
     return Cannon;
 }(Weapon));
@@ -752,7 +765,6 @@ var Character = /** @class */ (function (_super) {
         _this.fire = function (target) {
             this.weapons[this.currentWeapon].fire(target);
         };
-        _this.step = function () { };
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
@@ -760,6 +772,13 @@ var Character = /** @class */ (function (_super) {
         _this.currentWeapon = 0;
         return _this;
     }
+    Character.prototype.step = function () {
+        for (var i = 0; i < this.weapons.length; i++) {
+            if (null != this.weapons[i]) {
+                this.weapons[i].step();
+            }
+        }
+    };
     Character.prototype.takeDamage = function (amount) {
         this.hp -= amount;
     };
@@ -770,11 +789,6 @@ var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, x, y, map, bullets) {
         var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
-        _this.step = function () {
-            if (this.size != this.initalSize) {
-                this.size = this.initialSize;
-            }
-        };
         _this.control = function (drawWorker) {
             this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
             if (this.isFiring) {
@@ -800,6 +814,12 @@ var Player = /** @class */ (function (_super) {
         _this.enemiesKilled = 0;
         return _this;
     }
+    Player.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.size != this.initialSize) {
+            this.size = this.initialSize;
+        }
+    };
     Player.prototype.draw = function (drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
@@ -850,24 +870,6 @@ var Chicken = /** @class */ (function (_super) {
     __extends(Chicken, _super);
     function Chicken(x, y, map, food) {
         var _this = _super.call(this, 5, x, y, map, null, 8, null, 1000, 0, 200) || this;
-        _this.step = function () {
-            if (this.hp <= 0) {
-                this.food.push(new Food(this.x, this.y));
-            }
-            if (this.seesPlayer) {
-                if (this.fleeAge < this.fleeLife) {
-                    this.fleeAge++;
-                }
-                else {
-                    this.fleeAge = 0;
-                    this.direction = Math.random() * 360;
-                }
-                this.move(2);
-            }
-            else {
-                this.idle();
-            }
-        };
         _this.isRunning = false;
         _this.fleeAge = 0;
         _this.fleeLife = 20;
@@ -879,21 +881,31 @@ var Chicken = /** @class */ (function (_super) {
         drawWorker.fill(shade, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
     };
+    Chicken.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.hp <= 0) {
+            this.food.push(new Food(this.x, this.y));
+        }
+        if (this.seesPlayer) {
+            if (this.fleeAge < this.fleeLife) {
+                this.fleeAge++;
+            }
+            else {
+                this.fleeAge = 0;
+                this.direction = Math.random() * 360;
+            }
+            this.move(2);
+        }
+        else {
+            this.idle();
+        }
+    };
     return Chicken;
 }(NPC));
 var Spewer = /** @class */ (function (_super) {
     __extends(Spewer, _super);
     function Spewer(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.step = function () {
-            if (this.didIgnite) {
-                this.igniteAge++;
-                if (this.igniteAge > 100) {
-                    this.explode();
-                }
-            }
-            this.decideDraw();
-        };
         _this.explode = function () {
             this.fire(new Coord(this.target.x, this.target.y));
             this.fire(new Coord(this.target.x + 1, this.target.y + 1));
@@ -963,6 +975,16 @@ var Spewer = /** @class */ (function (_super) {
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
+    Spewer.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.didIgnite) {
+            this.igniteAge++;
+            if (this.igniteAge > 100) {
+                this.explode();
+            }
+        }
+        this.decideDraw();
+    };
     return Spewer;
 }(NPC));
 ;
@@ -970,10 +992,6 @@ var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
     function Pirate(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.step = function () {
-            this.weaponCooldownCounter++;
-            this.decideDraw();
-        };
         _this.attack = function () {
             this.point(this.lastSeenPlayerCoord);
             this.move(0.5);
@@ -1000,6 +1018,11 @@ var Pirate = /** @class */ (function (_super) {
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
+    Pirate.prototype.step = function () {
+        _super.prototype.step.call(this);
+        this.weaponCooldownCounter++;
+        this.decideDraw();
+    };
     return Pirate;
 }(NPC));
 ;
@@ -1007,20 +1030,6 @@ var LoadingActor = /** @class */ (function (_super) {
     __extends(LoadingActor, _super);
     function LoadingActor(x, y, map, bullets) {
         var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.step = function () {
-            if (this.direction < 360) {
-                this.direction += 3;
-            }
-            else {
-                this.direction = 0;
-            }
-            this.move(3);
-            if (this.stepCount % 8 == 0) {
-                var bulletRelative = World.calculateCoordinate(10, this.direction);
-                this.fire(new Coord(this.x + bulletRelative.x, this.y + bulletRelative.y));
-            }
-            this.stepCount++;
-        };
         _this.stepCount = 0;
         return _this;
     }
@@ -1028,6 +1037,21 @@ var LoadingActor = /** @class */ (function (_super) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
+    };
+    LoadingActor.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.direction < 360) {
+            this.direction += 3;
+        }
+        else {
+            this.direction = 0;
+        }
+        this.move(3);
+        if (this.stepCount % 8 == 0) {
+            var bulletRelative = World.calculateCoordinate(10, this.direction);
+            this.fire(new Coord(this.x + bulletRelative.x, this.y + bulletRelative.y));
+        }
+        this.stepCount++;
     };
     return LoadingActor;
 }(NPC));
@@ -1068,11 +1092,6 @@ var Mine = /** @class */ (function (_super) {
         };
         _this.idle = function () { };
         _this.attack = function () { };
-        _this.step = function () {
-            if (this.hp <= 0) {
-                this.explode();
-            }
-        };
         return _this;
     }
     Mine.prototype.draw = function (drawWorker, strokeColor) {
@@ -1080,6 +1099,12 @@ var Mine = /** @class */ (function (_super) {
         drawWorker.fill(128, 128, 128, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
+    };
+    Mine.prototype.step = function () {
+        _super.prototype.step.call(this);
+        if (this.hp <= 0) {
+            this.explode();
+        }
     };
     return Mine;
 }(NPC));
