@@ -535,8 +535,9 @@ class World {
         if (this.player != null) {
             this.player.control(this.drawWorker);
             this.player.step();
-            if (this.isShotByAny(this.player, this.bullets)) {
-                this.player.takeDamage(1);
+	    var damage = this.isShotByAny(this.player, this.bullets);
+            this.player.takeDamage(damage);
+	    if (damage) {
                 this.healthBar.hp = this.player.hp;
             }
             this.player.draw(this.drawWorker, this.strokeColor);
@@ -570,9 +571,8 @@ class World {
             if (this.nPCs[i] != null) {
 
                 //check for shots
-                if (this.isShotByAny(this.nPCs[i], this.bullets)) {
-                    this.nPCs[i].takeDamage(1);
-                }
+                var damage = this.isShotByAny(this.nPCs[i], this.bullets);
+                this.nPCs[i].takeDamage(damage);
 
                 if (this.player != null) {
                     var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
@@ -683,15 +683,18 @@ class World {
         return difference
     }
 
-    isShotByAny(obj, arr):boolean {
+    isShotByAny(obj, arr):number {
+	var totalDamage = 0;
+
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-                    return true
+			totalDamage += arr[i].maxForce;
                 }
             }
         }
-        return false;
+
+        return totalDamage;
     };
 
     // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
@@ -786,9 +789,11 @@ class Bullet extends Moveable {
     age: number;
     target: Coord;
     hasPassedTarget: boolean;
+    maxForce:number;
 
     constructor(x, y, target, map) {
         super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
+	this.maxForce = 1;
         this.age = 0;
         this.target = target;
         this.hasPassedTarget = false;

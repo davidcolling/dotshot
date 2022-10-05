@@ -417,8 +417,9 @@ var World = /** @class */ (function () {
             if (this.player != null) {
                 this.player.control(this.drawWorker);
                 this.player.step();
-                if (this.isShotByAny(this.player, this.bullets)) {
-                    this.player.takeDamage(1);
+                var damage = this.isShotByAny(this.player, this.bullets);
+                this.player.takeDamage(damage);
+                if (damage) {
                     this.healthBar.hp = this.player.hp;
                 }
                 this.player.draw(this.drawWorker, this.strokeColor);
@@ -450,9 +451,8 @@ var World = /** @class */ (function () {
             for (var i = 0; i < this.nPCs.length; i++) {
                 if (this.nPCs[i] != null) {
                     //check for shots
-                    if (this.isShotByAny(this.nPCs[i], this.bullets)) {
-                        this.nPCs[i].takeDamage(1);
-                    }
+                    var damage = this.isShotByAny(this.nPCs[i], this.bullets);
+                    this.nPCs[i].takeDamage(damage);
                     if (this.player != null) {
                         var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
                         this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
@@ -557,14 +557,15 @@ var World = /** @class */ (function () {
         }
     }
     World.prototype.isShotByAny = function (obj, arr) {
+        var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-                    return true;
+                    totalDamage += arr[i].maxForce;
                 }
             }
         }
-        return false;
+        return totalDamage;
     };
     ;
     // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
@@ -679,6 +680,7 @@ var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(x, y, target, map) {
         var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
+        _this.maxForce = 1;
         _this.age = 0;
         _this.target = target;
         _this.hasPassedTarget = false;
