@@ -89,7 +89,7 @@ class Gun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner));
     }
 }
 
@@ -100,7 +100,7 @@ class ExplodingBulletGun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.bullets));
+        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner, this.bullets));
     }
 }
 
@@ -111,8 +111,8 @@ class DoubleBarrelGun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map));
-        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map, this.owner));
     }
 }
 
@@ -123,7 +123,7 @@ class Cannon extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new CannonBall(this.owner.x+5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new CannonBall(this.owner.x+5, this.owner.y, target, this.owner.map, this.owner));
     }
 }
 
@@ -687,7 +687,9 @@ class World {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-                    totalDamage += arr[i].maxForce;
+                    if (obj != arr[i].owner) {
+                        totalDamage += arr[i].maxForce;
+                    }
                 }
             }
         }
@@ -788,10 +790,12 @@ class Bullet extends Moveable {
     target: Coord;
     hasPassedTarget: boolean;
     maxForce:number;
+    owner: Character;
 
-    constructor(x, y, target, map) {
+    constructor(x, y, target, map, owner) {
         super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
-    this.maxForce = 1;
+        this.maxForce = 1;
+        this.owner = owner;
         this.age = 0;
         this.target = target;
         this.hasPassedTarget = false;
@@ -822,18 +826,18 @@ class Bullet extends Moveable {
 class ExplodingBullet extends Bullet {
     bullets: Array<Bullet>;
 
-    constructor(x, y, target, map, bullets) {
-        super(x, y, target, map);
+    constructor(x, y, target, map, owner, bullets) {
+        super(x, y, target, map, owner);
         this.bullets = bullets;
     }
     step():boolean {
         super.step();
 
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map, this.owner));
             return false;
         }
 
@@ -845,8 +849,8 @@ class ExplodingBullet extends Bullet {
 }
 
 class CannonBall extends Bullet {
-    constructor(x, y, target, map) {
-        super(x, y, target, map);
+    constructor(x, y, target, map, owner) {
+        super(x, y, target, map, owner);
         this.size = 7;
         this.maxForce = 10;
     }

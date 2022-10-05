@@ -83,7 +83,7 @@ var Gun = /** @class */ (function (_super) {
     }
     Gun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner));
     };
     return Gun;
 }(Weapon));
@@ -94,7 +94,7 @@ var ExplodingBulletGun = /** @class */ (function (_super) {
     }
     ExplodingBulletGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.bullets));
+        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner, this.bullets));
     };
     return ExplodingBulletGun;
 }(Weapon));
@@ -105,8 +105,8 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map));
-        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map, this.owner));
     };
     return DoubleBarrelGun;
 }(Weapon));
@@ -117,7 +117,7 @@ var Cannon = /** @class */ (function (_super) {
     }
     Cannon.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map));
+        this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
     };
     return Cannon;
 }(Weapon));
@@ -559,7 +559,9 @@ var World = /** @class */ (function () {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i])) {
-                    totalDamage += arr[i].maxForce;
+                    if (obj != arr[i].owner) {
+                        totalDamage += arr[i].maxForce;
+                    }
                 }
             }
         }
@@ -676,9 +678,10 @@ var Moveable = /** @class */ (function (_super) {
 }(CenteredShape));
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
-    function Bullet(x, y, target, map) {
+    function Bullet(x, y, target, map, owner) {
         var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
         _this.maxForce = 1;
+        _this.owner = owner;
         _this.age = 0;
         _this.target = target;
         _this.hasPassedTarget = false;
@@ -711,18 +714,18 @@ var Bullet = /** @class */ (function (_super) {
 }(Moveable));
 var ExplodingBullet = /** @class */ (function (_super) {
     __extends(ExplodingBullet, _super);
-    function ExplodingBullet(x, y, target, map, bullets) {
-        var _this = _super.call(this, x, y, target, map) || this;
+    function ExplodingBullet(x, y, target, map, owner, bullets) {
+        var _this = _super.call(this, x, y, target, map, owner) || this;
         _this.bullets = bullets;
         return _this;
     }
     ExplodingBullet.prototype.step = function () {
         _super.prototype.step.call(this);
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map, this.owner));
             return false;
         }
         return true;
@@ -734,8 +737,8 @@ var ExplodingBullet = /** @class */ (function (_super) {
 }(Bullet));
 var CannonBall = /** @class */ (function (_super) {
     __extends(CannonBall, _super);
-    function CannonBall(x, y, target, map) {
-        var _this = _super.call(this, x, y, target, map) || this;
+    function CannonBall(x, y, target, map, owner) {
+        var _this = _super.call(this, x, y, target, map, owner) || this;
         _this.size = 7;
         _this.maxForce = 10;
         return _this;
