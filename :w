@@ -54,7 +54,7 @@ class NPcSpawner extends CenteredShape {
     }
     step():void {
         this.counter++;
-        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location.x, this.world.player.location.y, this.location.x, this.location.y))) == 0) {
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.x, this.world.player.y, this.location.x, this.location.y))) == 0) {
             this.world.nPCs.push(new Pirate(this.location.x, this.location.y,  this.world.map, this.world.bullets, this.world.player));
         }
     }
@@ -95,7 +95,7 @@ class Gun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner));
     }
 }
 
@@ -106,7 +106,7 @@ class ExplodingBulletGun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new ExplodingBullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner, this.bullets));
+        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner, this.bullets));
     }
 }
 
@@ -117,8 +117,8 @@ class DoubleBarrelGun extends Weapon {
 
     fire(target):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(this.owner.location.x - 5, this.owner.location.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map, this.owner));
     }
 }
 
@@ -136,7 +136,7 @@ class Cannon extends Weapon {
                 this.hasShot = true;
             }
             super.fire(target);
-            this.bullets.push(new CannonBall(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
+            this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
             this.lastCount = this.counter;
         }
     }
@@ -378,12 +378,12 @@ class GridMap extends Drawable {
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
                                 if (
-                                    coordinateTracker.location.x != previousCoord.x ||
-                                    coordinateTracker.location.y != previousCoord.y
+                                    coordinateTracker.x != previousCoord.x ||
+                                    coordinateTracker.y != previousCoord.y
                                 ) {
                                     currentDistance++;
-                                    previousCoord.x = coordinateTracker.location.x;
-                                    previousCoord.y = coordinateTracker.location.y;
+                                    previousCoord.x = coordinateTracker.x;
+                                    previousCoord.y = coordinateTracker.y;
                                 }
 
                                 moveCount++;
@@ -391,7 +391,7 @@ class GridMap extends Drawable {
                                     break;
                                 }
 
-                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.location.x, coordinateTracker.location.y), gridSquareSize);
+                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
                                 this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
 
@@ -562,7 +562,7 @@ class World {
                 if (this.food[i] != null) {
                     this.food[i].draw(this.drawWorker, this.strokeColor);
                     this.food[i].step();
-                    if (5 > World.calculateDistance(this.player.location.x, this.player.location.y, this.food[i].location.x, this.food[i].location.y)) {
+                    if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
                         if (this.player.hp < this.healthBar.max) {
                             this.food[i] = null;
                             this.player.hp += 10;
@@ -572,12 +572,12 @@ class World {
                 }
             }
             if (this.frameCount % 32 == 0) {
-                this.pings.push(new Ping(this.player.location.x, this.player.location.y));
+                this.pings.push(new Ping(this.player.x, this.player.y));
             }
         }
 
         if (this.player != null) {
-            var playerIndex = this.map.getGridIndex(new Coord(this.player.location.x, this.player.location.y));
+            var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
         }
         // NPCs
         for (var i = 0; i < this.nPCs.length; i++) {
@@ -588,10 +588,10 @@ class World {
                 this.nPCs[i].takeDamage(damage);
 
                 if (this.player != null) {
-                    var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].location.x, this.nPCs[i].location.y));
+                    var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
                     this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
                     if (this.nPCs[i].seesPlayer) {
-                        this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.location.x, this.player.location.y);
+                        this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
                     }
                 }
 
@@ -654,13 +654,13 @@ class World {
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
     isShotBy = function(obj1, obj2) {
-        var isClose =  3 > World.calculateDistance(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y) 
+        var isClose =  3 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y) 
         var isInFrontOf = this.isInFrontOf(obj1, obj2);
         return isClose && isInFrontOf;
     }
 
     isInFrontOf = function(obj1, obj2) {
-        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
+        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
     }
 
     static calculateDirection = function (x1, y1, x2, y2) {
@@ -779,7 +779,7 @@ class Moveable extends CenteredShape {
         this.map = map;
     }
     point = function (target) {
-        this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
+        this.direction = World.calculateDirection(this.location.x, this.location.y, target.location.x, target.location.y);
     }
     move = function (velocity) {
         // this function can be understood in two basic parts
@@ -817,7 +817,7 @@ class Bullet extends Moveable {
     }
     step():boolean {
         if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.location.x, this.location.y, this.target.x, this.target.y);
+            var distance = World.calculateDistance(this.location.x, this.location.y, this.target.location.x, this.target.location.y);
             if (distance > 10) {
                 this.point(this.target);
             } else {
@@ -849,10 +849,11 @@ class ExplodingBullet extends Bullet {
         super.step();
 
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y - 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map, this.owner));
+
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map, this.owner));
             return false;
         }
 
@@ -1011,7 +1012,7 @@ class Chicken extends NPC {
     step():void {
         super.step();
         if(this.hp <= 0) {
-            this.food.push(new Food(this.location.x, this.location.y));
+            this.food.push(new Food(this.x, this.y));
         }
         if (this.seesPlayer) {
             if (this.fleeAge < this.fleeLife) {
@@ -1061,16 +1062,16 @@ class Spewer extends NPC {
         this.decideDraw();
     }
     explode = function () {
-        this.fire(new Coord(this.target.location.x, this.target.location.y));
+        this.fire(new Coord(this.target.x, this.target.y));
 
-        this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
-        this.fire(new Coord(this.target.location.x - 1, this.target.location.y - 1));
+        this.fire(new Coord(this.target.x + 1, this.target.y + 1));
+        this.fire(new Coord(this.target.x - 1, this.target.y - 1));
 
-        this.fire(new Coord(this.target.location.x + 2, this.target.location.y + 2));
-        this.fire(new Coord(this.target.location.x - 2, this.target.location.y - 2));
+        this.fire(new Coord(this.target.x + 2, this.target.y + 2));
+        this.fire(new Coord(this.target.x - 2, this.target.y - 2));
 
-        this.fire(new Coord(this.target.location.x + 3, this.target.location.y + 3));
-        this.fire(new Coord(this.target.location.x - 3, this.target.location.y - 3));
+        this.fire(new Coord(this.target.x + 3, this.target.y + 3));
+        this.fire(new Coord(this.target.x - 3, this.target.y - 3));
         this.hp = 0;
     }
     // animation for when its about to explode
@@ -1092,7 +1093,7 @@ class Spewer extends NPC {
         }
     }
     attack = function () {
-        var distance = World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+        var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
         var willMove = true;
         if (this.seesPlayer) {
             if ( distance < 300 ) {
@@ -1149,11 +1150,11 @@ class Pirate extends NPC {
         this.move(0.5);
         if (this.seesPlayer) {
             if (this.weaponCooldownCounter % 16 == 0) {
-                this.fire(new Coord(this.target.location.x, this.target.location.y));
+                this.fire(new Coord(this.target.x, this.target.y));
             }
         }
         if (this.isHunting) {
-            if (0 != World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+            if (0 != World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
                 this.isHunting = false;
             }
         } else {
@@ -1184,7 +1185,7 @@ class LoadingActor extends NPC {
         this.move(3);
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.fire(new Coord(this.location.x + bulletRelative.x, this.location.y + bulletRelative.y));
+            this.fire(new Coord(this.x + bulletRelative.x, this.y + bulletRelative.y));
         }
         this.stepCount++;
     }
@@ -1207,10 +1208,10 @@ class Mine extends NPC {
     }
     explode = function () {
         var directions = Array();
-        directions.push(new Coord(this.location.x, this.location.y - 300));
-        directions.push(new Coord(this.location.x + 300, this.location.y));
-        directions.push(new Coord(this.location.x, this.location.y + 300));
-        directions.push(new Coord(this.location.x - 300, this.location.y));
+        directions.push(new Coord(this.x, this.y - 300));
+        directions.push(new Coord(this.x + 300, this.y));
+        directions.push(new Coord(this.x, this.y + 300));
+        directions.push(new Coord(this.x - 300, this.y));
 
         for(var i = 0; i < directions.length; i++) {
             this.fire(directions[i]);

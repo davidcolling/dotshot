@@ -40,12 +40,11 @@ var CenteredShape = /** @class */ (function (_super) {
     function CenteredShape(size, x, y) {
         var _this = _super.call(this) || this;
         _this.size = size;
-        _this.x = x;
-        _this.y = y;
+        _this.location = new Coord(x, y);
         return _this;
     }
     CenteredShape.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.circle(this.x, this.y, this.size);
+        drawWorker.circle(this.location.x, this.location.y, this.size);
     };
     return CenteredShape;
 }(Drawable));
@@ -59,12 +58,12 @@ var NPcSpawner = /** @class */ (function (_super) {
     }
     NPcSpawner.prototype.step = function () {
         this.counter++;
-        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.x, this.world.player.y, this.x, this.y))) == 0) {
-            this.world.nPCs.push(new Pirate(this.x, this.y, this.world.map, this.world.bullets, this.world.player));
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location.x, this.world.player.location.y, this.location.x, this.location.y))) == 0) {
+            this.world.nPCs.push(new Pirate(this.location.x, this.location.y, this.world.map, this.world.bullets, this.world.player));
         }
     };
     NPcSpawner.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.circle(this.x, this.y, this.size);
+        drawWorker.circle(this.location.x, this.location.y, this.size);
     };
     return NPcSpawner;
 }(CenteredShape));
@@ -88,7 +87,7 @@ var Gun = /** @class */ (function (_super) {
     }
     Gun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner));
     };
     return Gun;
 }(Weapon));
@@ -99,7 +98,7 @@ var ExplodingBulletGun = /** @class */ (function (_super) {
     }
     ExplodingBulletGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new ExplodingBullet(this.owner.x, this.owner.y, target, this.owner.map, this.owner, this.bullets));
+        this.bullets.push(new ExplodingBullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner, this.bullets));
     };
     return ExplodingBulletGun;
 }(Weapon));
@@ -110,8 +109,8 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(this.owner.x - 5, this.owner.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.x - 5, this.owner.location.y, target, this.owner.map, this.owner));
     };
     return DoubleBarrelGun;
 }(Weapon));
@@ -128,7 +127,7 @@ var Cannon = /** @class */ (function (_super) {
                 this.hasShot = true;
             }
             _super.prototype.fire.call(this, target);
-            this.bullets.push(new CannonBall(this.owner.x + 5, this.owner.y, target, this.owner.map, this.owner));
+            this.bullets.push(new CannonBall(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
             this.lastCount = this.counter;
         }
     };
@@ -364,17 +363,17 @@ var GridMap = /** @class */ (function (_super) {
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
-                                if (coordinateTracker.x != previousCoord.x ||
-                                    coordinateTracker.y != previousCoord.y) {
+                                if (coordinateTracker.location.x != previousCoord.x ||
+                                    coordinateTracker.location.y != previousCoord.y) {
                                     currentDistance++;
-                                    previousCoord.x = coordinateTracker.x;
-                                    previousCoord.y = coordinateTracker.y;
+                                    previousCoord.x = coordinateTracker.location.x;
+                                    previousCoord.y = coordinateTracker.location.y;
                                 }
                                 moveCount++;
                                 if (moveCount > 50) {
                                     break;
                                 }
-                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.x, coordinateTracker.y), gridSquareSize);
+                                var gridCoord = GridMap.getGridIndex(new Coord(coordinateTracker.location.x, coordinateTracker.location.y), gridSquareSize);
                                 _this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
                             }
                             if (currentDistance > furthestDistance) {
@@ -442,7 +441,7 @@ var World = /** @class */ (function () {
                     if (this.food[i] != null) {
                         this.food[i].draw(this.drawWorker, this.strokeColor);
                         this.food[i].step();
-                        if (5 > World.calculateDistance(this.player.x, this.player.y, this.food[i].x, this.food[i].y)) {
+                        if (5 > World.calculateDistance(this.player.location.x, this.player.location.y, this.food[i].location.x, this.food[i].location.y)) {
                             if (this.player.hp < this.healthBar.max) {
                                 this.food[i] = null;
                                 this.player.hp += 10;
@@ -452,11 +451,11 @@ var World = /** @class */ (function () {
                     }
                 }
                 if (this.frameCount % 32 == 0) {
-                    this.pings.push(new Ping(this.player.x, this.player.y));
+                    this.pings.push(new Ping(this.player.location.x, this.player.location.y));
                 }
             }
             if (this.player != null) {
-                var playerIndex = this.map.getGridIndex(new Coord(this.player.x, this.player.y));
+                var playerIndex = this.map.getGridIndex(new Coord(this.player.location.x, this.player.location.y));
             }
             // NPCs
             for (var i = 0; i < this.nPCs.length; i++) {
@@ -465,10 +464,10 @@ var World = /** @class */ (function () {
                     var damage = this.collectDamage(this.nPCs[i], this.bullets);
                     this.nPCs[i].takeDamage(damage);
                     if (this.player != null) {
-                        var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].x, this.nPCs[i].y));
+                        var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].location.x, this.nPCs[i].location.y));
                         this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
                         if (this.nPCs[i].seesPlayer) {
-                            this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.x, this.player.y);
+                            this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.location.x, this.player.location.y);
                         }
                     }
                     this.nPCs[i].step();
@@ -517,12 +516,12 @@ var World = /** @class */ (function () {
         };
         // returns true if obj1 (target) is shot by obj2 (projectile)
         this.isShotBy = function (obj1, obj2) {
-            var isClose = 3 > World.calculateDistance(obj1.x, obj1.y, obj2.x, obj2.y);
+            var isClose = 3 > World.calculateDistance(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y);
             var isInFrontOf = this.isInFrontOf(obj1, obj2);
             return isClose && isInFrontOf;
         };
         this.isInFrontOf = function (obj1, obj2) {
-            return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.x, obj1.y, obj2.x, obj2.y)));
+            return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
         };
         this.calculateDifference = function (direction1, direction2) {
             var difference = direction1 - direction2;
@@ -665,18 +664,18 @@ var Moveable = /** @class */ (function (_super) {
     function Moveable(size, x, y, direction, map) {
         var _this = _super.call(this, size, x, y) || this;
         _this.point = function (target) {
-            this.direction = World.calculateDirection(this.x, this.y, target.x, target.y);
+            this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
         };
         _this.move = function (velocity) {
             // this function can be understood in two basic parts
             // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
             var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-            var newX = this.x + relativeChangeCoordinate.x;
-            var newY = this.y + relativeChangeCoordinate.y;
+            var newX = this.location.x + relativeChangeCoordinate.x;
+            var newY = this.location.y + relativeChangeCoordinate.y;
             // part two determines if the coordinates are somewhere the character can actually go
             if (this.map.isOpen(new Coord(newX, newY))) {
-                this.x = newX;
-                this.y = newY;
+                this.location.x = newX;
+                this.location.y = newY;
                 return true;
             }
             else {
@@ -702,7 +701,7 @@ var Bullet = /** @class */ (function (_super) {
     }
     Bullet.prototype.step = function () {
         if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.x, this.y, this.target.x, this.target.y);
+            var distance = World.calculateDistance(this.location.x, this.location.y, this.target.x, this.target.y);
             if (distance > 10) {
                 this.point(this.target);
             }
@@ -735,10 +734,10 @@ var ExplodingBullet = /** @class */ (function (_super) {
     ExplodingBullet.prototype.step = function () {
         _super.prototype.step.call(this);
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x + 10, this.y - 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.x, this.y, new Coord(this.x - 10, this.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y - 10), this.map, this.owner));
             return false;
         }
         return true;
@@ -884,7 +883,7 @@ var Chicken = /** @class */ (function (_super) {
     Chicken.prototype.step = function () {
         _super.prototype.step.call(this);
         if (this.hp <= 0) {
-            this.food.push(new Food(this.x, this.y));
+            this.food.push(new Food(this.location.x, this.location.y));
         }
         if (this.seesPlayer) {
             if (this.fleeAge < this.fleeLife) {
@@ -907,13 +906,13 @@ var Spewer = /** @class */ (function (_super) {
     function Spewer(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
         _this.explode = function () {
-            this.fire(new Coord(this.target.x, this.target.y));
-            this.fire(new Coord(this.target.x + 1, this.target.y + 1));
-            this.fire(new Coord(this.target.x - 1, this.target.y - 1));
-            this.fire(new Coord(this.target.x + 2, this.target.y + 2));
-            this.fire(new Coord(this.target.x - 2, this.target.y - 2));
-            this.fire(new Coord(this.target.x + 3, this.target.y + 3));
-            this.fire(new Coord(this.target.x - 3, this.target.y - 3));
+            this.fire(new Coord(this.target.location.x, this.target.location.y));
+            this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
+            this.fire(new Coord(this.target.location.x - 1, this.target.location.y - 1));
+            this.fire(new Coord(this.target.location.x + 2, this.target.location.y + 2));
+            this.fire(new Coord(this.target.location.x - 2, this.target.location.y - 2));
+            this.fire(new Coord(this.target.location.x + 3, this.target.location.y + 3));
+            this.fire(new Coord(this.target.location.x - 3, this.target.location.y - 3));
             this.hp = 0;
         };
         // animation for when its about to explode
@@ -938,7 +937,7 @@ var Spewer = /** @class */ (function (_super) {
             }
         };
         _this.attack = function () {
-            var distance = World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            var distance = World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
             var willMove = true;
             if (this.seesPlayer) {
                 if (distance < 300) {
@@ -997,11 +996,11 @@ var Pirate = /** @class */ (function (_super) {
             this.move(0.5);
             if (this.seesPlayer) {
                 if (this.weaponCooldownCounter % 16 == 0) {
-                    this.fire(new Coord(this.target.x, this.target.y));
+                    this.fire(new Coord(this.target.location.x, this.target.location.y));
                 }
             }
             if (this.isHunting) {
-                if (0 != World.calculateDistance(this.x, this.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                if (0 != World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
                     this.isHunting = false;
                 }
             }
@@ -1049,7 +1048,7 @@ var LoadingActor = /** @class */ (function (_super) {
         this.move(3);
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.fire(new Coord(this.x + bulletRelative.x, this.y + bulletRelative.y));
+            this.fire(new Coord(this.location.x + bulletRelative.x, this.location.y + bulletRelative.y));
         }
         this.stepCount++;
     };
@@ -1061,10 +1060,10 @@ var Mine = /** @class */ (function (_super) {
         var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
         _this.explode = function () {
             var directions = Array();
-            directions.push(new Coord(this.x, this.y - 300));
-            directions.push(new Coord(this.x + 300, this.y));
-            directions.push(new Coord(this.x, this.y + 300));
-            directions.push(new Coord(this.x - 300, this.y));
+            directions.push(new Coord(this.location.x, this.location.y - 300));
+            directions.push(new Coord(this.location.x + 300, this.location.y));
+            directions.push(new Coord(this.location.x, this.location.y + 300));
+            directions.push(new Coord(this.location.x - 300, this.location.y));
             for (var i = 0; i < directions.length; i++) {
                 this.fire(directions[i]);
                 this.fire(new Coord(directions[i].x + 1, directions[i].y + 1));
