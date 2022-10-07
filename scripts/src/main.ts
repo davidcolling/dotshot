@@ -554,7 +554,7 @@ class World {
                 this.healthBar.hp = this.player.hp;
             }
             this.player.draw(this.drawWorker, this.strokeColor);
-            if (this.player.hp == 0) {
+            if (this.player.hp <= 0) {
                 playerIsDead = true;
             }
             this.healthBar.draw(this.drawWorker, this.strokeColor);
