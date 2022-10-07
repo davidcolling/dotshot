@@ -54,7 +54,7 @@ class NPcSpawner extends CenteredShape {
     }
     step():void {
         this.counter++;
-        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location.x, this.world.player.location.y, this.location.x, this.location.y))) == 0) {
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
             this.world.nPCs.push(new Pirate(this.location.x, this.location.y,  this.world.map, this.world.bullets, this.world.player));
         }
     }
@@ -562,7 +562,7 @@ class World {
                 if (this.food[i] != null) {
                     this.food[i].draw(this.drawWorker, this.strokeColor);
                     this.food[i].step();
-                    if (5 > World.calculateDistance(this.player.location.x, this.player.location.y, this.food[i].location.x, this.food[i].location.y)) {
+                    if (5 > World.calculateDistance(this.player.location, this.food[i].location)) {
                         if (this.player.hp < this.healthBar.max) {
                             this.food[i] = null;
                             this.player.hp += 10;
@@ -648,13 +648,13 @@ class World {
         }
     }
 
-    static calculateDistance = function (x1, y1, x2, y2) {
-        return Math.sqrt( Math.abs(x2 - x1)**2 + Math.abs(y2 - y1)**2 ) 
+    static calculateDistance = function (coord1, coord2) {
+        return Math.sqrt( Math.abs(coord2.x - coord1.x)**2 + Math.abs(coord2.y - coord1.y)**2 ) 
     };
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
     isShotBy = function(obj1, obj2) {
-        var isClose =  3 > World.calculateDistance(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y) 
+        var isClose =  3 > World.calculateDistance(obj1.location, obj2.location) 
         var isInFrontOf = this.isInFrontOf(obj1, obj2);
         return isClose && isInFrontOf;
     }
@@ -817,7 +817,7 @@ class Bullet extends Moveable {
     }
     step():boolean {
         if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.location.x, this.location.y, this.target.x, this.target.y);
+            var distance = World.calculateDistance(this.location, this.target);
             if (distance > 10) {
                 this.point(this.target);
             } else {
@@ -1092,7 +1092,7 @@ class Spewer extends NPC {
         }
     }
     attack = function () {
-        var distance = World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+        var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
         var willMove = true;
         if (this.seesPlayer) {
             if ( distance < 300 ) {
@@ -1153,7 +1153,7 @@ class Pirate extends NPC {
             }
         }
         if (this.isHunting) {
-            if (0 != World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+         if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
                 this.isHunting = false;
             }
         } else {

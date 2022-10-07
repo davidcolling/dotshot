@@ -58,7 +58,7 @@ var NPcSpawner = /** @class */ (function (_super) {
     }
     NPcSpawner.prototype.step = function () {
         this.counter++;
-        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location.x, this.world.player.location.y, this.location.x, this.location.y))) == 0) {
+        if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
             this.world.nPCs.push(new Pirate(this.location.x, this.location.y, this.world.map, this.world.bullets, this.world.player));
         }
     };
@@ -441,7 +441,7 @@ var World = /** @class */ (function () {
                     if (this.food[i] != null) {
                         this.food[i].draw(this.drawWorker, this.strokeColor);
                         this.food[i].step();
-                        if (5 > World.calculateDistance(this.player.location.x, this.player.location.y, this.food[i].location.x, this.food[i].location.y)) {
+                        if (5 > World.calculateDistance(this.player.location, this.food[i].location)) {
                             if (this.player.hp < this.healthBar.max) {
                                 this.food[i] = null;
                                 this.player.hp += 10;
@@ -516,7 +516,7 @@ var World = /** @class */ (function () {
         };
         // returns true if obj1 (target) is shot by obj2 (projectile)
         this.isShotBy = function (obj1, obj2) {
-            var isClose = 3 > World.calculateDistance(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y);
+            var isClose = 3 > World.calculateDistance(obj1.location, obj2.location);
             var isInFrontOf = this.isInFrontOf(obj1, obj2);
             return isClose && isInFrontOf;
         };
@@ -631,8 +631,8 @@ var World = /** @class */ (function () {
         dy *= length;
         return new Coord(dx, dy);
     };
-    World.calculateDistance = function (x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow(Math.abs(x2 - x1), 2) + Math.pow(Math.abs(y2 - y1), 2));
+    World.calculateDistance = function (coord1, coord2) {
+        return Math.sqrt(Math.pow(Math.abs(coord2.x - coord1.x), 2) + Math.pow(Math.abs(coord2.y - coord1.y), 2));
     };
     World.calculateDirection = function (x1, y1, x2, y2) {
         var dx = x1 - x2;
@@ -701,7 +701,7 @@ var Bullet = /** @class */ (function (_super) {
     }
     Bullet.prototype.step = function () {
         if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.location.x, this.location.y, this.target.x, this.target.y);
+            var distance = World.calculateDistance(this.location, this.target);
             if (distance > 10) {
                 this.point(this.target);
             }
@@ -937,7 +937,7 @@ var Spewer = /** @class */ (function (_super) {
             }
         };
         _this.attack = function () {
-            var distance = World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y);
+            var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
             var willMove = true;
             if (this.seesPlayer) {
                 if (distance < 300) {
@@ -1000,7 +1000,7 @@ var Pirate = /** @class */ (function (_super) {
                 }
             }
             if (this.isHunting) {
-                if (0 != World.calculateDistance(this.location.x, this.location.y, this.lastSeenPlayerCoord.x, this.lastSeenPlayerCoord.y)) {
+                if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
                     this.isHunting = false;
                 }
             }
