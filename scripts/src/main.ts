@@ -633,7 +633,7 @@ class World {
 
     };
 
-    save():String {
+    save():string {
         return JSON.stringify(this.map);
     }
 
