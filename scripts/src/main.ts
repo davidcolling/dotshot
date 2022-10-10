@@ -1338,7 +1338,7 @@ class HTMLDotshotUI {
 }
 
 class NumericalSetting {
-    name: Text;
+    name: string;
     defaultValue: number;
     value: number;
 
