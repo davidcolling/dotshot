@@ -137,13 +137,13 @@ var Ping = /** @class */ (function (_super) {
     __extends(Ping, _super);
     function Ping(x, y) {
         var _this = _super.call(this, 1, x, y) || this;
-        _this.step = function () {
-            this.age++;
-            this.size++;
-        };
         _this.age = 0;
         return _this;
     }
+    Ping.prototype.step = function () {
+        this.age++;
+        this.size++;
+    };
     Ping.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(strokeColor.r, 0);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
@@ -154,27 +154,27 @@ var Food = /** @class */ (function (_super) {
     __extends(Food, _super);
     function Food(x, y) {
         var _this = _super.call(this, 2, x, y) || this;
-        _this.step = function () {
-            this.growAge++;
-            if (this.growAge % 3 == 0) {
-                if (this.size == 4) {
-                    this.isGrowing = false;
-                }
-                if (this.size == 1) {
-                    this.isGrowing = true;
-                }
-                if (this.isGrowing) {
-                    this.size++;
-                }
-                else {
-                    this.size--;
-                }
-            }
-        };
         _this.isGrowing = true;
         _this.growAge = 0;
         return _this;
     }
+    Food.prototype.step = function () {
+        this.growAge++;
+        if (this.growAge % 3 == 0) {
+            if (this.size == 4) {
+                this.isGrowing = false;
+            }
+            if (this.size == 1) {
+                this.isGrowing = true;
+            }
+            if (this.isGrowing) {
+                this.size++;
+            }
+            else {
+                this.size--;
+            }
+        }
+    };
     Food.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.fill(strokeColor.r, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
@@ -183,12 +183,6 @@ var Food = /** @class */ (function (_super) {
 }(CenteredShape));
 var GridMapImage = /** @class */ (function () {
     function GridMapImage(width, height) {
-        this.set = function (x, y) {
-            this.map[x][y] = true;
-        };
-        this.unSet = function (x, y) {
-            this.map[x][y] = false;
-        };
         this.gridWidth = width;
         this.gridHeight = height;
         this.map = new Array();
@@ -199,20 +193,18 @@ var GridMapImage = /** @class */ (function () {
             }
         }
     }
+    GridMapImage.prototype.set = function (x, y) {
+        this.map[x][y] = true;
+    };
+    GridMapImage.prototype.unSet = function (x, y) {
+        this.map[x][y] = false;
+    };
     return GridMapImage;
 }());
 var GridSquare = /** @class */ (function (_super) {
     __extends(GridSquare, _super);
     function GridSquare(size, coord, isEmpty) {
         var _this = _super.call(this) || this;
-        _this.isVisible = function (coord) {
-            if (this.visibleIndexes == null) {
-                return true;
-            }
-            else {
-                return this.visibleIndexes.map[coord.x][coord.y];
-            }
-        };
         _this.size = size;
         _this.isEmpty = isEmpty;
         _this.coord = coord;
@@ -234,6 +226,14 @@ var GridSquare = /** @class */ (function (_super) {
                 drawWorker.fill(shade, 256);
                 drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
             }
+        }
+    };
+    GridSquare.prototype.isVisible = function (coord) {
+        if (this.visibleIndexes == null) {
+            return true;
+        }
+        else {
+            return this.visibleIndexes.map[coord.x][coord.y];
         }
     };
     return GridSquare;
@@ -263,44 +263,6 @@ var GridMap = /** @class */ (function (_super) {
     __extends(GridMap, _super);
     function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
         var _this = _super.call(this) || this;
-        // blocks out gridSquares that aren't visible from the viewpoint
-        _this.drawVisible = function (viewPointScreenCoord, drawWorker) {
-            if (!this.isEmpty) {
-                var viewPoint = this.getGridIndex(viewPointScreenCoord);
-                for (var i = 0; i < this.gridWidth; i++) {
-                    for (var j = 0; j < this.gridHeight; j++) {
-                        if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                            this.map[i][j].draw(drawWorker);
-                        }
-                        else {
-                            drawWorker.fill(0, 256);
-                            drawWorker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
-                        }
-                    }
-                }
-            }
-        };
-        _this.isOpen = function (screenCoord) {
-            if (!this.isEmpty) {
-                if (0 < screenCoord.x &&
-                    screenCoord.x < this.width &&
-                    0 < screenCoord.y &&
-                    screenCoord.y < this.height) {
-                    var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
-                    return this.map[gridIndex.x][gridIndex.y].isEmpty;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return true;
-            }
-        };
-        _this.getGridIndex = function (screenCoord) {
-            if (!this.isEmpty)
-                return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
-        };
         var gridWidth = Math.floor(screenWidth / gridSquareSize);
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
         var width = gridSquareSize * gridWidth;
@@ -401,11 +363,49 @@ var GridMap = /** @class */ (function (_super) {
             }
         }
     };
+    // blocks out gridSquares that aren't visible from the viewpoint
+    GridMap.prototype.drawVisible = function (viewPointScreenCoord, drawWorker, strokeColor) {
+        if (!this.isEmpty) {
+            var viewPoint = this.getGridIndex(viewPointScreenCoord);
+            for (var i = 0; i < this.gridWidth; i++) {
+                for (var j = 0; j < this.gridHeight; j++) {
+                    if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
+                        this.map[i][j].draw(drawWorker, strokeColor);
+                    }
+                    else {
+                        drawWorker.fill(0, 256);
+                        drawWorker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
+                    }
+                }
+            }
+        }
+    };
+    GridMap.prototype.isOpen = function (screenCoord) {
+        if (!this.isEmpty) {
+            if (0 < screenCoord.x &&
+                screenCoord.x < this.width &&
+                0 < screenCoord.y &&
+                screenCoord.y < this.height) {
+                var gridIndex = GridMap.getGridIndex(screenCoord, this.gridSquareSize);
+                return this.map[gridIndex.x][gridIndex.y].isEmpty;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
+    };
     GridMap.getGridIndex = function (screenCoord, gridSquareSize) {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
         var indexY = Math.floor(screenCoord.y / gridSquareSize);
         var indexCoord = new Coord(indexX, indexY);
         return indexCoord;
+    };
+    GridMap.prototype.getGridIndex = function (screenCoord) {
+        if (!this.isEmpty)
+            return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     };
     return GridMap;
 }(Drawable));
@@ -417,119 +417,6 @@ var GridMap = /** @class */ (function (_super) {
 // an observer of NPC "sight" for hunting
 var World = /** @class */ (function () {
     function World(width, height, numberOfEnemies, map, loading, strokeColor) {
-        this.draw = function () {
-            var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
-            // world 
-            this.frameCount++;
-            this.map.draw(this.drawWorker, this.strokeColor);
-            this.drawBullets(this.bullets);
-            // player
-            if (this.player != null) {
-                this.player.control(this.drawWorker);
-                this.player.step();
-                var damage = this.collectDamage(this.player, this.bullets);
-                this.player.takeDamage(damage);
-                if (damage) {
-                    this.healthBar.hp = this.player.hp;
-                }
-                this.player.draw(this.drawWorker, this.strokeColor);
-                if (this.player.hp == 0) {
-                    playerIsDead = true;
-                }
-                this.healthBar.draw(this.drawWorker, this.strokeColor);
-                for (var i = 0; i < this.food.length; i++) {
-                    if (this.food[i] != null) {
-                        this.food[i].draw(this.drawWorker, this.strokeColor);
-                        this.food[i].step();
-                        if (5 > World.calculateDistance(this.player.location, this.food[i].location)) {
-                            if (this.player.hp < this.healthBar.max) {
-                                this.food[i] = null;
-                                this.player.hp += 10;
-                                this.healthBar.hp = this.player.hp;
-                            }
-                        }
-                    }
-                }
-                if (this.frameCount % 32 == 0) {
-                    this.pings.push(new Ping(this.player.location.x, this.player.location.y));
-                }
-            }
-            if (this.player != null) {
-                var playerIndex = this.map.getGridIndex(new Coord(this.player.location.x, this.player.location.y));
-            }
-            // NPCs
-            for (var i = 0; i < this.nPCs.length; i++) {
-                if (this.nPCs[i] != null) {
-                    //check for shots
-                    var damage = this.collectDamage(this.nPCs[i], this.bullets);
-                    this.nPCs[i].takeDamage(damage);
-                    if (this.player != null) {
-                        var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].location.x, this.nPCs[i].location.y));
-                        this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
-                        if (this.nPCs[i].seesPlayer) {
-                            this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.location.x, this.player.location.y);
-                        }
-                    }
-                    this.nPCs[i].step();
-                    this.nPCs[i].draw(this.drawWorker, this.strokeColor);
-                    if (this.nPCs[i].hp <= 0) {
-                        this.nPCs[i] = null;
-                        this.player.enemiesKilled++;
-                    }
-                }
-            }
-            for (var i = 0; i < this.spawners.length; i++) {
-                if (this.spawners[i] != null) {
-                    this.spawners[i].draw(this.drawWorker, this.strokeColor);
-                    this.spawners[i].step();
-                }
-            }
-            // pings 
-            for (var i = 0; i < this.pings.length; i++) {
-                if (this.pings[i] != null) {
-                    this.pings[i].step();
-                    this.pings[i].draw(this.drawWorker, this.strokeColor);
-                    if (this.pings[i].age > 16) {
-                        this.pings[i] = null;
-                    }
-                }
-            }
-            if (playerIsDead) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        };
-        this.save = function () {
-            return JSON.stringify(this.map);
-        };
-        this.drawBullets = function (list) {
-            for (var i = 0; i < list.length; i++) {
-                if (list[i] != null) {
-                    list[i].draw(this.drawWorker, this.strokeColor);
-                    if (!list[i].step()) {
-                        list[i] = null;
-                    }
-                }
-            }
-        };
-        // returns true if obj1 (target) is shot by obj2 (projectile)
-        this.isShotBy = function (obj1, obj2) {
-            var isClose = 3 > World.calculateDistance(obj1.location, obj2.location);
-            var isInFrontOf = this.isInFrontOf(obj1, obj2);
-            return isClose && isInFrontOf;
-        };
-        this.isInFrontOf = function (obj1, obj2) {
-            return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
-        };
-        this.calculateDifference = function (direction1, direction2) {
-            var difference = direction1 - direction2;
-            if (difference > 180) {
-                difference = 360 - difference;
-            }
-            return difference;
-        };
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -566,6 +453,147 @@ var World = /** @class */ (function () {
             this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
         }
     }
+    World.prototype.draw = function () {
+        var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
+        // world 
+        this.frameCount++;
+        this.map.draw(this.drawWorker, this.strokeColor);
+        this.drawBullets(this.bullets);
+        // player
+        if (this.player != null) {
+            this.player.control(this.drawWorker);
+            this.player.step();
+            var damage = this.collectDamage(this.player, this.bullets);
+            this.player.takeDamage(damage);
+            if (damage) {
+                this.healthBar.hp = this.player.hp;
+            }
+            this.player.draw(this.drawWorker, this.strokeColor);
+            if (this.player.hp <= 0) {
+                playerIsDead = true;
+            }
+            this.healthBar.draw(this.drawWorker, this.strokeColor);
+            for (var i = 0; i < this.food.length; i++) {
+                if (this.food[i] != null) {
+                    this.food[i].draw(this.drawWorker, this.strokeColor);
+                    this.food[i].step();
+                    if (5 > World.calculateDistance(this.player.location, this.food[i].location)) {
+                        if (this.player.hp < this.healthBar.max) {
+                            this.food[i] = null;
+                            this.player.hp += 10;
+                            this.healthBar.hp = this.player.hp;
+                        }
+                    }
+                }
+            }
+            if (this.frameCount % 32 == 0) {
+                this.pings.push(new Ping(this.player.location.x, this.player.location.y));
+            }
+        }
+        if (this.player != null) {
+            var playerIndex = this.map.getGridIndex(new Coord(this.player.location.x, this.player.location.y));
+        }
+        // NPCs
+        for (var i = 0; i < this.nPCs.length; i++) {
+            if (this.nPCs[i] != null) {
+                //check for shots
+                var damage = this.collectDamage(this.nPCs[i], this.bullets);
+                this.nPCs[i].takeDamage(damage);
+                if (this.player != null) {
+                    var npcGridCoord = this.map.getGridIndex(new Coord(this.nPCs[i].location.x, this.nPCs[i].location.y));
+                    this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(new Coord(npcGridCoord.x, npcGridCoord.y));
+                    if (this.nPCs[i].seesPlayer) {
+                        this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.location.x, this.player.location.y);
+                    }
+                }
+                this.nPCs[i].step();
+                this.nPCs[i].draw(this.drawWorker, this.strokeColor);
+                if (this.nPCs[i].hp <= 0) {
+                    this.nPCs[i] = null;
+                    this.player.enemiesKilled++;
+                }
+            }
+        }
+        for (var i = 0; i < this.spawners.length; i++) {
+            if (this.spawners[i] != null) {
+                this.spawners[i].draw(this.drawWorker, this.strokeColor);
+                this.spawners[i].step();
+            }
+        }
+        // pings 
+        for (var i = 0; i < this.pings.length; i++) {
+            if (this.pings[i] != null) {
+                this.pings[i].step();
+                this.pings[i].draw(this.drawWorker, this.strokeColor);
+                if (this.pings[i].age > 16) {
+                    this.pings[i] = null;
+                }
+            }
+        }
+        if (playerIsDead) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    ;
+    World.prototype.save = function () {
+        return JSON.stringify(this.map);
+    };
+    World.prototype.drawBullets = function (list) {
+        for (var i = 0; i < list.length; i++) {
+            if (list[i] != null) {
+                list[i].draw(this.drawWorker, this.strokeColor);
+                if (!list[i].step()) {
+                    list[i] = null;
+                }
+            }
+        }
+    };
+    World.calculateDistance = function (coord1, coord2) {
+        return Math.sqrt(Math.pow(Math.abs(coord2.x - coord1.x), 2) + Math.pow(Math.abs(coord2.y - coord1.y), 2));
+    };
+    ;
+    // returns true if obj1 (target) is shot by obj2 (projectile)
+    World.prototype.isShotBy = function (obj1, obj2) {
+        var isClose = 3 > World.calculateDistance(obj1.location, obj2.location);
+        var isInFrontOf = this.isInFrontOf(obj1, obj2);
+        return isClose && isInFrontOf;
+    };
+    World.prototype.isInFrontOf = function (obj1, obj2) {
+        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
+    };
+    World.calculateDirection = function (x1, y1, x2, y2) {
+        var dx = x1 - x2;
+        var dy = y1 - y2;
+        var direction;
+        if (dx != 0 && dy != 0) {
+            if (dx < 0 && dy > 0) { // target is in quadrant 1
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+            }
+            else if (dx < 0 && dy < 0) { // target is in q2
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                direction += 90;
+            }
+            else if (dx > 0 && dy < 0) { // q3
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                direction += 180;
+            }
+            else if (dx > 0 && dy > 0) { // q4
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
+                direction += 270;
+            }
+            return direction;
+        }
+    };
+    World.prototype.calculateDifference = function (direction1, direction2) {
+        var difference = direction1 - direction2;
+        if (difference > 180) {
+            difference = 360 - difference;
+        }
+        return difference;
+    };
     World.prototype.collectDamage = function (obj, arr) {
         var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
@@ -631,61 +659,36 @@ var World = /** @class */ (function () {
         dy *= length;
         return new Coord(dx, dy);
     };
-    World.calculateDistance = function (coord1, coord2) {
-        return Math.sqrt(Math.pow(Math.abs(coord2.x - coord1.x), 2) + Math.pow(Math.abs(coord2.y - coord1.y), 2));
-    };
-    World.calculateDirection = function (x1, y1, x2, y2) {
-        var dx = x1 - x2;
-        var dy = y1 - y2;
-        var direction;
-        if (dx != 0 && dy != 0) {
-            if (dx < 0 && dy > 0) { // target is in quadrant 1
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-            }
-            else if (dx < 0 && dy < 0) { // target is in q2
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 90;
-            }
-            else if (dx > 0 && dy < 0) { // q3
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                direction += 180;
-            }
-            else if (dx > 0 && dy > 0) { // q4
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 270;
-            }
-            return direction;
-        }
-    };
     return World;
 }());
 var Moveable = /** @class */ (function (_super) {
     __extends(Moveable, _super);
     function Moveable(size, x, y, direction, map) {
         var _this = _super.call(this, size, x, y) || this;
-        _this.point = function (target) {
-            this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
-        };
-        _this.move = function (velocity) {
-            // this function can be understood in two basic parts
-            // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
-            var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-            var newX = this.location.x + relativeChangeCoordinate.x;
-            var newY = this.location.y + relativeChangeCoordinate.y;
-            // part two determines if the coordinates are somewhere the character can actually go
-            if (this.map.isOpen(new Coord(newX, newY))) {
-                this.location.x = newX;
-                this.location.y = newY;
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
         _this.direction = direction;
         _this.map = map;
         return _this;
     }
+    Moveable.prototype.point = function (target) {
+        this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
+    };
+    Moveable.prototype.move = function (velocity) {
+        // this function can be understood in two basic parts
+        // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
+        var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+        var newX = this.location.x + relativeChangeCoordinate.x;
+        var newY = this.location.y + relativeChangeCoordinate.y;
+        // part two determines if the coordinates are somewhere the character can actually go
+        if (this.map.isOpen(new Coord(newX, newY))) {
+            this.location.x = newX;
+            this.location.y = newY;
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    ;
     return Moveable;
 }(CenteredShape));
 var Bullet = /** @class */ (function (_super) {
@@ -761,9 +764,6 @@ var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
     function Character(size, x, y, map, bullets, maxHP) {
         var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
-        _this.fire = function (target) {
-            this.weapons[this.currentWeapon].fire(target);
-        };
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
@@ -771,6 +771,9 @@ var Character = /** @class */ (function (_super) {
         _this.currentWeapon = 0;
         return _this;
     }
+    Character.prototype.fire = function (target) {
+        this.weapons[this.currentWeapon].fire(target);
+    };
     Character.prototype.step = function () {
         for (var i = 0; i < this.weapons.length; i++) {
             if (null != this.weapons[i]) {
@@ -788,21 +791,6 @@ var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, x, y, map, bullets) {
         var _this = _super.call(this, size, x, y, map, bullets, 32) || this;
-        _this.control = function (drawWorker) {
-            this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
-            if (this.isFiring) {
-                this.firingAge++;
-                if (this.firingAge % 4 == 0) {
-                    this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
-                }
-            }
-            else {
-                this.firingAge = 0;
-            }
-            if (this.isMoving) {
-                this.move(3);
-            }
-        };
         _this.weapons.push(new DoubleBarrelGun(bullets, _this));
         _this.weapons.push(new ExplodingBulletGun(bullets, _this));
         _this.weapons.push(new Cannon(bullets, _this));
@@ -817,6 +805,21 @@ var Player = /** @class */ (function (_super) {
         _super.prototype.step.call(this);
         if (this.size != this.initialSize) {
             this.size = this.initialSize;
+        }
+    };
+    Player.prototype.control = function (drawWorker) {
+        this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+        if (this.isFiring) {
+            this.firingAge++;
+            if (this.firingAge % 4 == 0) {
+                this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+            }
+        }
+        else {
+            this.firingAge = 0;
+        }
+        if (this.isMoving) {
+            this.move(3);
         }
     };
     Player.prototype.draw = function (drawWorker, strokeColor) {
@@ -836,24 +839,6 @@ var NPC = /** @class */ (function (_super) {
     __extends(NPC, _super);
     function NPC(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
         var _this = _super.call(this, size, x, y, map, bullets, maxHP) || this;
-        _this.idle = function () {
-            if (!(this.idleAge < this.idleLife)) {
-                this.idleAge = 0;
-                this.idleLife = Math.random() * 2000;
-                this.direction = Math.random() * 360;
-            }
-            this.idleAge++;
-            this.move(1);
-        };
-        _this.attack = function () { };
-        _this.decideDraw = function () {
-            if (this.isHunting || this.seesPlayer) {
-                this.attack();
-            }
-            else {
-                this.idle();
-            }
-        };
         _this.isHunting = false;
         _this.age = 0;
         _this.idleAge = idleAge;
@@ -863,6 +848,24 @@ var NPC = /** @class */ (function (_super) {
         _this.lastSeenPlayerCoord = null;
         return _this;
     }
+    NPC.prototype.idle = function () {
+        if (!(this.idleAge < this.idleLife)) {
+            this.idleAge = 0;
+            this.idleLife = Math.random() * 2000;
+            this.direction = Math.random() * 360;
+        }
+        this.idleAge++;
+        this.move(1);
+    };
+    NPC.prototype.attack = function () { };
+    NPC.prototype.decideDraw = function () {
+        if (this.isHunting || this.seesPlayer) {
+            this.attack();
+        }
+        else {
+            this.idle();
+        }
+    };
     return NPC;
 }(Character));
 var Chicken = /** @class */ (function (_super) {
@@ -905,64 +908,6 @@ var Spewer = /** @class */ (function (_super) {
     __extends(Spewer, _super);
     function Spewer(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.explode = function () {
-            this.fire(new Coord(this.target.location.x, this.target.location.y));
-            this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
-            this.fire(new Coord(this.target.location.x - 1, this.target.location.y - 1));
-            this.fire(new Coord(this.target.location.x + 2, this.target.location.y + 2));
-            this.fire(new Coord(this.target.location.x - 2, this.target.location.y - 2));
-            this.fire(new Coord(this.target.location.x + 3, this.target.location.y + 3));
-            this.fire(new Coord(this.target.location.x - 3, this.target.location.y - 3));
-            this.hp = 0;
-        };
-        // animation for when its about to explode
-        _this.pulse = function () {
-            if (this.isGrowing) {
-                if (this.size < 9) {
-                    this.size += 1;
-                }
-                else {
-                    this.isGrowing = false;
-                    this.size -= 1;
-                }
-            }
-            else {
-                if (this.size > 5) {
-                    this.size -= 1;
-                }
-                else {
-                    this.isGrowing = true;
-                    this.size += 1;
-                }
-            }
-        };
-        _this.attack = function () {
-            var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
-            var willMove = true;
-            if (this.seesPlayer) {
-                if (distance < 300) {
-                    this.pulse();
-                    if (distance < 200) {
-                        this.didIgnite = true;
-                        if (distance < 100) {
-                            willMove = false;
-                        }
-                    }
-                }
-            }
-            if (willMove) {
-                this.point(this.lastSeenPlayerCoord);
-                this.move(1.6);
-            }
-            if (!this.isHunting) {
-                this.isHunting = true;
-            }
-            else {
-                if (distance < 2 && !this.didIgnite) {
-                    this.isHunting = false;
-                }
-            }
-        };
         _this.didIgnite = false;
         _this.igniteAge = 0;
         _this.isGrowing = true;
@@ -984,6 +929,64 @@ var Spewer = /** @class */ (function (_super) {
         }
         this.decideDraw();
     };
+    Spewer.prototype.explode = function () {
+        this.fire(new Coord(this.target.location.x, this.target.location.y));
+        this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
+        this.fire(new Coord(this.target.location.x - 1, this.target.location.y - 1));
+        this.fire(new Coord(this.target.location.x + 2, this.target.location.y + 2));
+        this.fire(new Coord(this.target.location.x - 2, this.target.location.y - 2));
+        this.fire(new Coord(this.target.location.x + 3, this.target.location.y + 3));
+        this.fire(new Coord(this.target.location.x - 3, this.target.location.y - 3));
+        this.hp = 0;
+    };
+    // animation for when its about to explode
+    Spewer.prototype.pulse = function () {
+        if (this.isGrowing) {
+            if (this.size < 9) {
+                this.size += 1;
+            }
+            else {
+                this.isGrowing = false;
+                this.size -= 1;
+            }
+        }
+        else {
+            if (this.size > 5) {
+                this.size -= 1;
+            }
+            else {
+                this.isGrowing = true;
+                this.size += 1;
+            }
+        }
+    };
+    Spewer.prototype.attack = function () {
+        var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
+        var willMove = true;
+        if (this.seesPlayer) {
+            if (distance < 300) {
+                this.pulse();
+                if (distance < 200) {
+                    this.didIgnite = true;
+                    if (distance < 100) {
+                        willMove = false;
+                    }
+                }
+            }
+        }
+        if (willMove) {
+            this.point(this.lastSeenPlayerCoord);
+            this.move(1.6);
+        }
+        if (!this.isHunting) {
+            this.isHunting = true;
+        }
+        else {
+            if (distance < 2 && !this.didIgnite) {
+                this.isHunting = false;
+            }
+        }
+    };
     return Spewer;
 }(NPC));
 ;
@@ -991,23 +994,6 @@ var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
     function Pirate(x, y, map, bullets, target) {
         var _this = _super.call(this, 5, x, y, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.attack = function () {
-            this.point(this.lastSeenPlayerCoord);
-            this.move(0.5);
-            if (this.seesPlayer) {
-                if (this.weaponCooldownCounter % 16 == 0) {
-                    this.fire(new Coord(this.target.location.x, this.target.location.y));
-                }
-            }
-            if (this.isHunting) {
-                if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
-                    this.isHunting = false;
-                }
-            }
-            else {
-                this.isHunting = true;
-            }
-        };
         _this.weaponCooldownCounter = 0;
         return _this;
     }
@@ -1021,6 +1007,23 @@ var Pirate = /** @class */ (function (_super) {
         _super.prototype.step.call(this);
         this.weaponCooldownCounter++;
         this.decideDraw();
+    };
+    Pirate.prototype.attack = function () {
+        this.point(this.lastSeenPlayerCoord);
+        this.move(0.5);
+        if (this.seesPlayer) {
+            if (this.weaponCooldownCounter % 16 == 0) {
+                this.fire(new Coord(this.target.location.x, this.target.location.y));
+            }
+        }
+        if (this.isHunting) {
+            if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
+                this.isHunting = false;
+            }
+        }
+        else {
+            this.isHunting = true;
+        }
     };
     return Pirate;
 }(NPC));
@@ -1057,41 +1060,7 @@ var LoadingActor = /** @class */ (function (_super) {
 var Mine = /** @class */ (function (_super) {
     __extends(Mine, _super);
     function Mine(x, y, map, bullets) {
-        var _this = _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.explode = function () {
-            var directions = Array();
-            directions.push(new Coord(this.location.x, this.location.y - 300));
-            directions.push(new Coord(this.location.x + 300, this.location.y));
-            directions.push(new Coord(this.location.x, this.location.y + 300));
-            directions.push(new Coord(this.location.x - 300, this.location.y));
-            for (var i = 0; i < directions.length; i++) {
-                this.fire(directions[i]);
-                this.fire(new Coord(directions[i].x + 1, directions[i].y + 1));
-                this.fire(new Coord(directions[i].x - 1, directions[i].y - 1));
-                this.fire(new Coord(directions[i].x + 2, directions[i].y + 2));
-                this.fire(new Coord(directions[i].x - 2, directions[i].y - 2));
-                this.fire(new Coord(directions[i].x + 3, directions[i].y + 3));
-                this.fire(new Coord(directions[i].x - 3, directions[i].y - 3));
-                this.fire(new Coord(directions[i].x + 4, directions[i].y + 4));
-                this.fire(new Coord(directions[i].x - 4, directions[i].y - 4));
-                this.fire(new Coord(directions[i].x + 5, directions[i].y + 5));
-                this.fire(new Coord(directions[i].x - 5, directions[i].y - 5));
-                this.fire(new Coord(directions[i].x + 10, directions[i].y + 10));
-                this.fire(new Coord(directions[i].x - 10, directions[i].y - 10));
-                this.fire(new Coord(directions[i].x + 20, directions[i].y + 20));
-                this.fire(new Coord(directions[i].x - 20, directions[i].y - 20));
-                this.fire(new Coord(directions[i].x + 30, directions[i].y + 30));
-                this.fire(new Coord(directions[i].x - 30, directions[i].y - 30));
-                this.fire(new Coord(directions[i].x + 40, directions[i].y + 40));
-                this.fire(new Coord(directions[i].x - 40, directions[i].y - 40));
-            }
-        };
-        _this.move = function () {
-            return false;
-        };
-        _this.idle = function () { };
-        _this.attack = function () { };
-        return _this;
+        return _super.call(this, 5, x, y, map, bullets, 1, null, 1000, 0, 200) || this;
     }
     Mine.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(130, 128, 128, 256);
@@ -1099,6 +1068,39 @@ var Mine = /** @class */ (function (_super) {
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
+    Mine.prototype.explode = function () {
+        var directions = Array();
+        directions.push(new Coord(this.location.x, this.location.y - 300));
+        directions.push(new Coord(this.location.x + 300, this.location.y));
+        directions.push(new Coord(this.location.x, this.location.y + 300));
+        directions.push(new Coord(this.location.x - 300, this.location.y));
+        for (var i = 0; i < directions.length; i++) {
+            this.fire(directions[i]);
+            this.fire(new Coord(directions[i].x + 1, directions[i].y + 1));
+            this.fire(new Coord(directions[i].x - 1, directions[i].y - 1));
+            this.fire(new Coord(directions[i].x + 2, directions[i].y + 2));
+            this.fire(new Coord(directions[i].x - 2, directions[i].y - 2));
+            this.fire(new Coord(directions[i].x + 3, directions[i].y + 3));
+            this.fire(new Coord(directions[i].x - 3, directions[i].y - 3));
+            this.fire(new Coord(directions[i].x + 4, directions[i].y + 4));
+            this.fire(new Coord(directions[i].x - 4, directions[i].y - 4));
+            this.fire(new Coord(directions[i].x + 5, directions[i].y + 5));
+            this.fire(new Coord(directions[i].x - 5, directions[i].y - 5));
+            this.fire(new Coord(directions[i].x + 10, directions[i].y + 10));
+            this.fire(new Coord(directions[i].x - 10, directions[i].y - 10));
+            this.fire(new Coord(directions[i].x + 20, directions[i].y + 20));
+            this.fire(new Coord(directions[i].x - 20, directions[i].y - 20));
+            this.fire(new Coord(directions[i].x + 30, directions[i].y + 30));
+            this.fire(new Coord(directions[i].x - 30, directions[i].y - 30));
+            this.fire(new Coord(directions[i].x + 40, directions[i].y + 40));
+            this.fire(new Coord(directions[i].x - 40, directions[i].y - 40));
+        }
+    };
+    Mine.prototype.move = function () {
+        return false;
+    };
+    Mine.prototype.idle = function () { };
+    Mine.prototype.attack = function () { };
     Mine.prototype.step = function () {
         _super.prototype.step.call(this);
         if (this.hp <= 0) {
@@ -1110,38 +1112,6 @@ var Mine = /** @class */ (function (_super) {
 ;
 var HTMLDotshotUI = /** @class */ (function () {
     function HTMLDotshotUI() {
-        this.startNewGame = function () {
-            if (this.display != null) {
-                this.display.remove();
-            }
-            for (var i = 0; i < this.worldSettings.length; i++) {
-                this.worldSettings[i].setFromDocument();
-            }
-            document.getElementById("message").textContent = "Loading...";
-            var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
-            this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
-            this.display = new p5(output, "canvas");
-            document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
-        };
-        this.saveMap = function () {
-            var map = this.world.save();
-            // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
-            var file = new Blob([map], { type: "string" });
-            if (window.navigator.msSaveOrOpenBlob) {
-                window.navigator.msSaveOrOpenBlob(file, "map.json");
-            }
-            else {
-                var a = document.createElement("a"), url = URL.createObjectURL(file);
-                a.href = url;
-                a.download = "map.json";
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(function () {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 0);
-            }
-        };
         // determine dimensions 
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
@@ -1171,23 +1141,42 @@ var HTMLDotshotUI = /** @class */ (function () {
             this.worldSettings[i].display();
         }
     }
+    HTMLDotshotUI.prototype.startNewGame = function () {
+        if (this.display != null) {
+            this.display.remove();
+        }
+        for (var i = 0; i < this.worldSettings.length; i++) {
+            this.worldSettings[i].setFromDocument();
+        }
+        document.getElementById("message").textContent = "Loading...";
+        var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
+        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
+        this.display = new p5(output, "canvas");
+        document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
+    };
+    HTMLDotshotUI.prototype.saveMap = function () {
+        var map = this.world.save();
+        // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
+        var file = new Blob([map], { type: "string" });
+        if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(file, "map.json");
+        }
+        else {
+            var a = document.createElement("a"), url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = "map.json";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    };
     return HTMLDotshotUI;
 }());
 var NumericalSetting = /** @class */ (function () {
     function NumericalSetting(name, defaultValue, value) {
-        this.display = function () {
-            var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
-            var container = document.getElementById("worldSettings");
-            if (container) {
-                container.innerHTML += output;
-            }
-        };
-        this.setFromDocument = function () {
-            var element = document.getElementById(this.name);
-            if (element) {
-                this.value = element.value;
-            }
-        };
         this.name = name;
         this.defaultValue = defaultValue;
         if (this.value == null) {
@@ -1197,6 +1186,19 @@ var NumericalSetting = /** @class */ (function () {
             this.value = value;
         }
     }
+    NumericalSetting.prototype.display = function () {
+        var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
+        var container = document.getElementById("worldSettings");
+        if (container) {
+            container.innerHTML += output;
+        }
+    };
+    NumericalSetting.prototype.setFromDocument = function () {
+        var element = document.getElementById(this.name);
+        if (element) {
+            this.value = element.value;
+        }
+    };
     return NumericalSetting;
 }());
 document.addEventListener('keydown', recordKey);

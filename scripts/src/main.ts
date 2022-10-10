@@ -148,7 +148,7 @@ class Ping extends CenteredShape {
         super(1, x, y);
         this.age = 0;
     }
-    step = function () {
+    step():void {
         this.age++;
         this.size++;
     }
@@ -167,7 +167,7 @@ class Food extends CenteredShape {
         this.isGrowing = true;
         this.growAge = 0;
     }
-    step = function () {
+    step():void {
         this.growAge++;
         if (this.growAge % 3 == 0) {
             if (this.size == 4) {
@@ -205,10 +205,10 @@ class GridMapImage {
             }
         }
     }
-    set = function(x, y) {
+    set(x, y):void {
         this.map[x][y] = true;
     }
-    unSet = function(x, y) {
+    unSet(x, y):void {
         this.map[x][y] = false;
     }
 }
@@ -229,7 +229,7 @@ class GridSquare extends Drawable {
         this.isHighlighted = false;
     }
 
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor):boolean {
         if (this.isHighlighted) {
             drawWorker.fill(256, 0, 0, 256);
             drawWorker.rect(
@@ -254,7 +254,7 @@ class GridSquare extends Drawable {
         }
     }
 
-    isVisible = function(coord) {
+    isVisible(coord):boolean {
         if (this.visibleIndexes == null) {
             return true;
         } else {
@@ -421,13 +421,13 @@ class GridMap extends Drawable {
     }
 
     // blocks out gridSquares that aren't visible from the viewpoint
-    drawVisible = function (viewPointScreenCoord, drawWorker) {
+    drawVisible(viewPointScreenCoord, drawWorker, strokeColor):void {
         if( !this.isEmpty) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
             for (var i = 0; i < this.gridWidth; i ++) {
                 for (var j = 0; j < this.gridHeight; j ++) {
                     if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                        this.map[i][j].draw(drawWorker);
+                        this.map[i][j].draw(drawWorker, strokeColor);
                     } else {
                         drawWorker.fill(0, 256);
                         drawWorker.rect(
@@ -442,7 +442,7 @@ class GridMap extends Drawable {
         }
     }
 
-    isOpen = function (screenCoord) {
+    isOpen(screenCoord):boolean {
         if(!this.isEmpty) {
             if (
                 0 < screenCoord.x &&
@@ -460,14 +460,14 @@ class GridMap extends Drawable {
         }
     }
 
-    static getGridIndex = function (screenCoord, gridSquareSize) {
+    static getGridIndex(screenCoord, gridSquareSize):Coord {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
         var indexY = Math.floor(screenCoord.y / gridSquareSize);
         var indexCoord = new Coord(indexX, indexY);
         return indexCoord;
     }
 
-    getGridIndex = function (screenCoord) {
+    getGridIndex(screenCoord):Coord {
         if (!this.isEmpty) 
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     }
@@ -536,7 +536,7 @@ class World {
         }
     }
 
-    draw = function () {
+    draw():boolean {
         var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
 
         // world 
@@ -633,11 +633,11 @@ class World {
 
     };
 
-    save = function () {
+    save():String {
         return JSON.stringify(this.map);
     }
 
-    drawBullets = function(list) {
+    drawBullets(list):void {
         for (var i = 0; i < list.length; i++) {
             if (list[i] != null) {
                 list[i].draw(this.drawWorker, this.strokeColor);
@@ -648,22 +648,22 @@ class World {
         }
     }
 
-    static calculateDistance = function (coord1, coord2) {
+    static calculateDistance(coord1, coord2):number {
         return Math.sqrt( Math.abs(coord2.x - coord1.x)**2 + Math.abs(coord2.y - coord1.y)**2 ) 
     };
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
-    isShotBy = function(obj1, obj2) {
+    isShotBy(obj1, obj2):boolean {
         var isClose =  3 > World.calculateDistance(obj1.location, obj2.location) 
         var isInFrontOf = this.isInFrontOf(obj1, obj2);
         return isClose && isInFrontOf;
     }
 
-    isInFrontOf = function(obj1, obj2) {
+    isInFrontOf(obj1, obj2):boolean {
         return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
     }
 
-    static calculateDirection = function (x1, y1, x2, y2) {
+    static calculateDirection(x1, y1, x2, y2):number {
         var dx = x1 - x2;
         var dy = y1 - y2;
 
@@ -686,7 +686,7 @@ class World {
         }
     }
 
-    calculateDifference = function(direction1, direction2) {
+    calculateDifference(direction1, direction2):number {
         var difference = direction1 - direction2;
 
         if (difference > 180) {
@@ -778,10 +778,10 @@ class Moveable extends CenteredShape {
         this.direction = direction;
         this.map = map;
     }
-    point = function (target) {
+    point(target):void {
         this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
     }
-    move = function (velocity) {
+    move(velocity):boolean {
         // this function can be understood in two basic parts
         // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
@@ -885,7 +885,7 @@ class Character extends Moveable {
         this.weapons.push(new Gun(bullets, this));
         this.currentWeapon = 0;
     }
-    fire = function(target) {
+    fire(target):void {
         this.weapons[this.currentWeapon].fire(target);
     }
     step():void {
@@ -924,7 +924,7 @@ class Player extends Character{
             this.size = this.initialSize;
         }
     }
-    control = function (drawWorker) {
+    control(drawWorker):void {
         this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
         if (this.isFiring) {
             this.firingAge++;
@@ -971,7 +971,7 @@ class NPC extends Character {
         this.seesPlayer = false;
         this.lastSeenPlayerCoord = null;
     }
-    idle = function () {
+    idle():void {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
@@ -980,8 +980,8 @@ class NPC extends Character {
         this.idleAge++;
         this.move(1);
     }
-    attack = function () {}
-    decideDraw = function () {
+    attack() :void{}
+    decideDraw():void {
         if ( this.isHunting || this.seesPlayer) {
             this.attack();
         } else {
@@ -1060,7 +1060,7 @@ class Spewer extends NPC {
         }
         this.decideDraw();
     }
-    explode = function () {
+    explode():void {
         this.fire(new Coord(this.target.location.x, this.target.location.y));
 
         this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
@@ -1074,7 +1074,7 @@ class Spewer extends NPC {
         this.hp = 0;
     }
     // animation for when its about to explode
-    pulse = function () {
+    pulse():void {
         if (this.isGrowing) {
             if (this.size < 9) {
                 this.size += 1;
@@ -1091,7 +1091,7 @@ class Spewer extends NPC {
             }
         }
     }
-    attack = function () {
+    attack():void {
         var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
         var willMove = true;
         if (this.seesPlayer) {
@@ -1144,7 +1144,7 @@ class Pirate extends NPC {
         this.weaponCooldownCounter++;
         this.decideDraw();
     }
-    attack = function () {
+    attack():void {
         this.point(this.lastSeenPlayerCoord);
         this.move(0.5);
         if (this.seesPlayer) {
@@ -1205,7 +1205,7 @@ class Mine extends NPC {
             strokeColor.a, 
         );            
     }
-    explode = function () {
+    explode():void {
         var directions = Array();
         directions.push(new Coord(this.location.x, this.location.y - 300));
         directions.push(new Coord(this.location.x + 300, this.location.y));
@@ -1244,11 +1244,11 @@ class Mine extends NPC {
         }
 
     }
-    move = function () {
+    move():boolean {
         return false;
     }
-    idle = function () { }
-    attack = function () { }
+    idle():void { }
+    attack():void { }
     step():void {
         super.step();
         if (this.hp <= 0) {
@@ -1297,7 +1297,7 @@ class HTMLDotshotUI {
         }
     }
 
-    startNewGame = function() {
+    startNewGame():void {
         if (this.display != null) {
             this.display.remove();
         }
@@ -1315,7 +1315,7 @@ class HTMLDotshotUI {
         document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
     }
 
-    saveMap = function () {
+    saveMap():void {
         var map = this.world.save();
     
         // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
@@ -1351,14 +1351,14 @@ class NumericalSetting {
             this.value = value;
         }
     }
-    display = function() {
+    display():void {
         var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
         var container = document.getElementById("worldSettings");
         if (container) {
             container.innerHTML += output;
         }
     }
-    setFromDocument = function() {
+    setFromDocument():void {
         var element = document.getElementById(this.name);
         if (element) {
             this.value = (element as HTMLFormElement).value;
