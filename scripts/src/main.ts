@@ -869,6 +869,10 @@ class CannonBall extends Bullet {
         this.size = 7;
         this.maxForce = 10;
     }
+    step(): boolean {
+        this.size = 5 + (this.age % 10);
+	return super.step();
+    }
 }
 
 class Character extends Moveable {

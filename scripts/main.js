@@ -758,6 +758,10 @@ var CannonBall = /** @class */ (function (_super) {
         _this.maxForce = 10;
         return _this;
     }
+    CannonBall.prototype.step = function () {
+        this.size = 5 + (this.age % 10);
+        return _super.prototype.step.call(this);
+    };
     return CannonBall;
 }(Bullet));
 var Character = /** @class */ (function (_super) {
