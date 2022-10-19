@@ -321,7 +321,7 @@ var GridMap = /** @class */ (function (_super) {
                             // wherever this Moveable is able to move in a "straight" line is visible from the starting place
                             var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
                             var currentDistance = 0;
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, _this);
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, _this, false);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
@@ -663,30 +663,32 @@ var World = /** @class */ (function () {
 }());
 var Moveable = /** @class */ (function (_super) {
     __extends(Moveable, _super);
-    function Moveable(size, x, y, direction, map) {
+    function Moveable(size, x, y, direction, map, doesRicochet) {
         var _this = _super.call(this, size, x, y) || this;
         _this.direction = direction;
         _this.map = map;
+        _this.doesRicochet = doesRicochet;
         return _this;
     }
     Moveable.prototype.point = function (target) {
         this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
     };
     Moveable.prototype.move = function (velocity) {
-        // this function can be understood in two basic parts
-        // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        var newX = this.location.x + relativeChangeCoordinate.x;
-        var newY = this.location.y + relativeChangeCoordinate.y;
-        // part two determines if the coordinates are somewhere the character can actually go
-        if (this.map.isOpen(new Coord(newX, newY))) {
-            this.location.x = newX;
-            this.location.y = newY;
-            return true;
+        var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+        while (!this.map.isOpen(newLocation)) {
+            if (this.doesRicochet) {
+                var newCoordAsGrid = this.map.getGridIndex(newLocation);
+                this.direction = World.calculateDirection(newCoordAsGrid.x, newCoordAsGrid.y, this.location.x, this.location.y);
+                relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+                newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+            }
+            else {
+                return false;
+            }
         }
-        else {
-            return false;
-        }
+        this.location = newLocation;
+        return true;
     };
     ;
     return Moveable;
@@ -694,7 +696,7 @@ var Moveable = /** @class */ (function (_super) {
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(x, y, target, map, owner) {
-        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map) || this;
+        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map, false) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
@@ -767,7 +769,7 @@ var CannonBall = /** @class */ (function (_super) {
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
     function Character(size, x, y, map, bullets, maxHP) {
-        var _this = _super.call(this, size, x, y, Math.random() * 360, map) || this;
+        var _this = _super.call(this, size, x, y, Math.random() * 360, map, false) || this;
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();

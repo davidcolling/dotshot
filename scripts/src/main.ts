@@ -373,7 +373,7 @@ class GridMap extends Drawable {
                             var previousCoord = new Coord(i * gridSquareSize, j * gridSquareSize);
                             var currentDistance = 0;
 
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this);
+                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this, false);
                             var moveCount = 0;
                             while (coordinateTracker.move(2)) {
                                 //check if the tracker entered a new grid cell
@@ -772,31 +772,32 @@ class World {
 class Moveable extends CenteredShape {
     direction: number;
     map: GridMap;
+    doesRicochet: boolean;
 
-    constructor(size, x, y, direction, map) {
+    constructor(size, x, y, direction, map, doesRicochet) {
         super(size, x, y);
         this.direction = direction;
         this.map = map;
+        this.doesRicochet = doesRicochet;
     }
     point(target):void {
         this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
     }
     move(velocity):boolean {
-        // this function can be understood in two basic parts
-        // port one calculates the objects new coordinates based off of their current coordinates, their direction, their velocity
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        var newX = this.location.x + relativeChangeCoordinate.x;
-        var newY = this.location.y + relativeChangeCoordinate.y;
-        // part two determines if the coordinates are somewhere the character can actually go
-        if (
-            this.map.isOpen(new Coord(newX, newY))
-        ) {
-            this.location.x = newX;
-            this.location.y = newY;
-            return true;
-        } else {
-            return false;
+        var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+        while (!this.map.isOpen(newLocation)) {
+            if (this.doesRicochet) {
+                var newCoordAsGrid = this.map.getGridIndex(newLocation);
+                this.direction = World.calculateDirection(newCoordAsGrid.x, newCoordAsGrid.y, this.location.x, this.location.y);
+                relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+                newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+            } else {
+                return false;
+            }
         }
+        this.location = newLocation;
+        return true;
     };
 }
 
@@ -808,7 +809,7 @@ class Bullet extends Moveable {
     owner: Character;
 
     constructor(x, y, target, map, owner) {
-        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map);
+        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, false);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
@@ -882,7 +883,7 @@ class Character extends Moveable {
     currentWeapon:number;
 
     constructor(size, x, y, map, bullets, maxHP) {
-        super(size, x, y, Math.random() * 360, map);
+        super(size, x, y, Math.random() * 360, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
@@ -1458,4 +1459,5 @@ var game;
 var loadPage = function() {
     game = new HTMLDotshotUI();
 }
+
 
