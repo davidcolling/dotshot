@@ -809,7 +809,7 @@ class Bullet extends Moveable {
     owner: Character;
 
     constructor(x, y, target, map, owner) {
-        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, false);
+        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;

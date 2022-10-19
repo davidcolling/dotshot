@@ -696,7 +696,7 @@ var Moveable = /** @class */ (function (_super) {
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(x, y, target, map, owner) {
-        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map, false) || this;
+        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map, true) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
