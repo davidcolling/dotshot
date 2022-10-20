@@ -587,6 +587,9 @@ var World = /** @class */ (function () {
             return direction;
         }
     };
+    World.calculateAddDirection = function (direction, summand) {
+        return (direction + summand) % 360;
+    };
     World.prototype.calculateDifference = function (direction1, direction2) {
         var difference = direction1 - direction2;
         if (difference > 180) {
@@ -679,7 +682,7 @@ var Moveable = /** @class */ (function (_super) {
         while (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                this.direction = World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y);
+                this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), 90);
                 relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
             }

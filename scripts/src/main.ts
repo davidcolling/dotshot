@@ -686,6 +686,10 @@ class World {
         }
     }
 
+    static calculateAddDirection(direction, summand) {
+        return (direction + summand) % 360;
+    }
+
     calculateDifference(direction1, direction2):number {
         var difference = direction1 - direction2;
 
@@ -789,7 +793,7 @@ class Moveable extends CenteredShape {
         while (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                this.direction = World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y);
+                this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), 90);
                 relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
             } else {
