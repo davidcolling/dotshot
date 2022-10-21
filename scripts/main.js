@@ -682,7 +682,8 @@ var Moveable = /** @class */ (function (_super) {
         while (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), 90);
+                var angleToAdd = 90;
+                this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), angleToAdd);
                 relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
             }
