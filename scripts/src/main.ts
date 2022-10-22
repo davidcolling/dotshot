@@ -471,6 +471,16 @@ class GridMap extends Drawable {
         if (!this.isEmpty) 
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     }
+
+    static getSquareScreenCoord(square):Array<Coord> {
+        // 0: UL, 1: UR, 2: LL, 3: LR
+        var output = new Array();
+        output.push(new Coord(square.x * gridSquareSize, square.y * gridSquareSize)); // UL
+        output.push(new Coord(output[0].x + gridSquareSize, output[0].y)) // UR
+        output.push(new Coord(output[0].x, output[0].y + gridSquareSize)) // LR
+        output.push(new Coord(output[0].x + gridSquareSize, output[0].y + gridSquareSize)) // LR
+        return output;
+    }
     
 }
 
