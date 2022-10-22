@@ -690,6 +690,9 @@ class World {
         return (direction + summand) % 360;
     }
 
+    static calculateRicochetDirection(currentDirection, wallSide1, wallSideGreater, isHorizontal):number {
+    }
+
     calculateDifference(direction1, direction2):number {
         var difference = direction1 - direction2;
 
