@@ -690,7 +690,28 @@ class World {
         return (direction + summand) % 360;
     }
 
-    static calculateRicochetDirection(currentDirection, wallSide1, wallSideGreater, isHorizontal):number {
+    static calculateRicochetDirection(currentDirection, isHorizontal):number {
+        if (isHorizontal) {
+            if (0 <= currentDirection && 90 > currentDirection) {
+                return (90 - currentDirection) + 90;
+            } else if (90 <= currentDirection && 180 > currentDirection) {
+                return 90 - (currentDirection - 90);
+            } else if (180 <= currentDirection && 270 > currentDirection) {
+                return (270 - currentDirection) + 270;
+            } else {
+                return 270 - (currentDirection - 270);
+            }
+        } else {
+            if (0 <= currentDirection && 90 > currentDirection) {
+                return 360 - currentDirection;
+            } else if (90 <= currentDirection && 180 > currentDirection) {
+                return 180 + (180 - currentDirection);
+            } else if (180 <= currentDirection && 270 > currentDirection) {
+                return 180 - (currentDirection - 180);
+            } else {
+                return 360 - currentDirection;
+            }
+        }
     }
 
     calculateDifference(direction1, direction2):number {
