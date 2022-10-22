@@ -690,8 +690,8 @@ class World {
         return (direction + summand) % 360;
     }
 
-    static calculateRicochetDirection(currentDirection, isHorizontal):number {
-        if (isHorizontal) {
+    static calculateRicochetDirection(currentDirection, faceIsHorizontal):number {
+        if (faceIsHorizontal) {
             if (0 <= currentDirection && 90 > currentDirection) {
                 return (90 - currentDirection) + 90;
             } else if (90 <= currentDirection && 180 > currentDirection) {
