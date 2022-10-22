@@ -472,13 +472,13 @@ class GridMap extends Drawable {
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     }
 
-    static getSquareScreenCoord(square):Array<Coord> {
+    getSquareScreenCoord(square):Array<Coord> {
         // 0: UL, 1: UR, 2: LL, 3: LR
         var output = new Array();
-        output.push(new Coord(square.x * gridSquareSize, square.y * gridSquareSize)); // UL
-        output.push(new Coord(output[0].x + gridSquareSize, output[0].y)) // UR
-        output.push(new Coord(output[0].x, output[0].y + gridSquareSize)) // LR
-        output.push(new Coord(output[0].x + gridSquareSize, output[0].y + gridSquareSize)) // LR
+        output.push(new Coord(square.x * this.gridSquareSize, square.y * this.gridSquareSize)); // UL
+        output.push(new Coord(output[0].x + this.gridSquareSize, output[0].y)) // UR
+        output.push(new Coord(output[0].x, output[0].y + this.gridSquareSize)) // LR
+        output.push(new Coord(output[0].x + this.gridSquareSize, output[0].y + this.gridSquareSize)) // LR
         return output;
     }
     
@@ -829,6 +829,8 @@ class Moveable extends CenteredShape {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
                 this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), angleToAdd);
+
+                var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
 
                 relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
