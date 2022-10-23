@@ -701,7 +701,9 @@ class World {
     }
 
     static calculateRicochetDirection(currentDirection, faceIsHorizontal):number {
+        console.log("dotshot debug: inside calculateRicochetDirection");
         if (faceIsHorizontal) {
+            console.log("dotshot debug: inside calculateRicochetDirection faceIsHorizontal");
             if (0 <= currentDirection && 90 > currentDirection) {
                 return (90 - currentDirection) + 90;
             } else if (90 <= currentDirection && 180 > currentDirection) {
@@ -712,10 +714,11 @@ class World {
                 return 270 - (currentDirection - 270);
             }
         } else {
+            console.log("dotshot debug: inside calculateRicochetDirection !faceIsHorizontal");
             if (0 <= currentDirection && 90 > currentDirection) {
                 return 360 - currentDirection;
             } else if (90 <= currentDirection && 180 > currentDirection) {
-                return 180 + (180 - currentDirection);
+                return 360 - currentDirection;
             } else if (180 <= currentDirection && 270 > currentDirection) {
                 return 180 - (currentDirection - 180);
             } else {
@@ -824,13 +827,25 @@ class Moveable extends CenteredShape {
     move(velocity):boolean {
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
         var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
-        while (!this.map.isOpen(newLocation)) {
+        if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
-                this.direction = World.calculateAddDirection(World.calculateDirection(newLocation.x, newLocation.y, this.location.x, this.location.y), angleToAdd);
 
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
+                if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet isHorizontal");
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
+                    this.direction = World.calculateRicochetDirection(this.direction, true);
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
+                } else if (squareCoords[0].y <= this.location.y && squareCoords[1].y >= this.location.y) {
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet !isHorizontal");
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
+                    this.direction = World.calculateRicochetDirection(this.direction, false);
+                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
+                } else {
+                    console.log("dotshot debug: corner case");
+                }
 
                 relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
                 newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
