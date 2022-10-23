@@ -701,9 +701,7 @@ class World {
     }
 
     static calculateRicochetDirection(currentDirection, faceIsHorizontal):number {
-        console.log("dotshot debug: inside calculateRicochetDirection");
         if (faceIsHorizontal) {
-            console.log("dotshot debug: inside calculateRicochetDirection faceIsHorizontal");
             if (0 <= currentDirection && 90 > currentDirection) {
                 return (90 - currentDirection) + 90;
             } else if (90 <= currentDirection && 180 > currentDirection) {
@@ -714,7 +712,6 @@ class World {
                 return 270 - (currentDirection - 270);
             }
         } else {
-            console.log("dotshot debug: inside calculateRicochetDirection !faceIsHorizontal");
             if (0 <= currentDirection && 90 > currentDirection) {
                 return 360 - currentDirection;
             } else if (90 <= currentDirection && 180 > currentDirection) {
@@ -837,17 +834,10 @@ class Moveable extends CenteredShape {
 
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
                 if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet isHorizontal");
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                     this.direction = World.calculateRicochetDirection(this.direction, true);
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                 } else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet !isHorizontal");
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                     this.direction = World.calculateRicochetDirection(this.direction, false);
-                    console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                 } else {
-                    console.log("dotshot debug: corner case");
                 }
             } else {
                 return false;
