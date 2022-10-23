@@ -734,7 +734,7 @@ var Moveable = /** @class */ (function (_super) {
                     this.direction = World.calculateRicochetDirection(this.direction, true);
                     console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                 }
-                else if (squareCoords[0].y <= this.location.y && squareCoords[1].y >= this.location.y) {
+                else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
                     console.log("dotshot debug: inside Moveable.move this.doesRicochet !isHorizontal");
                     console.log("dotshot debug: inside Moveable.move this.doesRicochet current direction: " + this.direction);
                     this.direction = World.calculateRicochetDirection(this.direction, false);
