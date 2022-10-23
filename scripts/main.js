@@ -713,6 +713,7 @@ var Moveable = /** @class */ (function (_super) {
         _this.direction = direction;
         _this.map = map;
         _this.doesRicochet = doesRicochet;
+        _this.hasRicocheted = false;
         return _this;
     }
     Moveable.prototype.point = function (target) {
@@ -723,6 +724,7 @@ var Moveable = /** @class */ (function (_super) {
         var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
+                this.hasRicocheted = true;
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
@@ -741,8 +743,6 @@ var Moveable = /** @class */ (function (_super) {
                 else {
                     console.log("dotshot debug: corner case");
                 }
-                relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-                newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
             }
             else {
                 return false;
@@ -766,6 +766,11 @@ var Bullet = /** @class */ (function (_super) {
         return _this;
     }
     Bullet.prototype.step = function () {
+        if (this.doesRicochet) {
+            if (this.hasRicocheted) {
+                this.hasPassedTarget = true;
+            }
+        }
         if (!this.hasPassedTarget) {
             var distance = World.calculateDistance(this.location, this.target);
             if (distance > 10) {

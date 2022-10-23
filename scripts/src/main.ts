@@ -814,12 +814,14 @@ class Moveable extends CenteredShape {
     direction: number;
     map: GridMap;
     doesRicochet: boolean;
+    hasRicocheted: boolean;
 
     constructor(size, x, y, direction, map, doesRicochet) {
         super(size, x, y);
         this.direction = direction;
         this.map = map;
         this.doesRicochet = doesRicochet;
+        this.hasRicocheted = false;
     }
     point(target):void {
         this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
@@ -829,6 +831,7 @@ class Moveable extends CenteredShape {
         var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
+                this.hasRicocheted = true;
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
 
@@ -846,9 +849,6 @@ class Moveable extends CenteredShape {
                 } else {
                     console.log("dotshot debug: corner case");
                 }
-
-                relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-                newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
             } else {
                 return false;
             }
@@ -874,6 +874,11 @@ class Bullet extends Moveable {
         this.hasPassedTarget = false;
     }
     step():boolean {
+        if (this.doesRicochet) {
+            if (this.hasRicocheted) {
+                this.hasPassedTarget = true;
+            }
+        }
         if (!this.hasPassedTarget) {
             var distance = World.calculateDistance(this.location, this.target);
             if (distance > 10) {
