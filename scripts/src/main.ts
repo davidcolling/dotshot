@@ -843,6 +843,8 @@ class Moveable extends CenteredShape {
                 return false;
             }
         }
+        relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
+        newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
