@@ -29,7 +29,7 @@ class CenteredShape extends Drawable {
     size: number;
     location: Coord
 
-    constructor(size, x, y) {
+    constructor(size: number, x: number, y:number) {
         super();
         this.size = size;
 	this.location = new Coord(x, y);
