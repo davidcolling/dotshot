@@ -22,7 +22,7 @@ class Coord {
 }
 
 class Drawable {
-    draw(drawWorker, strokeColor):void {}
+    draw(drawWorker, strokeColor: RGBA):void {}
 }
 
 class CenteredShape extends Drawable {
@@ -34,7 +34,7 @@ class CenteredShape extends Drawable {
         this.size = size;
 	this.location = new Coord(x, y);
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.circle(
             this.location.x,
             this.location.y,
@@ -47,7 +47,7 @@ class NPcSpawner extends CenteredShape {
     counter:number;
     world: World;
 
-    constructor(x, y, world) {
+    constructor(x: number, y: number, world: World) {
         super(8, x, y);
         this.counter = 0;
         this.world = world
@@ -58,7 +58,7 @@ class NPcSpawner extends CenteredShape {
             this.world.nPCs.push(new Pirate(this.location.x, this.location.y,  this.world.map, this.world.bullets, this.world.player));
         }
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.circle(
             this.location.x,
             this.location.y,
@@ -74,14 +74,14 @@ class Weapon {
     counter:  number;
     lastCount: number;
 
-    constructor(bullets, owner) {
+    constructor(bullets: Array<Bullet>, owner: Character) {
         this.bullets = bullets;
         this.owner = owner;
         this.counter = 0;
         this.lastCount = 0;
     }
 
-    fire(target):void {}
+    fire(target: Coord):void {}
 
     step():void {
         this.counter++;
@@ -89,33 +89,33 @@ class Weapon {
 }
 
 class Gun extends Weapon {
-    constructor(bullets, owner) {
+    constructor(bullets: Array<Bullet>, owner: Character) {
         super(bullets, owner);
     }
 
-    fire(target):void {
+    fire(target: Coord):void {
         super.fire(target);
         this.bullets.push(new Bullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner));
     }
 }
 
 class ExplodingBulletGun extends Weapon {
-    constructor(bullets, owner) {
+    constructor(bullets: Array<Bullet>, owner: Character) {
         super(bullets, owner);
     }
 
-    fire(target):void {
+    fire(target: Coord):void {
         super.fire(target);
         this.bullets.push(new ExplodingBullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner, this.bullets));
     }
 }
 
 class DoubleBarrelGun extends Weapon {
-    constructor(bullets, owner) {
+    constructor(bullets: Array<Bullet>, owner: Character) {
         super(bullets, owner);
     }
 
-    fire(target):void {
+    fire(target: Coord):void {
         super.fire(target);
         this.bullets.push(new Bullet(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
         this.bullets.push(new Bullet(this.owner.location.x - 5, this.owner.location.y, target, this.owner.map, this.owner));
@@ -125,12 +125,12 @@ class DoubleBarrelGun extends Weapon {
 class Cannon extends Weapon {
     hasShot:boolean;
 
-    constructor(bullets, owner) {
+    constructor(bullets: Array<Bullet>, owner: Character) {
         super(bullets, owner);
         this.hasShot = false;
     }
 
-    fire(target):void {
+    fire(target: Coord):void {
         if (!this.hasShot || this.counter - this.lastCount > 35) {
             if (!this.hasShot) {
                 this.hasShot = true;
@@ -144,7 +144,7 @@ class Cannon extends Weapon {
 
 class Ping extends CenteredShape {
     age: number;
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         super(1, x, y);
         this.age = 0;
     }
@@ -152,7 +152,7 @@ class Ping extends CenteredShape {
         this.age++;
         this.size++;
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.fill(strokeColor.r, 0);
         super.draw(drawWorker, strokeColor); 
     }
@@ -162,7 +162,7 @@ class Food extends CenteredShape {
     isGrowing: boolean;
     growAge: number;
 
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         super(2, x, y);
         this.isGrowing = true;
         this.growAge = 0;
@@ -183,7 +183,7 @@ class Food extends CenteredShape {
             }
         }
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.fill(strokeColor.r, 256);
         super.draw(drawWorker, strokeColor); 
     }
@@ -194,7 +194,7 @@ class GridMapImage {
     gridHeight:number;
     map: Array<Array<boolean>>;
 
-    constructor(width, height) {
+    constructor(width: number, height: number) {
         this.gridWidth = width;
         this.gridHeight = height;
         this.map = new Array();
@@ -205,10 +205,10 @@ class GridMapImage {
             }
         }
     }
-    set(x, y):void {
+    set(x: number, y: number):void {
         this.map[x][y] = true;
     }
-    unSet(x, y):void {
+    unSet(x: number, y: number):void {
         this.map[x][y] = false;
     }
 }
@@ -220,7 +220,7 @@ class GridSquare extends Drawable {
     visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
     isHighlighted: boolean; // for ad-hoc debugging
 
-    constructor(size, coord, isEmpty) {
+    constructor(size: number, coord: Coord, isEmpty: boolean) {
         super();
         this.size = size;
         this.isEmpty = isEmpty;
@@ -229,7 +229,7 @@ class GridSquare extends Drawable {
         this.isHighlighted = false;
     }
 
-    draw(drawWorker, strokeColor):boolean {
+    draw(drawWorker, strokeColor: RGBA):boolean {
         if (this.isHighlighted) {
             drawWorker.fill(256, 0, 0, 256);
             drawWorker.rect(
@@ -254,7 +254,7 @@ class GridSquare extends Drawable {
         }
     }
 
-    isVisible(coord):boolean {
+    isVisible(coord: Coord):boolean {
         if (this.visibleIndexes == null) {
             return true;
         } else {
@@ -268,14 +268,14 @@ class HealthBar extends Drawable {
     hp: number;
     map: GridMap;
 
-    constructor(max, map) {
+    constructor(max: number, map: GridMap) {
         super();
         this.max = max;
         this.map = map
         this.hp = this.max;
     }
 
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         if (this.hp != 0) {
             drawWorker.stroke(256, 0, 0, 256);
             drawWorker.fill(256, 0, 0, 256);
@@ -306,7 +306,7 @@ class GridMap extends Drawable {
     gridSquareSize: number; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
     isEmpty: boolean;
     
-    constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
+    constructor(screenWidth: number, screenHeight: number, gridSquareSize: number, numberOfWalls: number, wallLength: number, isEmpty: boolean) {
         super();
         var gridWidth = Math.floor(screenWidth / gridSquareSize);
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
@@ -410,7 +410,7 @@ class GridMap extends Drawable {
         }
     }
 
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         if (!this.isEmpty) {
             for (var i = 0; i < this.gridWidth; i ++) {
                 for (var j = 0; j < this.gridHeight; j ++) {
@@ -421,7 +421,7 @@ class GridMap extends Drawable {
     }
 
     // blocks out gridSquares that aren't visible from the viewpoint
-    drawVisible(viewPointScreenCoord, drawWorker, strokeColor):void {
+    drawVisible(viewPointScreenCoord: Coord, drawWorker, strokeColor: RGBA):void {
         if( !this.isEmpty) {
             var viewPoint = this.getGridIndex(viewPointScreenCoord);
             for (var i = 0; i < this.gridWidth; i ++) {
@@ -442,7 +442,7 @@ class GridMap extends Drawable {
         }
     }
 
-    isOpen(screenCoord):boolean {
+    isOpen(screenCoord: Coord):boolean {
         if(!this.isEmpty) {
             if (
                 0 < screenCoord.x &&
@@ -460,19 +460,19 @@ class GridMap extends Drawable {
         }
     }
 
-    static getGridIndex(screenCoord, gridSquareSize):Coord {
+    static getGridIndex(screenCoord: Coord, gridSquareSize: number):Coord {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
         var indexY = Math.floor(screenCoord.y / gridSquareSize);
         var indexCoord = new Coord(indexX, indexY);
         return indexCoord;
     }
 
-    getGridIndex(screenCoord):Coord {
+    getGridIndex(screenCoord: Coord):Coord {
         if (!this.isEmpty) 
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
     }
 
-    getSquareScreenCoord(square):Array<Coord> {
+    getSquareScreenCoord(square: Coord):Array<Coord> {
         // 0: UL, 1: UR, 2: LL, 3: LR
         var output = new Array();
         output.push(new Coord(square.x * this.gridSquareSize, square.y * this.gridSquareSize)); // UL
