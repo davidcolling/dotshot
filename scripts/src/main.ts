@@ -1020,7 +1020,7 @@ class NPC extends Character {
     seesPlayer:boolean;
     lastSeenPlayerCoord: Coord;
 
-   constructor(size, x, y, map, bullets, maxHP, target, life, idleAge, idleLife) {
+   constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>, maxHP: number, target: Character, life: number, idleAge: number, idleLife: number) {
         super(size, x, y, map, bullets, maxHP);
         this.isHunting = false;
         this.age = 0;
@@ -1055,14 +1055,14 @@ class Chicken extends NPC {
     fleeLife: number;
     food: Array<Food>;
 
-    constructor(x, y, map, food) {
+    constructor(x: number, y: number, map: GridMap, food: Array<Food>) {
         super(5, x, y, map, null, 8, null, 1000, 0, 200);
         this.isRunning = false;
         this.fleeAge = 0;
         this.fleeLife = 20;
         this.food = food;
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor:RGBA ):void {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
@@ -1092,13 +1092,13 @@ class Spewer extends NPC {
     igniteAge: number;
     isGrowing: boolean;
 
-    constructor(x, y, map, bullets, target) {
+    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>, target: Character) {
         super(5, x, y, map, bullets, 8, target, 1000, 0, 200);
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
         super.draw(drawWorker, strokeColor); 
@@ -1183,11 +1183,11 @@ class Spewer extends NPC {
 class Pirate extends NPC {
     weaponCooldownCounter: number;
 
-    constructor(x, y, map, bullets, target) {
+    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>, target: Character) {
         super(5 , x, y, map, bullets, 8, target, 1000, 0, 200);
         this.weaponCooldownCounter = 0
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
         super.draw(drawWorker, strokeColor); 
@@ -1224,7 +1224,7 @@ class Pirate extends NPC {
 class LoadingActor extends NPC {
     stepCount: number;
 
-    constructor(x, y, map, bullets) {
+    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
         super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
         this.stepCount = 0;
     }
@@ -1250,10 +1250,10 @@ class LoadingActor extends NPC {
 }
 
 class Mine extends NPC {
-    constructor(x, y, map, bullets) {
+    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
         super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(130, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
         super.draw(drawWorker, strokeColor); 
@@ -1347,10 +1347,10 @@ class HTMLDotshotUI {
     
         // Create and display settings
         this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
-        this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 10, null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
+        this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
@@ -1401,7 +1401,7 @@ class NumericalSetting {
     defaultValue: number;
     value: number;
 
-    constructor (name, defaultValue, value) {
+    constructor (name: string, defaultValue: number, value: number) {
         this.name = name;
         this.defaultValue = defaultValue;
         if (this.value == null) {

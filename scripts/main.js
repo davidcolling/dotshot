@@ -1197,10 +1197,10 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         // Create and display settings
         this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", "10", null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", "50", null));
-        this.worldSettings.push(new NumericalSetting("wallLength", "10", null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", "8", null));
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 10, null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
+        this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
