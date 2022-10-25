@@ -503,7 +503,7 @@ class World {
     strokeColor: RGBA;
     spawners: Array<NPcSpawner>;
 
-    constructor(width, height, numberOfEnemies, map, loading, strokeColor) {
+    constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -647,7 +647,7 @@ class World {
         return JSON.stringify(this.map);
     }
 
-    drawBullets(list):void {
+    drawBullets(list: Array<Bullet>):void {
         for (var i = 0; i < list.length; i++) {
             if (list[i] != null) {
                 list[i].draw(this.drawWorker, this.strokeColor);
@@ -658,22 +658,22 @@ class World {
         }
     }
 
-    static calculateDistance(coord1, coord2):number {
+    static calculateDistance(coord1: Coord, coord2: Coord):number {
         return Math.sqrt( Math.abs(coord2.x - coord1.x)**2 + Math.abs(coord2.y - coord1.y)**2 ) 
     };
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
-    isShotBy(obj1, obj2):boolean {
+    isShotBy(obj1: Character, obj2: Bullet):boolean {
         var isClose =  3 > World.calculateDistance(obj1.location, obj2.location) 
         var isInFrontOf = this.isInFrontOf(obj1, obj2);
         return isClose && isInFrontOf;
     }
 
-    isInFrontOf(obj1, obj2):boolean {
+    isInFrontOf(obj1: Character, obj2: Bullet):boolean {
         return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
     }
 
-    static calculateDirection(x1, y1, x2, y2):number {
+    static calculateDirection(x1: number, y1: number, x2: number, y2: number):number {
         var dx = x1 - x2;
         var dy = y1 - y2;
 
@@ -696,11 +696,11 @@ class World {
         }
     }
 
-    static calculateAddDirection(direction, summand) {
+    static calculateAddDirection(direction: number, summand: number) {
         return (direction + summand) % 360;
     }
 
-    static calculateRicochetDirection(currentDirection, faceIsHorizontal):number {
+    static calculateRicochetDirection(currentDirection: number, faceIsHorizontal: boolean):number {
         if (faceIsHorizontal) {
             if (0 <= currentDirection && 90 > currentDirection) {
                 return (90 - currentDirection) + 90;
@@ -724,7 +724,7 @@ class World {
         }
     }
 
-    calculateDifference(direction1, direction2):number {
+    calculateDifference(direction1: number, direction2: number):number {
         var difference = direction1 - direction2;
 
         if (difference > 180) {
@@ -734,7 +734,7 @@ class World {
         return difference
     }
 
-    collectDamage(obj, arr):number {
+    collectDamage(obj: Character, arr: Array<Bullet>):number {
         var totalDamage = 0;
 
         for (var i = 0; i < arr.length; i++) {
@@ -753,7 +753,7 @@ class World {
     // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
     // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
     // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David
-    static calculateCoordinate(length, direction): Coord {
+    static calculateCoordinate(length: number, direction: number): Coord {
         var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
         var quadrantAngle = direction - (quadrant * 90);
         var quadrantAngleIsLowHalf = quadrantAngle < 45;
@@ -813,17 +813,17 @@ class Moveable extends CenteredShape {
     doesRicochet: boolean;
     hasRicocheted: boolean;
 
-    constructor(size, x, y, direction, map, doesRicochet) {
+    constructor(size: number, x: number, y: number, direction: number, map: GridMap, doesRicochet: boolean) {
         super(size, x, y);
         this.direction = direction;
         this.map = map;
         this.doesRicochet = doesRicochet;
         this.hasRicocheted = false;
     }
-    point(target):void {
+    point(target: Coord):void {
         this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
     }
-    move(velocity):boolean {
+    move(velocity: number):boolean {
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
         var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
@@ -857,7 +857,7 @@ class Bullet extends Moveable {
     maxForce:number;
     owner: Character;
 
-    constructor(x, y, target, map, owner) {
+    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character) {
         super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, true);
         this.maxForce = 1;
         this.owner = owner;
@@ -887,7 +887,7 @@ class Bullet extends Moveable {
             return false;
         }
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.fill(256, 256);
         super.draw(drawWorker, strokeColor); 
     }
@@ -896,7 +896,7 @@ class Bullet extends Moveable {
 class ExplodingBullet extends Bullet {
     bullets: Array<Bullet>;
 
-    constructor(x, y, target, map, owner, bullets) {
+    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character, bullets: Array<Bullet>) {
         super(x, y, target, map, owner);
         this.bullets = bullets;
     }
@@ -913,20 +913,20 @@ class ExplodingBullet extends Bullet {
 
         return true;
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         super.draw(drawWorker, strokeColor);
     }
 }
 
 class CannonBall extends Bullet {
-    constructor(x, y, target, map, owner) {
+    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character) {
         super(x, y, target, map, owner);
         this.size = 7;
         this.maxForce = 10;
     }
     step(): boolean {
         this.size = 5 + (this.age % 10);
-	return super.step();
+        return super.step();
     }
 }
 
@@ -936,7 +936,7 @@ class Character extends Moveable {
     weapons: Array<Weapon>;
     currentWeapon:number;
 
-    constructor(size, x, y, map, bullets, maxHP) {
+    constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
         super(size, x, y, Math.random() * 360, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
@@ -944,7 +944,7 @@ class Character extends Moveable {
         this.weapons.push(new Gun(bullets, this));
         this.currentWeapon = 0;
     }
-    fire(target):void {
+    fire(target: Coord):void {
         this.weapons[this.currentWeapon].fire(target);
     }
     step():void {
@@ -954,7 +954,7 @@ class Character extends Moveable {
             }
         }
     }
-    takeDamage(amount):void {
+    takeDamage(amount: number):void {
         this.hp -= amount;
     };
 }
@@ -966,7 +966,7 @@ class Player extends Character{
     initialSize:number;
     enemiesKilled: number;
 
-    constructor(size, x, y, map, bullets) {
+    constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
         super(size, x, y, map, bullets, 32);
         this.weapons.push(new DoubleBarrelGun(bullets, this));
         this.weapons.push(new ExplodingBulletGun(bullets, this));
@@ -997,16 +997,16 @@ class Player extends Character{
             this.move(3);
         }
     }
-    draw(drawWorker, strokeColor):void {
+    draw(drawWorker, strokeColor: RGBA):void {
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
     }
-    takeDamage(amount):void {
+    takeDamage(amount: number):void {
         super.takeDamage(amount);
-    if (amount > 0) {
+        if (amount > 0) {
             this.size = 30;
-    }
+        }
     }
     
 }
