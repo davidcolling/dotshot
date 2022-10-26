@@ -32,7 +32,7 @@ class CenteredShape extends Drawable {
     constructor(size: number, x: number, y:number) {
         super();
         this.size = size;
-	this.location = new Coord(x, y);
+        this.location = new Coord(x, y);
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.circle(
