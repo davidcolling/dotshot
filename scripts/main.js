@@ -1201,6 +1201,7 @@ var HTMLDotshotUI = /** @class */ (function () {
         this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
         this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
         this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
+        this.worldSettings.push(new BinarySetting("useSpawner", 1, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
@@ -1239,16 +1240,30 @@ var HTMLDotshotUI = /** @class */ (function () {
     };
     return HTMLDotshotUI;
 }());
-var NumericalSetting = /** @class */ (function () {
-    function NumericalSetting(name, defaultValue, value) {
+var Setting = /** @class */ (function () {
+    function Setting(name) {
         this.name = name;
-        this.defaultValue = defaultValue;
-        if (this.value == null) {
-            this.value = defaultValue;
+    }
+    Setting.prototype.getValueFromDocument = function () {
+        var element = document.getElementById(this.name);
+        if (element) {
+            return element.value;
+        }
+    };
+    return Setting;
+}());
+var NumericalSetting = /** @class */ (function (_super) {
+    __extends(NumericalSetting, _super);
+    function NumericalSetting(name, defaultValue, value) {
+        var _this = _super.call(this, name) || this;
+        _this.defaultValue = defaultValue;
+        if (_this.value == null) {
+            _this.value = defaultValue;
         }
         else {
-            this.value = value;
+            _this.value = value;
         }
+        return _this;
     }
     NumericalSetting.prototype.display = function () {
         var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
@@ -1258,13 +1273,24 @@ var NumericalSetting = /** @class */ (function () {
         }
     };
     NumericalSetting.prototype.setFromDocument = function () {
-        var element = document.getElementById(this.name);
-        if (element) {
-            this.value = element.value;
-        }
+        this.value = this.getValueFromDocument();
     };
     return NumericalSetting;
-}());
+}(Setting));
+var BinarySetting = /** @class */ (function (_super) {
+    __extends(BinarySetting, _super);
+    function BinarySetting(name, defaultValue, value) {
+        return _super.call(this, name, defaultValue, value) || this;
+    }
+    BinarySetting.prototype.display = function () {
+        var output = "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
+        var container = document.getElementById("worldSettings");
+        if (container) {
+            container.innerHTML += output;
+        }
+    };
+    return BinarySetting;
+}(NumericalSetting));
 document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {

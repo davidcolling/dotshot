@@ -1351,6 +1351,7 @@ class HTMLDotshotUI {
         this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
         this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
         this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
+        this.worldSettings.push(new BinarySetting("useSpawner", 1, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
@@ -1364,7 +1365,7 @@ class HTMLDotshotUI {
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].setFromDocument();
         }
-    
+
         document.getElementById("message").textContent = "Loading...";
 
         var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
@@ -1396,13 +1397,26 @@ class HTMLDotshotUI {
 
 }
 
-class NumericalSetting {
+class Setting {
+    name: string;
+    constructor(name: string) {
+        this.name = name;
+    }
+    getValueFromDocument(): * {
+        var element = document.getElementById(this.name);
+        if (element) {
+            return (element as HTMLFormElement).value;
+        }
+    }
+}
+
+class NumericalSetting extends Setting{
     name: string;
     defaultValue: number;
     value: number;
 
     constructor (name: string, defaultValue: number, value: number) {
-        this.name = name;
+        super(name);
         this.defaultValue = defaultValue;
         if (this.value == null) {
             this.value = defaultValue;
@@ -1418,9 +1432,19 @@ class NumericalSetting {
         }
     }
     setFromDocument():void {
-        var element = document.getElementById(this.name);
-        if (element) {
-            this.value = (element as HTMLFormElement).value;
+        this.value = this.getValueFromDocument();
+    }
+}
+
+class BinarySetting extends NumericalSetting {
+    constructor (name: string, defaultValue: number, value: number) {
+        super(name, defaultValue, value);
+    }
+    display():void {
+        var output = "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
+        var container = document.getElementById("worldSettings");
+        if (container) {
+            container.innerHTML += output;
         }
     }
 }
