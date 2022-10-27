@@ -1250,6 +1250,15 @@ var Setting = /** @class */ (function () {
             return element.value;
         }
     };
+    Setting.prototype.display = function () {
+        var container = document.getElementById("worldSettings");
+        if (container) {
+            container.innerHTML += this.generateHTML();
+        }
+    };
+    Setting.prototype.generateHTML = function () {
+        return "<p class='label'>" + this.name + "</p>";
+    };
     return Setting;
 }());
 var NumericalSetting = /** @class */ (function (_super) {
@@ -1265,12 +1274,8 @@ var NumericalSetting = /** @class */ (function (_super) {
         }
         return _this;
     }
-    NumericalSetting.prototype.display = function () {
-        var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
-        var container = document.getElementById("worldSettings");
-        if (container) {
-            container.innerHTML += output;
-        }
+    NumericalSetting.prototype.generateHTML = function () {
+        return _super.prototype.generateHTML.call(this) + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
     };
     NumericalSetting.prototype.setFromDocument = function () {
         this.value = this.getValueFromDocument();
@@ -1282,12 +1287,8 @@ var BinarySetting = /** @class */ (function (_super) {
     function BinarySetting(name, defaultValue, value) {
         return _super.call(this, name, defaultValue, value) || this;
     }
-    BinarySetting.prototype.display = function () {
-        var output = "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
-        var container = document.getElementById("worldSettings");
-        if (container) {
-            container.innerHTML += output;
-        }
+    BinarySetting.prototype.generateHTML = function () {
+        return _super.prototype.generateHTML.call(this) + "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
     };
     return BinarySetting;
 }(NumericalSetting));

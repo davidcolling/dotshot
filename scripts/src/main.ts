@@ -1408,6 +1408,15 @@ class Setting {
             return (element as HTMLFormElement).value;
         }
     }
+    display():void {
+        var container = document.getElementById("worldSettings");
+        if (container) {
+            container.innerHTML += this.generateHTML();
+        }
+    }
+    generateHTML(): string {
+        return "<p class='label'>" + this.name + "</p>";
+    }
 }
 
 class NumericalSetting extends Setting{
@@ -1424,12 +1433,8 @@ class NumericalSetting extends Setting{
             this.value = value;
         }
     }
-    display():void {
-        var output = "<p class='label'>" + this.name + "</p> <input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
-        var container = document.getElementById("worldSettings");
-        if (container) {
-            container.innerHTML += output;
-        }
+    generateHTML(): string{
+        return super.generateHTML() + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
     }
     setFromDocument():void {
         this.value = this.getValueFromDocument();
@@ -1440,12 +1445,8 @@ class BinarySetting extends NumericalSetting {
     constructor (name: string, defaultValue: number, value: number) {
         super(name, defaultValue, value);
     }
-    display():void {
-        var output = "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
-        var container = document.getElementById("worldSettings");
-        if (container) {
-            container.innerHTML += output;
-        }
+    generateHTML(): string{
+        return super.generateHTML() + "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
     }
 }
 
