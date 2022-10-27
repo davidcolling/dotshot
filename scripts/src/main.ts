@@ -1445,7 +1445,7 @@ class BinarySetting extends Setting<boolean> {
         super(name, defaultValue, value);
     }
     generateHTML(): string{
-        return super.generateHTML() + "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
+        return super.generateHTML() + "<input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
     }
 }
 
