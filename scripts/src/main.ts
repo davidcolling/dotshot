@@ -1320,7 +1320,7 @@ class HTMLDotshotUI {
     world: World;
     defaultStrokeColor: RGBA;
     display: Object;
-    worldSettings: Array<NumericalSetting>;
+    worldSettings: Array<Setting<any>>;
     height: number;
     width: number;
 
@@ -1351,7 +1351,7 @@ class HTMLDotshotUI {
         this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
         this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
         this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
-        this.worldSettings.push(new BinarySetting("useSpawner", 1, null));
+        this.worldSettings.push(new BinarySetting("useSpawner", true, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
@@ -1363,7 +1363,7 @@ class HTMLDotshotUI {
         }
     
         for (var i = 0; i < this.worldSettings.length; i++) {
-            this.worldSettings[i].setFromDocument();
+            this.worldSettings[i].setValueFromDocument();
         }
 
         document.getElementById("message").textContent = "Loading...";
@@ -1397,12 +1397,21 @@ class HTMLDotshotUI {
 
 }
 
-class Setting {
+class Setting<T> {
     name: string;
-    constructor(name: string) {
+    defaultValue: T;
+    value: T;
+
+    constructor(name: string, defaultValue: T, value: T) {
         this.name = name;
+        this.defaultValue = defaultValue;
+        if (this.value == null) {
+            this.value = defaultValue;
+        } else {
+            this.value = value;
+        }
     }
-    getValueFromDocument(): * {
+    getValueFromDocument(): T {
         var element = document.getElementById(this.name);
         if (element) {
             return (element as HTMLFormElement).value;
@@ -1417,32 +1426,22 @@ class Setting {
     generateHTML(): string {
         return "<p class='label'>" + this.name + "</p>";
     }
-}
-
-class NumericalSetting extends Setting{
-    name: string;
-    defaultValue: number;
-    value: number;
-
-    constructor (name: string, defaultValue: number, value: number) {
-        super(name);
-        this.defaultValue = defaultValue;
-        if (this.value == null) {
-            this.value = defaultValue;
-        } else {
-            this.value = value;
-        }
-    }
-    generateHTML(): string{
-        return super.generateHTML() + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
-    }
-    setFromDocument():void {
+    setValueFromDocument():void {
         this.value = this.getValueFromDocument();
     }
 }
 
-class BinarySetting extends NumericalSetting {
+class NumericalSetting extends Setting<number>{
     constructor (name: string, defaultValue: number, value: number) {
+        super(name, defaultValue, value);
+    }
+    generateHTML(): string{
+        return super.generateHTML() + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
+    }
+}
+
+class BinarySetting extends Setting<boolean> {
+    constructor (name: string, defaultValue: boolean, value: boolean) {
         super(name, defaultValue, value);
     }
     generateHTML(): string{
