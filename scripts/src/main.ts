@@ -503,7 +503,7 @@ class World {
     strokeColor: RGBA;
     spawners: Array<NPcSpawner>;
 
-    constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA) {
+    constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA, includeSpawner: boolean) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -534,7 +534,9 @@ class World {
             }
 
             this.spawners = new Array();
-            this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+            if (includeSpawner) {
+                this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+            }
 
         } else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
@@ -1320,7 +1322,7 @@ class HTMLDotshotUI {
     world: World;
     defaultStrokeColor: RGBA;
     display: Object;
-    worldSettings: Array<Setting<any>>;
+    worldSettings: Array<Setting<any, any>>;
     height: number;
     width: number;
 
@@ -1369,7 +1371,7 @@ class HTMLDotshotUI {
         document.getElementById("message").textContent = "Loading...";
 
         var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
-        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
+        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor, this.worldSettings[4].value);
         this.display = new p5(output, "canvas");
 
         document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
@@ -1397,10 +1399,11 @@ class HTMLDotshotUI {
 
 }
 
-class Setting<T> {
+class Setting<T, U> {
     name: string;
     defaultValue: T;
     value: T;
+    htmlValue: U;
     htmlType: string;
     htmlExtraAttributes: string;
 
@@ -1414,38 +1417,59 @@ class Setting<T> {
         }
         this.htmlExtraAttributes = "";
     }
-    getValueFromDocument(): T {
+    setValueFromDocument(): void {
         var element = document.getElementById(this.name);
         if (element) {
-            return (element as HTMLFormElement).value;
+            this.htmlValue = (element as HTMLFormElement).value;
         }
+        this.setValueFromHTML();
     }
     display():void {
+        this.setHTMLFromValue();
         var container = document.getElementById("worldSettings");
         if (container) {
             container.innerHTML += this.generateHTML();
         }
     }
     generateHTML(): string {
-        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.value + "' id='" + this.name + "'>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.htmlValue + "' id='" + this.name + "'>";
     }
-    setValueFromDocument():void {
-        this.value = this.getValueFromDocument();
-    }
+    setValueFromHTML(): void {}
+    setHTMLFromValue(): void {}
 }
 
-class NumericalSetting extends Setting<number>{
+class NumericalSetting extends Setting<number, number>{
     constructor (name: string, defaultValue: number, value: number) {
         super(name, defaultValue, value);
         this.htmlType = "range"
         this.htmlExtraAttributes = "' min='0' max='500' ";
     }
+    setValueFromHTML(): void {
+        this.value = this.htmlValue;
+    }
+    setHTMLFromValue(): void {
+        this.htmlValue = this.value;
+    }
 }
 
-class BinarySetting extends Setting<boolean> {
+class BinarySetting extends Setting<boolean, string> {
     constructor (name: string, defaultValue: boolean, value: boolean) {
         super(name, defaultValue, value);
         this.htmlType = "checkbox";
+    }
+    setValueFromHTML():void {
+        if (this.htmlValue == "on") { 
+            this.value = true;
+        } else {
+            this.value = false;
+        }
+    }
+    setHTMLFromValue(): void {
+        if (this.value) {
+            this.htmlValue = "on";
+        } else {
+            this.htmlValue = "off";
+        }
     }
 }
 

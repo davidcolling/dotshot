@@ -425,7 +425,7 @@ var GridMap = /** @class */ (function (_super) {
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
 var World = /** @class */ (function () {
-    function World(width, height, numberOfEnemies, map, loading, strokeColor) {
+    function World(width, height, numberOfEnemies, map, loading, strokeColor, includeSpawner) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -451,7 +451,9 @@ var World = /** @class */ (function () {
                 this.nPCs.push(new Chicken(Math.random() * this.map.width, Math.random() * this.map.height, this.map, this.food));
             }
             this.spawners = new Array();
-            this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+            if (includeSpawner) {
+                this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+            }
         }
         else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
@@ -1215,7 +1217,7 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         document.getElementById("message").textContent = "Loading...";
         var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
-        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor);
+        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor, this.worldSettings[4].value);
         this.display = new p5(output, "canvas");
         document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
     };
@@ -1252,24 +1254,25 @@ var Setting = /** @class */ (function () {
         }
         this.htmlExtraAttributes = "";
     }
-    Setting.prototype.getValueFromDocument = function () {
+    Setting.prototype.setValueFromDocument = function () {
         var element = document.getElementById(this.name);
         if (element) {
-            return element.value;
+            this.htmlValue = element.value;
         }
+        this.setValueFromHTML();
     };
     Setting.prototype.display = function () {
+        this.setHTMLFromValue();
         var container = document.getElementById("worldSettings");
         if (container) {
             container.innerHTML += this.generateHTML();
         }
     };
     Setting.prototype.generateHTML = function () {
-        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.value + "' id='" + this.name + "'>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.htmlValue + "' id='" + this.name + "'>";
     };
-    Setting.prototype.setValueFromDocument = function () {
-        this.value = this.getValueFromDocument();
-    };
+    Setting.prototype.setValueFromHTML = function () { };
+    Setting.prototype.setHTMLFromValue = function () { };
     return Setting;
 }());
 var NumericalSetting = /** @class */ (function (_super) {
@@ -1280,6 +1283,12 @@ var NumericalSetting = /** @class */ (function (_super) {
         _this.htmlExtraAttributes = "' min='0' max='500' ";
         return _this;
     }
+    NumericalSetting.prototype.setValueFromHTML = function () {
+        this.value = this.htmlValue;
+    };
+    NumericalSetting.prototype.setHTMLFromValue = function () {
+        this.htmlValue = this.value;
+    };
     return NumericalSetting;
 }(Setting));
 var BinarySetting = /** @class */ (function (_super) {
@@ -1289,6 +1298,22 @@ var BinarySetting = /** @class */ (function (_super) {
         _this.htmlType = "checkbox";
         return _this;
     }
+    BinarySetting.prototype.setValueFromHTML = function () {
+        if (this.htmlValue == "on") {
+            this.value = true;
+        }
+        else {
+            this.value = false;
+        }
+    };
+    BinarySetting.prototype.setHTMLFromValue = function () {
+        if (this.value) {
+            this.htmlValue = "on";
+        }
+        else {
+            this.htmlValue = "off";
+        }
+    };
     return BinarySetting;
 }(Setting));
 document.addEventListener('keydown', recordKey);
