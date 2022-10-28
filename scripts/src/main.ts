@@ -1401,6 +1401,8 @@ class Setting<T> {
     name: string;
     defaultValue: T;
     value: T;
+    htmlType: string;
+    htmlExtraAttributes: string;
 
     constructor(name: string, defaultValue: T, value: T) {
         this.name = name;
@@ -1410,6 +1412,7 @@ class Setting<T> {
         } else {
             this.value = value;
         }
+        this.htmlExtraAttributes = "";
     }
     getValueFromDocument(): T {
         var element = document.getElementById(this.name);
@@ -1424,7 +1427,7 @@ class Setting<T> {
         }
     }
     generateHTML(): string {
-        return "<p class='label'>" + this.name + "</p>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.value + "' id='" + this.name + "'>";
     }
     setValueFromDocument():void {
         this.value = this.getValueFromDocument();
@@ -1434,18 +1437,15 @@ class Setting<T> {
 class NumericalSetting extends Setting<number>{
     constructor (name: string, defaultValue: number, value: number) {
         super(name, defaultValue, value);
-    }
-    generateHTML(): string{
-        return super.generateHTML() + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
+        this.htmlType = "range"
+        this.htmlExtraAttributes = "' min='0' max='500' ";
     }
 }
 
 class BinarySetting extends Setting<boolean> {
     constructor (name: string, defaultValue: boolean, value: boolean) {
         super(name, defaultValue, value);
-    }
-    generateHTML(): string{
-        return super.generateHTML() + "<input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
+        this.htmlType = "checkbox";
     }
 }
 

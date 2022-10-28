@@ -1250,6 +1250,7 @@ var Setting = /** @class */ (function () {
         else {
             this.value = value;
         }
+        this.htmlExtraAttributes = "";
     }
     Setting.prototype.getValueFromDocument = function () {
         var element = document.getElementById(this.name);
@@ -1264,7 +1265,7 @@ var Setting = /** @class */ (function () {
         }
     };
     Setting.prototype.generateHTML = function () {
-        return "<p class='label'>" + this.name + "</p>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.value + "' id='" + this.name + "'>";
     };
     Setting.prototype.setValueFromDocument = function () {
         this.value = this.getValueFromDocument();
@@ -1274,21 +1275,20 @@ var Setting = /** @class */ (function () {
 var NumericalSetting = /** @class */ (function (_super) {
     __extends(NumericalSetting, _super);
     function NumericalSetting(name, defaultValue, value) {
-        return _super.call(this, name, defaultValue, value) || this;
+        var _this = _super.call(this, name, defaultValue, value) || this;
+        _this.htmlType = "range";
+        _this.htmlExtraAttributes = "' min='0' max='500' ";
+        return _this;
     }
-    NumericalSetting.prototype.generateHTML = function () {
-        return _super.prototype.generateHTML.call(this) + "<input type='range' min='0' max='500' value='" + this.value + "' id='" + this.name + "'>";
-    };
     return NumericalSetting;
 }(Setting));
 var BinarySetting = /** @class */ (function (_super) {
     __extends(BinarySetting, _super);
     function BinarySetting(name, defaultValue, value) {
-        return _super.call(this, name, defaultValue, value) || this;
+        var _this = _super.call(this, name, defaultValue, value) || this;
+        _this.htmlType = "checkbox";
+        return _this;
     }
-    BinarySetting.prototype.generateHTML = function () {
-        return _super.prototype.generateHTML.call(this) + "<p class='label'>" + this.name + "</p> <input type='checkbox' value='" + this.value + "' id='" + this.name + "'>";
-    };
     return BinarySetting;
 }(Setting));
 document.addEventListener('keydown', recordKey);
