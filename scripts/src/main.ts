@@ -672,12 +672,12 @@ class World {
     }
 
     isInFrontOf(obj1: Character, obj2: Bullet):boolean {
-        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
+        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
     }
 
-    static calculateDirection(x1: number, y1: number, x2: number, y2: number):number {
-        var dx = x1 - x2;
-        var dy = y1 - y2;
+    static calculateDirection(c1: Coord, c2: Coord):number {
+        var dx = c1.x - c2.x;
+        var dy = c1.y - c2.y;
 
         var direction;
 
@@ -823,7 +823,7 @@ class Moveable extends CenteredShape {
         this.hasRicocheted = false;
     }
     point(target: Coord):void {
-        this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
+        this.direction = World.calculateDirection(this.location, target);
     }
     move(velocity: number):boolean {
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
@@ -860,7 +860,7 @@ class Bullet extends Moveable {
     owner: Character;
 
     constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character) {
-        super(3, x, y, World.calculateDirection(x, y, target.x, target.y), map, true);
+        super(3, x, y, World.calculateDirection(new Coord(x, y), target), map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;

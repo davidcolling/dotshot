@@ -573,11 +573,11 @@ var World = /** @class */ (function () {
         return isClose && isInFrontOf;
     };
     World.prototype.isInFrontOf = function (obj1, obj2) {
-        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location.x, obj1.location.y, obj2.location.x, obj2.location.y)));
+        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
     };
-    World.calculateDirection = function (x1, y1, x2, y2) {
-        var dx = x1 - x2;
-        var dy = y1 - y2;
+    World.calculateDirection = function (c1, c2) {
+        var dx = c1.x - c2.x;
+        var dy = c1.y - c2.y;
         var direction;
         if (dx != 0 && dy != 0) {
             if (dx < 0 && dy > 0) { // target is in quadrant 1
@@ -716,7 +716,7 @@ var Moveable = /** @class */ (function (_super) {
         return _this;
     }
     Moveable.prototype.point = function (target) {
-        this.direction = World.calculateDirection(this.location.x, this.location.y, target.x, target.y);
+        this.direction = World.calculateDirection(this.location, target);
     };
     Moveable.prototype.move = function (velocity) {
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
@@ -751,7 +751,7 @@ var Moveable = /** @class */ (function (_super) {
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(x, y, target, map, owner) {
-        var _this = _super.call(this, 3, x, y, World.calculateDirection(x, y, target.x, target.y), map, true) || this;
+        var _this = _super.call(this, 3, x, y, World.calculateDirection(new Coord(x, y), target), map, true) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
