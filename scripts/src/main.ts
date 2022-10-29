@@ -1417,11 +1417,14 @@ class Setting<T, U> {
         }
         this.htmlExtraAttributes = "";
     }
-    setValueFromDocument(): void {
+    getElementFromDocument(): HTMLFormElement {
         var element = document.getElementById(this.name);
         if (element) {
-            this.htmlValue = (element as HTMLFormElement).value;
+            return (element as HTMLFormElement);
         }
+    }
+    setValueFromDocument(): void {
+        this.htmlValue = this.getElementFromDocument().value;
         this.setValueFromHTML();
     }
     display():void {
@@ -1432,7 +1435,7 @@ class Setting<T, U> {
         }
     }
     generateHTML(): string {
-        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.htmlValue + "' id='" + this.name + "'>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value=" + this.htmlValue + " id='" + this.name + "'>";
     }
     setValueFromHTML(): void {}
     setHTMLFromValue(): void {}
@@ -1458,7 +1461,7 @@ class BinarySetting extends Setting<boolean, string> {
         this.htmlType = "checkbox";
     }
     setValueFromHTML():void {
-        if (this.htmlValue == "on") { 
+        if (this.htmlExtraAttributes == " checked ") { 
             this.value = true;
         } else {
             this.value = false;
@@ -1466,10 +1469,19 @@ class BinarySetting extends Setting<boolean, string> {
     }
     setHTMLFromValue(): void {
         if (this.value) {
-            this.htmlValue = "on";
+            this.htmlExtraAttributes = " checked ";
         } else {
-            this.htmlValue = "off";
+            this.htmlExtraAttributes = "";
         }
+    }
+    setValueFromDocument(): void {
+        var element = this.getElementFromDocument();
+        if (element.checked == true) {
+            this.htmlExtraAttributes = " checked ";
+        } else {
+            this.htmlExtraAttributes = "";
+        }
+        this.setValueFromHTML();
     }
 }
 

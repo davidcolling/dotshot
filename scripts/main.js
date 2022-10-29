@@ -1254,11 +1254,14 @@ var Setting = /** @class */ (function () {
         }
         this.htmlExtraAttributes = "";
     }
-    Setting.prototype.setValueFromDocument = function () {
+    Setting.prototype.getElementFromDocument = function () {
         var element = document.getElementById(this.name);
         if (element) {
-            this.htmlValue = element.value;
+            return element;
         }
+    };
+    Setting.prototype.setValueFromDocument = function () {
+        this.htmlValue = this.getElementFromDocument().value;
         this.setValueFromHTML();
     };
     Setting.prototype.display = function () {
@@ -1269,7 +1272,7 @@ var Setting = /** @class */ (function () {
         }
     };
     Setting.prototype.generateHTML = function () {
-        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value='" + this.htmlValue + "' id='" + this.name + "'>";
+        return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value=" + this.htmlValue + " id='" + this.name + "'>";
     };
     Setting.prototype.setValueFromHTML = function () { };
     Setting.prototype.setHTMLFromValue = function () { };
@@ -1299,7 +1302,7 @@ var BinarySetting = /** @class */ (function (_super) {
         return _this;
     }
     BinarySetting.prototype.setValueFromHTML = function () {
-        if (this.htmlValue == "on") {
+        if (this.htmlExtraAttributes == " checked ") {
             this.value = true;
         }
         else {
@@ -1308,11 +1311,21 @@ var BinarySetting = /** @class */ (function (_super) {
     };
     BinarySetting.prototype.setHTMLFromValue = function () {
         if (this.value) {
-            this.htmlValue = "on";
+            this.htmlExtraAttributes = " checked ";
         }
         else {
-            this.htmlValue = "off";
+            this.htmlExtraAttributes = "";
         }
+    };
+    BinarySetting.prototype.setValueFromDocument = function () {
+        var element = this.getElementFromDocument();
+        if (element.checked == true) {
+            this.htmlExtraAttributes = " checked ";
+        }
+        else {
+            this.htmlExtraAttributes = "";
+        }
+        this.setValueFromHTML();
     };
     return BinarySetting;
 }(Setting));
