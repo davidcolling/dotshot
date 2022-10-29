@@ -182,22 +182,67 @@ var Food = /** @class */ (function (_super) {
     return Food;
 }(CenteredShape));
 var GridMapImage = /** @class */ (function () {
-    function GridMapImage(width, height) {
+    function GridMapImage(width, height, viewPoint, viewDistance) {
         this.gridWidth = width;
         this.gridHeight = height;
+        this.viewPoint = viewPoint;
+        this.viewDistance = viewDistance;
+        var distLeft = viewDistance;
+        if (this.viewPoint.x < this.viewDistance)
+            this.distAbove -= this.viewDistance - this.viewPoint.x;
+        this.distLeft = distLeft;
+        var distRight = viewDistance;
+        if (this.viewPoint.x + this.viewDistance > width)
+            this.distBelow -= this.viewDistance - (width - this.viewPoint.x);
+        this.distRight = distRight;
+        var distAbove = viewDistance;
+        if (this.viewPoint.y < this.viewDistance)
+            this.distAbove -= this.viewDistance - this.viewPoint.y;
+        this.distAbove = distAbove;
+        var distBelow = viewDistance;
+        if (this.viewPoint.y + this.viewDistance > height)
+            this.distBelow -= this.viewDistance - (height - this.viewPoint.y);
+        this.distBelow = distBelow;
         this.map = new Array();
-        for (var i = 0; i < width; i++) {
+        for (var i = 0; i < distLeft + distRight; i++) {
             this.map[i] = new Array();
-            for (var j = 0; j < height; j++) {
+            for (var j = 0; j < distAbove + distBelow; j++) {
                 this.map[i][j] = false;
             }
         }
     }
     GridMapImage.prototype.set = function (x, y) {
-        this.map[x][y] = true;
+        var coord = this.mapIndexToHashIndex(new Coord(x, y));
+        if (this.indexIsInRange(new Coord(x, y))) {
+            this.map[coord.x][coord.y] = true;
+        }
     };
     GridMapImage.prototype.unSet = function (x, y) {
-        this.map[x][y] = false;
+        var coord = this.mapIndexToHashIndex(new Coord(x, y));
+        if (this.indexIsInRange(new Coord(x, y))) {
+            this.map[coord.x][coord.y] = false;
+        }
+    };
+    GridMapImage.prototype.canSee = function (coord) {
+        if (this.indexIsInRange(this.mapIndexToHashIndex(coord))) {
+            var translatedCoord = this.mapIndexToHashIndex(coord);
+            return this.map[translatedCoord.x][translatedCoord.y];
+        }
+        else {
+            return false;
+        }
+    };
+    // translates a grid index from the whole map to the grid index of the interal hash map representing the visible portion of the entire math
+    GridMapImage.prototype.mapIndexToHashIndex = function (coord) {
+        var dx = this.viewPoint.x - this.distLeft;
+        var dy = this.viewPoint.y - this.distAbove;
+        return new Coord(coord.x - dx, coord.y - dy);
+    };
+    GridMapImage.prototype.indexIsInRange = function (coord) {
+        return (coord.x >= 0 &&
+            coord.x < this.map.length &&
+            coord.y >= 0 &&
+            coord.y < this.map[0].length);
     };
     return GridMapImage;
 }());
