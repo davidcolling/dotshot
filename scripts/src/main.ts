@@ -226,34 +226,22 @@ class GridMapImage {
         this.distBelow = distBelow ;
 
         this.map = new Array();
-        for (var i = 0; i < distLeft + distRight; i++) {
+        for (var i = 0; i < width; i++) {
             this.map[i] = new Array();
-            for (var j = 0; j < distAbove + distBelow; j++) {
+            for (var j = 0; j < height; j++) {
                 this.map[i][j] = false;
             }
         }
     }
     set(x: number, y: number):void {
-        var coord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(new Coord(x, y))) {
-            this.map[coord.x][coord.y] = true;
-        }
+        this.map[x][y] = true;
     }
     unSet(x: number, y: number):void {
-        var coord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(new Coord(x, y))) {
-            this.map[coord.x][coord.y] = false;
-        }
+        this.map[x][y] = false;
     }
 
     canSee(coord: Coord): boolean {
-        if (this.indexIsInRange(this.mapIndexToHashIndex(coord))) {
-            var translatedCoord = this.mapIndexToHashIndex(coord);
-            console.log(this.map[translatedCoord.x][translatedCoord.y]);
-            return this.map[translatedCoord.x][translatedCoord.y];
-        } else {
-            return false;
-        }
+        return this.map[coord.x][coord.y];
     }
 
     // translates a grid index from the whole map to the grid index of the interal hash map representing the visible portion of the entire math
