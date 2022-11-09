@@ -1292,6 +1292,7 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
         for (var i = 0; i < this.numberOfLines; i++) {
             this.lines[i] = "";
         }
+        this.currentLineNumber = 1;
         this.constructHTML();
     }
     HTMLDotshotMessageConsole.prototype.constructHTML = function () {
@@ -1313,9 +1314,10 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
                 this.lines[i] = this.lines[i + 1];
             }
             else {
-                this.lines[i] = string;
+                this.lines[i] = this.currentLineNumber + " " + string;
             }
         }
+        this.currentLineNumber++;
         this.constructHTML();
     };
     return HTMLDotshotMessageConsole;

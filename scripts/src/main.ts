@@ -1459,6 +1459,7 @@ class HTMLDotshotUI {
 }
 
 class HTMLDotshotMessageConsole {
+    currentLineNumber: number;
     html: string;
     numberOfLines: number;
     lines:Array<string>;
@@ -1469,6 +1470,7 @@ class HTMLDotshotMessageConsole {
         for (var i = 0; i < this.numberOfLines; i++) {
             this.lines[i] = "";
         }
+        this.currentLineNumber = 1;
         this.constructHTML();
     }
 
@@ -1492,9 +1494,10 @@ class HTMLDotshotMessageConsole {
             if (i != this.numberOfLines - 1) {
                 this.lines[i] = this.lines[i + 1];
             } else {
-                this.lines[i] = string;
+                this.lines[i] = this.currentLineNumber + " " + string;
             }
         }
+        this.currentLineNumber++;
         this.constructHTML();
     }
 }
