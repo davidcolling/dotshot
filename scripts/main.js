@@ -357,7 +357,7 @@ var GridMap = /** @class */ (function (_super) {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 4;
+            var viewDistance = 10;
             for (var i = 0; i < gridWidth; i++) {
                 for (var j = 0; j < gridHeight; j++) {
                     if (_this.map[i][j].isEmpty) {
