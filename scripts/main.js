@@ -1247,6 +1247,8 @@ var HTMLDotshotUI = /** @class */ (function () {
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
+        this.console = new HTMLDotshotMessageConsole();
+        this.console.display();
     }
     HTMLDotshotUI.prototype.startNewGame = function () {
         if (this.display != null) {
@@ -1281,6 +1283,18 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
     };
     return HTMLDotshotUI;
+}());
+var HTMLDotshotMessageConsole = /** @class */ (function () {
+    function HTMLDotshotMessageConsole() {
+        this.page = "";
+    }
+    HTMLDotshotMessageConsole.prototype.display = function () {
+        var element = document.getElementById("console");
+        if (element) {
+            element.innerHTML = "<p>" + this.page + "</p>";
+        }
+    };
+    return HTMLDotshotMessageConsole;
 }());
 var Setting = /** @class */ (function () {
     function Setting(name, defaultValue, value) {

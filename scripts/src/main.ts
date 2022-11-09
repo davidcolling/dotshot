@@ -1379,6 +1379,7 @@ class HTMLDotshotUI {
     worldSettings: Array<Setting<any, any>>;
     height: number;
     width: number;
+    console: HTMLDotshotMessageConsole;
 
     constructor () {
         // determine dimensions 
@@ -1411,6 +1412,9 @@ class HTMLDotshotUI {
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
         }
+
+        this.console = new HTMLDotshotMessageConsole();
+        this.console.display();
     }
 
     startNewGame():void {
@@ -1451,6 +1455,21 @@ class HTMLDotshotUI {
         }
     }
 
+}
+
+class HTMLDotshotMessageConsole {
+    page: string;
+
+    constructor() {
+        this.page = "";
+    }
+
+    display():void {
+        var element = document.getElementById("console");
+        if (element) {
+            element.innerHTML = "<p>" + this.page + "</p>";
+        }
+    }
 }
 
 class Setting<T, U> {
