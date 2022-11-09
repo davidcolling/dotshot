@@ -665,6 +665,7 @@ class World {
 
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
+                    game.console.post("kill");
                     this.nPCs[i] = null;
                     this.player.enemiesKilled++;
                 }
@@ -1458,17 +1459,43 @@ class HTMLDotshotUI {
 }
 
 class HTMLDotshotMessageConsole {
-    page: string;
+    html: string;
+    numberOfLines: number;
+    lines:Array<string>;
 
     constructor() {
-        this.page = "";
+        this.numberOfLines = 4;
+        this.lines = new Array();
+        for (var i = 0; i < this.numberOfLines; i++) {
+            this.lines[i] = "";
+        }
+        this.constructHTML();
+    }
+
+    constructHTML():void {
+        this.html = "";
+        for (var i = 0; i < this.numberOfLines; i++) {
+            this.html += "<p>" + this.lines[i] + "</p>";
+        }
+        this.display();
     }
 
     display():void {
         var element = document.getElementById("console");
         if (element) {
-            element.innerHTML = "<p>" + this.page + "</p>";
+            element.innerHTML = this.html;
         }
+    }
+
+    post(string):void {
+        for (var i = 0; i < this.numberOfLines; i++) {
+            if (i != this.numberOfLines - 1) {
+                this.lines[i] = this.lines[i + 1];
+            } else {
+                this.lines[i] = string;
+            }
+        }
+        this.constructHTML();
     }
 }
 

@@ -560,6 +560,7 @@ var World = /** @class */ (function () {
                 this.nPCs[i].step();
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
+                    game.console.post("kill");
                     this.nPCs[i] = null;
                     this.player.enemiesKilled++;
                 }
@@ -1286,13 +1287,36 @@ var HTMLDotshotUI = /** @class */ (function () {
 }());
 var HTMLDotshotMessageConsole = /** @class */ (function () {
     function HTMLDotshotMessageConsole() {
-        this.page = "";
+        this.numberOfLines = 4;
+        this.lines = new Array();
+        for (var i = 0; i < this.numberOfLines; i++) {
+            this.lines[i] = "";
+        }
+        this.constructHTML();
     }
+    HTMLDotshotMessageConsole.prototype.constructHTML = function () {
+        this.html = "";
+        for (var i = 0; i < this.numberOfLines; i++) {
+            this.html += "<p>" + this.lines[i] + "</p>";
+        }
+        this.display();
+    };
     HTMLDotshotMessageConsole.prototype.display = function () {
         var element = document.getElementById("console");
         if (element) {
-            element.innerHTML = "<p>" + this.page + "</p>";
+            element.innerHTML = this.html;
         }
+    };
+    HTMLDotshotMessageConsole.prototype.post = function (string) {
+        for (var i = 0; i < this.numberOfLines; i++) {
+            if (i != this.numberOfLines - 1) {
+                this.lines[i] = this.lines[i + 1];
+            }
+            else {
+                this.lines[i] = string;
+            }
+        }
+        this.constructHTML();
     };
     return HTMLDotshotMessageConsole;
 }());
