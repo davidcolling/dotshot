@@ -1258,11 +1258,11 @@ var HTMLDotshotUI = /** @class */ (function () {
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].setValueFromDocument();
         }
-        document.getElementById("message").textContent = "Loading...";
+        this.console.post("Loading...");
         var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
         this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor, this.worldSettings[4].value);
         this.display = new p5(output, "canvas");
-        document.getElementById("message").textContent = "'w' to move; 'r' to shoot; player faces the cursor; desktop only";
+        this.console.post("'w' to move; 'r' to shoot; player faces the cursor; desktop only");
     };
     HTMLDotshotUI.prototype.saveMap = function () {
         var map = this.world.save();
