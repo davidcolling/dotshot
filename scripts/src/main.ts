@@ -226,22 +226,33 @@ class GridMapImage {
         this.distBelow = distBelow ;
 
         this.map = new Array();
-        for (var i = 0; i < width; i++) {
+        for (var i = 0; i < distLeft + distRight + 1; i++) {
             this.map[i] = new Array();
-            for (var j = 0; j < height; j++) {
+            for (var j = 0; j < distAbove + distBelow + 1; j++) {
                 this.map[i][j] = false;
             }
         }
     }
     set(x: number, y: number):void {
-        this.map[x][y] = true;
+        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
+        if (this.indexIsInRange(subMapCoord)) {
+            this.map[subMapCoord.x][subMapCoord.y] = true;
+        }
     }
     unSet(x: number, y: number):void {
-        this.map[x][y] = false;
+        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
+        if (this.indexIsInRange(subMapCoord)) {
+            this.map[subMapCoord.x][subMapCoord.y] = false;
+        }
     }
 
     canSee(coord: Coord): boolean {
-        return this.map[coord.x][coord.y];
+        var subMapCoord = this.mapIndexToHashIndex(coord);
+        if (this.indexIsInRange(subMapCoord)) {
+            return this.map[subMapCoord.x][subMapCoord.y];
+        } else {
+            return false;
+        }
     }
 
     // translates a grid index from the whole map to the grid index of the interal hash map representing the visible portion of the entire math
@@ -410,7 +421,7 @@ class GridMap extends Drawable {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 30;
+            var viewDistance = 4;
             for (var i = 0; i < gridWidth; i++) { 
                 for (var j = 0; j < gridHeight; j++) {
                     if (this.map[i][j].isEmpty) {
