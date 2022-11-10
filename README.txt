@@ -14,7 +14,6 @@ Matt's sketches and BZFlag.
 To Do
 soon:
     - clean
-        - use Coord everywhere
         - loosen coupling between world
         classes and HTML UI
     - make full use of new GridMap
