@@ -1097,7 +1097,7 @@ class NPC extends Character {
         this.move(1);
     }
     attack() :void{}
-    decideDraw():void {
+    decide():void {
         if ( this.isHunting || this.seesPlayer) {
             this.attack();
         } else {
@@ -1174,7 +1174,7 @@ class Spewer extends NPC {
                 this.explode();
             }
         }
-        this.decideDraw();
+        this.decide();
     }
     explode():void {
         this.fire(new Coord(this.target.location.x, this.target.location.y));
@@ -1258,7 +1258,7 @@ class Pirate extends NPC {
     step():void {
         super.step();
         this.weaponCooldownCounter++;
-        this.decideDraw();
+        this.decide();
     }
     attack():void {
         this.point(this.lastSeenPlayerCoord);

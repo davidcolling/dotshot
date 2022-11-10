@@ -965,7 +965,7 @@ var NPC = /** @class */ (function (_super) {
         this.move(1);
     };
     NPC.prototype.attack = function () { };
-    NPC.prototype.decideDraw = function () {
+    NPC.prototype.decide = function () {
         if (this.isHunting || this.seesPlayer) {
             this.attack();
         }
@@ -1034,7 +1034,7 @@ var Spewer = /** @class */ (function (_super) {
                 this.explode();
             }
         }
-        this.decideDraw();
+        this.decide();
     };
     Spewer.prototype.explode = function () {
         this.fire(new Coord(this.target.location.x, this.target.location.y));
@@ -1113,7 +1113,7 @@ var Pirate = /** @class */ (function (_super) {
     Pirate.prototype.step = function () {
         _super.prototype.step.call(this);
         this.weaponCooldownCounter++;
-        this.decideDraw();
+        this.decide();
     };
     Pirate.prototype.attack = function () {
         this.point(this.lastSeenPlayerCoord);
