@@ -29,10 +29,10 @@ class CenteredShape extends Drawable {
     size: number;
     location: Coord
 
-    constructor(size: number, x: number, y:number) {
+    constructor(size: number, location: Coord) {
         super();
         this.size = size;
-        this.location = new Coord(x, y);
+        this.location = location;
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.circle(
@@ -47,15 +47,15 @@ class NPcSpawner extends CenteredShape {
     counter:number;
     world: World;
 
-    constructor(x: number, y: number, world: World) {
-        super(8, x, y);
+    constructor(location: Coord, world: World) {
+        super(8, location);
         this.counter = 0;
         this.world = world
     }
     step():void {
         this.counter++;
         if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
-            this.world.nPCs.push(new Pirate(this.location.x, this.location.y,  this.world.map, this.world.bullets, this.world.player));
+            this.world.nPCs.push(new Pirate(this.location,  this.world.map, this.world.bullets, this.world.player));
         }
     }
     draw(drawWorker, strokeColor: RGBA):void {
@@ -95,7 +95,7 @@ class Gun extends Weapon {
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner));
     }
 }
 
@@ -106,7 +106,7 @@ class ExplodingBulletGun extends Weapon {
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new ExplodingBullet(this.owner.location.x, this.owner.location.y, target, this.owner.map, this.owner, this.bullets));
+        this.bullets.push(new ExplodingBullet(this.owner.location, target, this.owner.map, this.owner, this.bullets));
     }
 }
 
@@ -117,8 +117,8 @@ class DoubleBarrelGun extends Weapon {
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(this.owner.location.x - 5, this.owner.location.y, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(new Coord(this.owner.location.x + 5, this.owner.location.y), target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(new Coord(this.owner.location.x - 5, this.owner.location.y), target, this.owner.map, this.owner));
     }
 }
 
@@ -136,7 +136,7 @@ class Cannon extends Weapon {
                 this.hasShot = true;
             }
             super.fire(target);
-            this.bullets.push(new CannonBall(this.owner.location.x + 5, this.owner.location.y, target, this.owner.map, this.owner));
+            this.bullets.push(new CannonBall(new Coord(this.owner.location.x + 5, this.owner.location.y), target, this.owner.map, this.owner));
             this.lastCount = this.counter;
         }
     }
@@ -144,8 +144,8 @@ class Cannon extends Weapon {
 
 class Ping extends CenteredShape {
     age: number;
-    constructor(x: number, y: number) {
-        super(1, x, y);
+    constructor(location) {
+        super(1, location);
         this.age = 0;
     }
     step():void {
@@ -162,8 +162,8 @@ class Food extends CenteredShape {
     isGrowing: boolean;
     growAge: number;
 
-    constructor(x: number, y: number) {
-        super(2, x, y);
+    constructor(location) {
+        super(2, location);
         this.isGrowing = true;
         this.growAge = 0;
     }
@@ -432,7 +432,7 @@ class GridMap extends Drawable {
                             var previousCoord = new Coord(i, j);
                             var currentDistance = 0;
 
-                            var coordinateTracker = new Moveable(1, i * gridSquareSize, j * gridSquareSize, k, this, false);
+                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k, this, false);
                             while (coordinateTracker.move(2)) {
                                 var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
 
@@ -571,25 +571,25 @@ class World {
             while (!map.isOpen(playerCoordinate)) {
                 playerCoordinate.x--;
             }
-            this.player = new Player(5, playerCoordinate.x, playerCoordinate.y, this.map, this.bullets);
+            this.player = new Player(5, playerCoordinate, this.map, this.bullets);
             this.healthBar = new HealthBar(32, this.map);
 
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
-                this.food.push(new Food(Math.random() * this.map.width, Math.random() * this.map.height));
+                this.food.push(new Food(new Coord(Math.random() * this.map.width, Math.random() * this.map.height)));
             }
 
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(  this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Spewer(    this.map.width * Math.random(),     (this.map.height / 2) * Math.random(),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Mine(    this.map.width * Math.random(),     (this.map.height) * Math.random(),      this.map, this.bullets));
-                this.nPCs.push(new Chicken( Math.random() * this.map.width,     Math.random() * this.map.height,        this.map, this.food));
+                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+                this.nPCs.push(new Spewer(    new Coord(this.map.width * Math.random(),     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+                this.nPCs.push(new Mine(    new Coord(this.map.width * Math.random(),     (this.map.height) * Math.random()),      this.map, this.bullets));
+                this.nPCs.push(new Chicken( new Coord(Math.random() * this.map.width,     Math.random() * this.map.height),        this.map, this.food));
             }
 
             this.spawners = new Array();
             if (includeSpawner) {
-                this.spawners.push(new NPcSpawner(this.map.width / 2, this.map.height / 2, this));
+                this.spawners.push(new NPcSpawner(new Coord(this.map.width / 2, this.map.height / 2), this));
             }
 
         } else {
@@ -598,7 +598,7 @@ class World {
             this.healthBar = null;
             this.food = null;
             this.nPCs = new Array();
-            this.nPCs.push(new LoadingActor(width / 2, height / 2, this.map, this.bullets));
+            this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets));
         }
     }
 
@@ -638,7 +638,7 @@ class World {
                 }
             }
             if (this.frameCount % 32 == 0) {
-                this.pings.push(new Ping(this.player.location.x, this.player.location.y));
+                this.pings.push(new Ping(this.player.location));
             }
         }
 
@@ -870,8 +870,8 @@ class Moveable extends CenteredShape {
     doesRicochet: boolean;
     hasRicocheted: boolean;
 
-    constructor(size: number, x: number, y: number, direction: number, map: GridMap, doesRicochet: boolean) {
-        super(size, x, y);
+    constructor(size: number, location: Coord, direction: number, map: GridMap, doesRicochet: boolean) {
+        super(size, location);
         this.direction = direction;
         this.map = map;
         this.doesRicochet = doesRicochet;
@@ -914,8 +914,8 @@ class Bullet extends Moveable {
     maxForce:number;
     owner: Character;
 
-    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character) {
-        super(3, x, y, World.calculateDirection(new Coord(x, y), target), map, true);
+    constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
+        super(3, location, World.calculateDirection(location, target), map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
@@ -953,18 +953,18 @@ class Bullet extends Moveable {
 class ExplodingBullet extends Bullet {
     bullets: Array<Bullet>;
 
-    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character, bullets: Array<Bullet>) {
-        super(x, y, target, map, owner);
+    constructor(location: Coord, target: Coord, map: GridMap, owner: Character, bullets: Array<Bullet>) {
+        super(location, target, map, owner);
         this.bullets = bullets;
     }
     step():boolean {
         super.step();
 
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x + 10, this.location.y - 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location.x, this.location.y, new Coord(this.location.x - 10, this.location.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, new Coord(this.location.x + 10, this.location.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, new Coord(this.location.x + 10, this.location.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, new Coord(this.location.x - 10, this.location.y + 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, new Coord(this.location.x - 10, this.location.y - 10), this.map, this.owner));
             return false;
         }
 
@@ -976,8 +976,8 @@ class ExplodingBullet extends Bullet {
 }
 
 class CannonBall extends Bullet {
-    constructor(x: number, y: number, target: Coord, map: GridMap, owner: Character) {
-        super(x, y, target, map, owner);
+    constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
+        super(location, target, map, owner);
         this.size = 7;
         this.maxForce = 10;
     }
@@ -993,8 +993,8 @@ class Character extends Moveable {
     weapons: Array<Weapon>;
     currentWeapon:number;
 
-    constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
-        super(size, x, y, Math.random() * 360, map, false);
+    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
+        super(size, location, Math.random() * 360, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
@@ -1023,8 +1023,8 @@ class Player extends Character{
     initialSize:number;
     enemiesKilled: number;
 
-    constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
-        super(size, x, y, map, bullets, 32);
+    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
+        super(size, location, map, bullets, 32);
         this.weapons.push(new DoubleBarrelGun(bullets, this));
         this.weapons.push(new ExplodingBulletGun(bullets, this));
         this.weapons.push(new Cannon(bullets, this));
@@ -1077,8 +1077,8 @@ class NPC extends Character {
     seesPlayer:boolean;
     lastSeenPlayerCoord: Coord;
 
-   constructor(size: number, x: number, y: number, map: GridMap, bullets: Array<Bullet>, maxHP: number, target: Character, life: number, idleAge: number, idleLife: number) {
-        super(size, x, y, map, bullets, maxHP);
+   constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number, target: Character, life: number, idleAge: number, idleLife: number) {
+        super(size, location, map, bullets, maxHP);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
@@ -1112,8 +1112,8 @@ class Chicken extends NPC {
     fleeLife: number;
     food: Array<Food>;
 
-    constructor(x: number, y: number, map: GridMap, food: Array<Food>) {
-        super(5, x, y, map, null, 8, null, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, food: Array<Food>) {
+        super(5, location, map, null, 8, null, 1000, 0, 200);
         this.isRunning = false;
         this.fleeAge = 0;
         this.fleeLife = 20;
@@ -1127,7 +1127,7 @@ class Chicken extends NPC {
     step():void {
         super.step();
         if(this.hp <= 0) {
-            this.food.push(new Food(this.location.x, this.location.y));
+            this.food.push(new Food(this.location));
         }
         if (this.seesPlayer) {
             if (this.fleeAge < this.fleeLife) {
@@ -1149,8 +1149,8 @@ class Spewer extends NPC {
     igniteAge: number;
     isGrowing: boolean;
 
-    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>, target: Character) {
-        super(5, x, y, map, bullets, 8, target, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, target: Character) {
+        super(5, location, map, bullets, 8, target, 1000, 0, 200);
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
@@ -1240,8 +1240,8 @@ class Spewer extends NPC {
 class Pirate extends NPC {
     weaponCooldownCounter: number;
 
-    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>, target: Character) {
-        super(5 , x, y, map, bullets, 8, target, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, target: Character) {
+        super(5 , location, map, bullets, 8, target, 1000, 0, 200);
         this.weaponCooldownCounter = 0
     }
     draw(drawWorker, strokeColor: RGBA):void {
@@ -1281,8 +1281,8 @@ class Pirate extends NPC {
 class LoadingActor extends NPC {
     stepCount: number;
 
-    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
-        super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
+        super(5, location, map, bullets, 1, null, 1000, 0, 200);
         this.stepCount = 0;
     }
     draw(drawWorker, strokeColor):void {
@@ -1307,8 +1307,8 @@ class LoadingActor extends NPC {
 }
 
 class Mine extends NPC {
-    constructor(x: number, y: number, map: GridMap, bullets: Array<Bullet>) {
-        super(5, x, y, map, bullets, 1, null, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
+        super(5, location, map, bullets, 1, null, 1000, 0, 200);
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(130, 128, 128, 256);
