@@ -27,6 +27,9 @@ var Coord = /** @class */ (function () {
         this.x = x;
         this.y = y;
     }
+    Coord.prototype.createOffset = function (dx, dy) {
+        return new Coord(this.x + dx, this.y + dy);
+    };
     return Coord;
 }());
 var Drawable = /** @class */ (function () {
@@ -109,8 +112,8 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(new Coord(this.owner.location.x + 5, this.owner.location.y), target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(new Coord(this.owner.location.x - 5, this.owner.location.y), target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner));
     };
     return DoubleBarrelGun;
 }(Weapon));
@@ -127,7 +130,7 @@ var Cannon = /** @class */ (function (_super) {
                 this.hasShot = true;
             }
             _super.prototype.fire.call(this, target);
-            this.bullets.push(new CannonBall(new Coord(this.owner.location.x + 5, this.owner.location.y), target, this.owner.map, this.owner));
+            this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
             this.lastCount = this.counter;
         }
     };
@@ -451,9 +454,9 @@ var GridMap = /** @class */ (function (_super) {
         // 0: UL, 1: UR, 2: LL, 3: LR
         var output = new Array();
         output.push(new Coord(square.x * this.gridSquareSize, square.y * this.gridSquareSize)); // UL
-        output.push(new Coord(output[0].x + this.gridSquareSize, output[0].y)); // UR
-        output.push(new Coord(output[0].x, output[0].y + this.gridSquareSize)); // LR
-        output.push(new Coord(output[0].x + this.gridSquareSize, output[0].y + this.gridSquareSize)); // LR
+        output.push(output[0].createOffset(this.gridSquareSize, 0)); // UR
+        output.push(output[0].createOffset(0, this.gridSquareSize)); // LL
+        output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)); // LR
         return output;
     };
     return GridMap;
@@ -542,7 +545,7 @@ var World = /** @class */ (function () {
             }
         }
         if (this.player != null) {
-            var playerIndex = this.map.getGridIndex(new Coord(this.player.location.x, this.player.location.y));
+            var playerIndex = this.map.getGridIndex(this.player.location);
         }
         // NPCs
         for (var i = 0; i < this.nPCs.length; i++) {
@@ -554,7 +557,7 @@ var World = /** @class */ (function () {
                     var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
                     this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(npcGridCoord);
                     if (this.nPCs[i].seesPlayer) {
-                        this.nPCs[i].lastSeenPlayerCoord = new Coord(this.player.location.x, this.player.location.y);
+                        this.nPCs[i].lastSeenPlayerCoord = this.player.location;
                     }
                 }
                 this.nPCs[i].step();
@@ -761,7 +764,7 @@ var Moveable = /** @class */ (function (_super) {
     };
     Moveable.prototype.move = function (velocity) {
         var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        var newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+        var newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 this.hasRicocheted = true;
@@ -782,7 +785,7 @@ var Moveable = /** @class */ (function (_super) {
             }
         }
         relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        newLocation = new Coord(this.location.x + relativeChangeCoordinate.x, this.location.y + relativeChangeCoordinate.y);
+        newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
@@ -840,10 +843,10 @@ var ExplodingBullet = /** @class */ (function (_super) {
     ExplodingBullet.prototype.step = function () {
         _super.prototype.step.call(this);
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.location, new Coord(this.location.x + 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, new Coord(this.location.x + 10, this.location.y - 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, new Coord(this.location.x - 10, this.location.y + 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, new Coord(this.location.x - 10, this.location.y - 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, 10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, -10), this.map, this.owner));
             return false;
         }
         return true;
@@ -1037,13 +1040,13 @@ var Spewer = /** @class */ (function (_super) {
         this.decide();
     };
     Spewer.prototype.explode = function () {
-        this.fire(new Coord(this.target.location.x, this.target.location.y));
-        this.fire(new Coord(this.target.location.x + 1, this.target.location.y + 1));
-        this.fire(new Coord(this.target.location.x - 1, this.target.location.y - 1));
-        this.fire(new Coord(this.target.location.x + 2, this.target.location.y + 2));
-        this.fire(new Coord(this.target.location.x - 2, this.target.location.y - 2));
-        this.fire(new Coord(this.target.location.x + 3, this.target.location.y + 3));
-        this.fire(new Coord(this.target.location.x - 3, this.target.location.y - 3));
+        this.fire(this.target.location);
+        this.fire(this.target.location.createOffset(1, 1));
+        this.fire(this.target.location.createOffset(-1, -1));
+        this.fire(this.target.location.createOffset(2, 2));
+        this.fire(this.target.location.createOffset(-2, -2));
+        this.fire(this.target.location.createOffset(3, 3));
+        this.fire(this.target.location.createOffset(-3, -3));
         this.hp = 0;
     };
     // animation for when its about to explode
@@ -1120,7 +1123,7 @@ var Pirate = /** @class */ (function (_super) {
         this.move(0.5);
         if (this.seesPlayer) {
             if (this.weaponCooldownCounter % 16 == 0) {
-                this.fire(new Coord(this.target.location.x, this.target.location.y));
+                this.fire(this.target.location);
             }
         }
         if (this.isHunting) {
@@ -1158,7 +1161,7 @@ var LoadingActor = /** @class */ (function (_super) {
         this.move(3);
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.fire(new Coord(this.location.x + bulletRelative.x, this.location.y + bulletRelative.y));
+            this.fire(this.location.createOffset(bulletRelative.x, bulletRelative.y));
         }
         this.stepCount++;
     };
@@ -1177,30 +1180,30 @@ var Mine = /** @class */ (function (_super) {
     };
     Mine.prototype.explode = function () {
         var directions = Array();
-        directions.push(new Coord(this.location.x, this.location.y - 300));
-        directions.push(new Coord(this.location.x + 300, this.location.y));
-        directions.push(new Coord(this.location.x, this.location.y + 300));
-        directions.push(new Coord(this.location.x - 300, this.location.y));
+        directions.push(this.location.createOffset(0, -300));
+        directions.push(this.location.createOffset(300, 0));
+        directions.push(this.location.createOffset(0, 300));
+        directions.push(this.location.createOffset(-300, 0));
         for (var i = 0; i < directions.length; i++) {
             this.fire(directions[i]);
-            this.fire(new Coord(directions[i].x + 1, directions[i].y + 1));
-            this.fire(new Coord(directions[i].x - 1, directions[i].y - 1));
-            this.fire(new Coord(directions[i].x + 2, directions[i].y + 2));
-            this.fire(new Coord(directions[i].x - 2, directions[i].y - 2));
-            this.fire(new Coord(directions[i].x + 3, directions[i].y + 3));
-            this.fire(new Coord(directions[i].x - 3, directions[i].y - 3));
-            this.fire(new Coord(directions[i].x + 4, directions[i].y + 4));
-            this.fire(new Coord(directions[i].x - 4, directions[i].y - 4));
-            this.fire(new Coord(directions[i].x + 5, directions[i].y + 5));
-            this.fire(new Coord(directions[i].x - 5, directions[i].y - 5));
-            this.fire(new Coord(directions[i].x + 10, directions[i].y + 10));
-            this.fire(new Coord(directions[i].x - 10, directions[i].y - 10));
-            this.fire(new Coord(directions[i].x + 20, directions[i].y + 20));
-            this.fire(new Coord(directions[i].x - 20, directions[i].y - 20));
-            this.fire(new Coord(directions[i].x + 30, directions[i].y + 30));
-            this.fire(new Coord(directions[i].x - 30, directions[i].y - 30));
-            this.fire(new Coord(directions[i].x + 40, directions[i].y + 40));
-            this.fire(new Coord(directions[i].x - 40, directions[i].y - 40));
+            this.fire(directions[i].createOffset(1, 1));
+            this.fire(directions[i].createOffset(-1, -1));
+            this.fire(directions[i].createOffset(2, 2));
+            this.fire(directions[i].createOffset(-2, -2));
+            this.fire(directions[i].createOffset(3, 3));
+            this.fire(directions[i].createOffset(-3, -3));
+            this.fire(directions[i].createOffset(4, 4));
+            this.fire(directions[i].createOffset(-4, -4));
+            this.fire(directions[i].createOffset(5, 5));
+            this.fire(directions[i].createOffset(-5, -5));
+            this.fire(directions[i].createOffset(10, 10));
+            this.fire(directions[i].createOffset(-10, -10));
+            this.fire(directions[i].createOffset(20, 20));
+            this.fire(directions[i].createOffset(-20, -20));
+            this.fire(directions[i].createOffset(30, 30));
+            this.fire(directions[i].createOffset(-30, -30));
+            this.fire(directions[i].createOffset(40, 40));
+            this.fire(directions[i].createOffset(-40, -40));
         }
     };
     Mine.prototype.move = function () {
