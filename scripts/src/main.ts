@@ -564,12 +564,14 @@ class World {
     drawWorker: Object;
     strokeColor: RGBA;
     spawners: Array<NPcSpawner>;
+    messages: Array<string>;
 
     constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA, includeSpawner: boolean) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
         this.strokeColor = strokeColor;
+        this.messages = new Array();
 
         this.pings = new Array();
 
@@ -696,7 +698,7 @@ class World {
 
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
-                    game.console.post("kill");
+                    this.messages.push("kill");
                     this.nPCs[i] = null;
                     this.player.enemiesKilled++;
                 }
@@ -1678,6 +1680,12 @@ var output = function (drawWorker) {
         drawWorker.clear();
         if (!game.world.draw()) {
             drawWorker.noLoop();
+        }
+        for (var i = 0; i < game.world.messages.length; i++) {
+            if (game.world.messages[i] != null) {
+                game.console.post(game.world.messages[i]);
+                game.world.messages.pop(i);
+            }
         }
     }
 
