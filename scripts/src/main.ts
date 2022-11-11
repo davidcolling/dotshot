@@ -584,10 +584,17 @@ class World {
 
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Spewer(    new Coord(this.map.width * Math.random(),     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
-                this.nPCs.push(new Mine(    new Coord(this.map.width * Math.random(),     (this.map.height) * Math.random()),      this.map, this.bullets));
-                this.nPCs.push(new Chicken( new Coord(Math.random() * this.map.width,     Math.random() * this.map.height),        this.map, this.food));
+                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     
+                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+                    
+                this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(),     
+                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+
+                this.nPCs.push(new Mine(    new Coord(this.map.width * Math.random(),     
+                    (this.map.height) * Math.random()),      this.map, this.bullets));
+
+                this.nPCs.push(new Chicken( new Coord(Math.random() * this.map.width,     
+                    Math.random() * this.map.height),        this.map, this.food));
             }
 
             this.spawners = new Array();
