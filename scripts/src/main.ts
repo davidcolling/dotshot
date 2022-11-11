@@ -543,7 +543,7 @@ class GridMap extends Drawable {
 
 // facade and factory of all game objects: bullets, map, characters (player and npc)
 // an unenforced singleton
-// on observer of when bullets should be collected from characters
+// an observer of when bullets should be collected from characters
 // an observer of when objects need to become null, eg old bullets and dead npc
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
@@ -619,6 +619,22 @@ class World {
         this.frameCount++;
         this.map.draw(this.drawWorker, this.strokeColor);
         this.drawBullets(this.bullets);
+        for (var i = 0; i < this.spawners.length; i++) {
+            if( this.spawners[i] != null ) {
+                this.spawners[i].draw(this.drawWorker, this.strokeColor);
+                this.spawners[i].step();
+            }
+        }
+        for (var i = 0; i < this.pings.length; i++) {
+            if (this.pings[i] != null) {
+                this.pings[i].step();
+                this.pings[i].draw(this.drawWorker, this.strokeColor);
+    
+                if ( this.pings[i].age > 16 ) {
+                    this.pings[i] = null;
+                }
+            }
+        }
 
         // player
         if (this.player != null) {
@@ -680,25 +696,6 @@ class World {
                     this.player.enemiesKilled++;
                 }
 
-            }
-        }
-
-        for (var i = 0; i < this.spawners.length; i++) {
-            if( this.spawners[i] != null ) {
-                this.spawners[i].draw(this.drawWorker, this.strokeColor);
-                this.spawners[i].step();
-            }
-        }
-
-        // pings 
-        for (var i = 0; i < this.pings.length; i++) {
-            if (this.pings[i] != null) {
-                this.pings[i].step();
-                this.pings[i].draw(this.drawWorker, this.strokeColor);
-    
-                if ( this.pings[i].age > 16 ) {
-                    this.pings[i] = null;
-                }
             }
         }
 
