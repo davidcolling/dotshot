@@ -71,12 +71,22 @@ var NPcSpawner = /** @class */ (function (_super) {
     return NPcSpawner;
 }(CenteredShape));
 var Weapon = /** @class */ (function () {
-    function Weapon(bullets, owner) {
+    function Weapon(bullets, owner, coolDownTimer) {
         this.bullets = bullets;
         this.owner = owner;
         this.counter = 0;
         this.lastCount = 0;
+        this.coolDownTimer = coolDownTimer;
     }
+    Weapon.prototype.shoot = function (target) {
+        if (!this.hasShot || this.counter - this.lastCount >= this.coolDownTimer) {
+            if (!this.hasShot) {
+                this.hasShot = true;
+            }
+            this.counter = this.lastCount;
+            this.fire(target);
+        }
+    };
     Weapon.prototype.fire = function (target) { };
     Weapon.prototype.step = function () {
         this.counter++;
@@ -85,8 +95,8 @@ var Weapon = /** @class */ (function () {
 }());
 var Gun = /** @class */ (function (_super) {
     __extends(Gun, _super);
-    function Gun(bullets, owner) {
-        return _super.call(this, bullets, owner) || this;
+    function Gun(bullets, owner, coolDownTimer) {
+        return _super.call(this, bullets, owner, coolDownTimer) || this;
     }
     Gun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
@@ -96,8 +106,8 @@ var Gun = /** @class */ (function (_super) {
 }(Weapon));
 var ExplodingBulletGun = /** @class */ (function (_super) {
     __extends(ExplodingBulletGun, _super);
-    function ExplodingBulletGun(bullets, owner) {
-        return _super.call(this, bullets, owner) || this;
+    function ExplodingBulletGun(bullets, owner, coolDownTimer) {
+        return _super.call(this, bullets, owner, coolDownTimer) || this;
     }
     ExplodingBulletGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
@@ -107,8 +117,8 @@ var ExplodingBulletGun = /** @class */ (function (_super) {
 }(Weapon));
 var DoubleBarrelGun = /** @class */ (function (_super) {
     __extends(DoubleBarrelGun, _super);
-    function DoubleBarrelGun(bullets, owner) {
-        return _super.call(this, bullets, owner) || this;
+    function DoubleBarrelGun(bullets, owner, coolDownTimer) {
+        return _super.call(this, bullets, owner, coolDownTimer) || this;
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
@@ -120,19 +130,12 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
 var Cannon = /** @class */ (function (_super) {
     __extends(Cannon, _super);
     function Cannon(bullets, owner) {
-        var _this = _super.call(this, bullets, owner) || this;
-        _this.hasShot = false;
-        return _this;
+        return _super.call(this, bullets, owner, 35) || this;
     }
     Cannon.prototype.fire = function (target) {
-        if (!this.hasShot || this.counter - this.lastCount > 35) {
-            if (!this.hasShot) {
-                this.hasShot = true;
-            }
-            _super.prototype.fire.call(this, target);
-            this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
-            this.lastCount = this.counter;
-        }
+        _super.prototype.fire.call(this, target);
+        this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
+        this.lastCount = this.counter;
     };
     return Cannon;
 }(Weapon));
@@ -876,12 +879,11 @@ var Character = /** @class */ (function (_super) {
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
-        _this.weapons.push(new Gun(bullets, _this));
         _this.currentWeapon = 0;
         return _this;
     }
-    Character.prototype.fire = function (target) {
-        this.weapons[this.currentWeapon].fire(target);
+    Character.prototype.shoot = function (target) {
+        this.weapons[this.currentWeapon].shoot(target);
     };
     Character.prototype.step = function () {
         for (var i = 0; i < this.weapons.length; i++) {
@@ -900,8 +902,9 @@ var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, location, map, bullets) {
         var _this = _super.call(this, size, location, map, bullets, 32) || this;
-        _this.weapons.push(new DoubleBarrelGun(bullets, _this));
-        _this.weapons.push(new ExplodingBulletGun(bullets, _this));
+        _this.weapons.push(new Gun(bullets, _this, 0));
+        _this.weapons.push(new DoubleBarrelGun(bullets, _this, 0));
+        _this.weapons.push(new ExplodingBulletGun(bullets, _this, 0));
         _this.weapons.push(new Cannon(bullets, _this));
         _this.initialSize = size;
         _this.isFiring = true;
@@ -921,7 +924,7 @@ var Player = /** @class */ (function (_super) {
         if (this.isFiring) {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {
-                this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+                this.shoot(new Coord(drawWorker.mouseX, drawWorker.mouseY));
             }
         }
         else {
@@ -1020,6 +1023,7 @@ var Spewer = /** @class */ (function (_super) {
         _this.didIgnite = false;
         _this.igniteAge = 0;
         _this.isGrowing = true;
+        _this.weapons.push(new Gun(bullets, _this, 0));
         return _this;
     }
     Spewer.prototype.draw = function (drawWorker, strokeColor) {
@@ -1039,13 +1043,13 @@ var Spewer = /** @class */ (function (_super) {
         this.decide();
     };
     Spewer.prototype.explode = function () {
-        this.fire(this.target.location);
-        this.fire(this.target.location.createOffset(1, 1));
-        this.fire(this.target.location.createOffset(-1, -1));
-        this.fire(this.target.location.createOffset(2, 2));
-        this.fire(this.target.location.createOffset(-2, -2));
-        this.fire(this.target.location.createOffset(3, 3));
-        this.fire(this.target.location.createOffset(-3, -3));
+        this.shoot(this.target.location);
+        this.shoot(this.target.location.createOffset(1, 1));
+        this.shoot(this.target.location.createOffset(-1, -1));
+        this.shoot(this.target.location.createOffset(2, 2));
+        this.shoot(this.target.location.createOffset(-2, -2));
+        this.shoot(this.target.location.createOffset(3, 3));
+        this.shoot(this.target.location.createOffset(-3, -3));
         this.hp = 0;
     };
     // animation for when its about to explode
@@ -1103,7 +1107,7 @@ var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
     function Pirate(location, map, bullets, target) {
         var _this = _super.call(this, 5, location, map, bullets, 8, target, 1000, 0, 200) || this;
-        _this.weaponCooldownCounter = 0;
+        _this.weapons.push(new Gun(bullets, _this, 10));
         return _this;
     }
     Pirate.prototype.draw = function (drawWorker, strokeColor) {
@@ -1114,16 +1118,13 @@ var Pirate = /** @class */ (function (_super) {
     };
     Pirate.prototype.step = function () {
         _super.prototype.step.call(this);
-        this.weaponCooldownCounter++;
         this.decide();
     };
     Pirate.prototype.attack = function () {
         this.point(this.lastSeenPlayerCoord);
         this.move(0.5);
         if (this.seesPlayer) {
-            if (this.weaponCooldownCounter % 16 == 0) {
-                this.fire(this.target.location);
-            }
+            this.shoot(this.target.location);
         }
         if (this.isHunting) {
             if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
@@ -1142,6 +1143,7 @@ var LoadingActor = /** @class */ (function (_super) {
     function LoadingActor(location, map, bullets) {
         var _this = _super.call(this, 5, location, map, bullets, 1, null, 1000, 0, 200) || this;
         _this.stepCount = 0;
+        _this.weapons.push(new Gun(bullets, _this, 0));
         return _this;
     }
     LoadingActor.prototype.draw = function (drawWorker, strokeColor) {
@@ -1160,7 +1162,7 @@ var LoadingActor = /** @class */ (function (_super) {
         this.move(3);
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.fire(this.location.createOffset(bulletRelative.x, bulletRelative.y));
+            this.shoot(this.location.createOffset(bulletRelative.x, bulletRelative.y));
         }
         this.stepCount++;
     };
@@ -1169,7 +1171,9 @@ var LoadingActor = /** @class */ (function (_super) {
 var Mine = /** @class */ (function (_super) {
     __extends(Mine, _super);
     function Mine(location, map, bullets) {
-        return _super.call(this, 5, location, map, bullets, 1, null, 1000, 0, 200) || this;
+        var _this = _super.call(this, 5, location, map, bullets, 1, null, 1000, 0, 200) || this;
+        _this.weapons.push(new Gun(bullets, _this, 0));
+        return _this;
     }
     Mine.prototype.draw = function (drawWorker, strokeColor) {
         drawWorker.stroke(130, 128, 128, 256);
@@ -1184,25 +1188,25 @@ var Mine = /** @class */ (function (_super) {
         directions.push(this.location.createOffset(0, 300));
         directions.push(this.location.createOffset(-300, 0));
         for (var i = 0; i < directions.length; i++) {
-            this.fire(directions[i]);
-            this.fire(directions[i].createOffset(1, 1));
-            this.fire(directions[i].createOffset(-1, -1));
-            this.fire(directions[i].createOffset(2, 2));
-            this.fire(directions[i].createOffset(-2, -2));
-            this.fire(directions[i].createOffset(3, 3));
-            this.fire(directions[i].createOffset(-3, -3));
-            this.fire(directions[i].createOffset(4, 4));
-            this.fire(directions[i].createOffset(-4, -4));
-            this.fire(directions[i].createOffset(5, 5));
-            this.fire(directions[i].createOffset(-5, -5));
-            this.fire(directions[i].createOffset(10, 10));
-            this.fire(directions[i].createOffset(-10, -10));
-            this.fire(directions[i].createOffset(20, 20));
-            this.fire(directions[i].createOffset(-20, -20));
-            this.fire(directions[i].createOffset(30, 30));
-            this.fire(directions[i].createOffset(-30, -30));
-            this.fire(directions[i].createOffset(40, 40));
-            this.fire(directions[i].createOffset(-40, -40));
+            this.shoot(directions[i]);
+            this.shoot(directions[i].createOffset(1, 1));
+            this.shoot(directions[i].createOffset(-1, -1));
+            this.shoot(directions[i].createOffset(2, 2));
+            this.shoot(directions[i].createOffset(-2, -2));
+            this.shoot(directions[i].createOffset(3, 3));
+            this.shoot(directions[i].createOffset(-3, -3));
+            this.shoot(directions[i].createOffset(4, 4));
+            this.shoot(directions[i].createOffset(-4, -4));
+            this.shoot(directions[i].createOffset(5, 5));
+            this.shoot(directions[i].createOffset(-5, -5));
+            this.shoot(directions[i].createOffset(10, 10));
+            this.shoot(directions[i].createOffset(-10, -10));
+            this.shoot(directions[i].createOffset(20, 20));
+            this.shoot(directions[i].createOffset(-20, -20));
+            this.shoot(directions[i].createOffset(30, 30));
+            this.shoot(directions[i].createOffset(-30, -30));
+            this.shoot(directions[i].createOffset(40, 40));
+            this.shoot(directions[i].createOffset(-40, -40));
         }
     };
     Mine.prototype.move = function () {

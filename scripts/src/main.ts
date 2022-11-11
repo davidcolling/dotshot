@@ -76,12 +76,25 @@ class Weapon {
     owner: Character;
     counter:  number;
     lastCount: number;
+    coolDownTimer: number;
+    hasShot:boolean;
 
-    constructor(bullets: Array<Bullet>, owner: Character) {
+    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number) {
         this.bullets = bullets;
         this.owner = owner;
         this.counter = 0;
         this.lastCount = 0;
+        this.coolDownTimer = coolDownTimer;
+    }
+
+    shoot(target:Coord):void {
+        if (!this.hasShot || this.counter - this.lastCount >= this.coolDownTimer) {
+            if (!this.hasShot) {
+                this.hasShot = true;
+            }
+            this.counter = this.lastCount;
+            this.fire(target);
+        }
     }
 
     fire(target: Coord):void {}
@@ -92,8 +105,8 @@ class Weapon {
 }
 
 class Gun extends Weapon {
-    constructor(bullets: Array<Bullet>, owner: Character) {
-        super(bullets, owner);
+    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number) {
+        super(bullets, owner, coolDownTimer);
     }
 
     fire(target: Coord):void {
@@ -103,8 +116,8 @@ class Gun extends Weapon {
 }
 
 class ExplodingBulletGun extends Weapon {
-    constructor(bullets: Array<Bullet>, owner: Character) {
-        super(bullets, owner);
+    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number) {
+        super(bullets, owner, coolDownTimer);
     }
 
     fire(target: Coord):void {
@@ -114,8 +127,8 @@ class ExplodingBulletGun extends Weapon {
 }
 
 class DoubleBarrelGun extends Weapon {
-    constructor(bullets: Array<Bullet>, owner: Character) {
-        super(bullets, owner);
+    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number) {
+        super(bullets, owner, coolDownTimer);
     }
 
     fire(target: Coord):void {
@@ -126,22 +139,14 @@ class DoubleBarrelGun extends Weapon {
 }
 
 class Cannon extends Weapon {
-    hasShot:boolean;
-
     constructor(bullets: Array<Bullet>, owner: Character) {
-        super(bullets, owner);
-        this.hasShot = false;
+        super(bullets, owner, 35);
     }
 
     fire(target: Coord):void {
-        if (!this.hasShot || this.counter - this.lastCount > 35) {
-            if (!this.hasShot) {
-                this.hasShot = true;
-            }
-            super.fire(target);
-            this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
-            this.lastCount = this.counter;
-        }
+        super.fire(target);
+        this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
+        this.lastCount = this.counter;
     }
 }
 
@@ -1005,11 +1010,10 @@ class Character extends Moveable {
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
-        this.weapons.push(new Gun(bullets, this));
         this.currentWeapon = 0;
     }
-    fire(target: Coord):void {
-        this.weapons[this.currentWeapon].fire(target);
+    shoot(target: Coord):void {
+        this.weapons[this.currentWeapon].shoot(target);
     }
     step():void {
         for (var i = 0; i < this.weapons.length; i++) {
@@ -1032,8 +1036,9 @@ class Player extends Character{
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
         super(size, location, map, bullets, 32);
-        this.weapons.push(new DoubleBarrelGun(bullets, this));
-        this.weapons.push(new ExplodingBulletGun(bullets, this));
+        this.weapons.push(new Gun(bullets, this, 0));
+        this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
+        this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
         this.weapons.push(new Cannon(bullets, this));
         this.initialSize = size;
         this.isFiring = true; 
@@ -1052,7 +1057,7 @@ class Player extends Character{
         if (this.isFiring) {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {
-                this.fire(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+                this.shoot(new Coord(drawWorker.mouseX, drawWorker.mouseY));
             }
         } else {
             this.firingAge = 0;
@@ -1161,6 +1166,7 @@ class Spewer extends NPC {
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
+        this.weapons.push(new Gun(bullets, this, 0));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(128, 0, 0, 256);
@@ -1184,16 +1190,16 @@ class Spewer extends NPC {
         this.decide();
     }
     explode():void {
-        this.fire(this.target.location);
+        this.shoot(this.target.location);
 
-        this.fire(this.target.location.createOffset(1, 1));
-        this.fire(this.target.location.createOffset(-1, -1));
+        this.shoot(this.target.location.createOffset(1, 1));
+        this.shoot(this.target.location.createOffset(-1, -1));
 
-        this.fire(this.target.location.createOffset(2, 2));
-        this.fire(this.target.location.createOffset(-2, -2));
+        this.shoot(this.target.location.createOffset(2, 2));
+        this.shoot(this.target.location.createOffset(-2, -2));
 
-        this.fire(this.target.location.createOffset(3, 3));
-        this.fire(this.target.location.createOffset(-3, -3));
+        this.shoot(this.target.location.createOffset(3, 3));
+        this.shoot(this.target.location.createOffset(-3, -3));
 
         this.hp = 0;
     }
@@ -1246,11 +1252,9 @@ class Spewer extends NPC {
 };
 
 class Pirate extends NPC {
-    weaponCooldownCounter: number;
-
     constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, target: Character) {
         super(5 , location, map, bullets, 8, target, 1000, 0, 200);
-        this.weaponCooldownCounter = 0
+        this.weapons.push(new Gun(bullets, this, 10));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(256, 0, 0, 256);
@@ -1265,16 +1269,13 @@ class Pirate extends NPC {
     }
     step():void {
         super.step();
-        this.weaponCooldownCounter++;
         this.decide();
     }
     attack():void {
         this.point(this.lastSeenPlayerCoord);
         this.move(0.5);
         if (this.seesPlayer) {
-            if (this.weaponCooldownCounter % 16 == 0) {
-                this.fire(this.target.location);
-            }
+            this.shoot(this.target.location);
         }
         if (this.isHunting) {
          if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
@@ -1292,6 +1293,7 @@ class LoadingActor extends NPC {
     constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
         super(5, location, map, bullets, 1, null, 1000, 0, 200);
         this.stepCount = 0;
+        this.weapons.push(new Gun(bullets, this, 0));
     }
     draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
@@ -1308,7 +1310,7 @@ class LoadingActor extends NPC {
         this.move(3);
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.fire(this.location.createOffset(bulletRelative.x, bulletRelative.y));
+            this.shoot(this.location.createOffset(bulletRelative.x, bulletRelative.y));
         }
         this.stepCount++;
     }
@@ -1317,6 +1319,7 @@ class LoadingActor extends NPC {
 class Mine extends NPC {
     constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
         super(5, location, map, bullets, 1, null, 1000, 0, 200);
+        this.weapons.push(new Gun(bullets, this, 0));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(130, 128, 128, 256);
@@ -1337,34 +1340,34 @@ class Mine extends NPC {
         directions.push(this.location.createOffset(-300, 0));
 
         for(var i = 0; i < directions.length; i++) {
-            this.fire(directions[i]);
+            this.shoot(directions[i]);
 
-            this.fire(directions[i].createOffset(1, 1));
-            this.fire(directions[i].createOffset(-1, -1));
+            this.shoot(directions[i].createOffset(1, 1));
+            this.shoot(directions[i].createOffset(-1, -1));
 
-            this.fire(directions[i].createOffset(2, 2));
-            this.fire(directions[i].createOffset(-2, -2));
+            this.shoot(directions[i].createOffset(2, 2));
+            this.shoot(directions[i].createOffset(-2, -2));
 
-            this.fire(directions[i].createOffset(3, 3));
-            this.fire(directions[i].createOffset(-3, -3));
+            this.shoot(directions[i].createOffset(3, 3));
+            this.shoot(directions[i].createOffset(-3, -3));
 
-            this.fire(directions[i].createOffset(4, 4));
-            this.fire(directions[i].createOffset(-4, -4));
+            this.shoot(directions[i].createOffset(4, 4));
+            this.shoot(directions[i].createOffset(-4, -4));
 
-            this.fire(directions[i].createOffset(5, 5));
-            this.fire(directions[i].createOffset(-5, -5));
+            this.shoot(directions[i].createOffset(5, 5));
+            this.shoot(directions[i].createOffset(-5, -5));
 
-            this.fire(directions[i].createOffset(10, 10));
-            this.fire(directions[i].createOffset(-10, -10));
+            this.shoot(directions[i].createOffset(10, 10));
+            this.shoot(directions[i].createOffset(-10, -10));
 
-            this.fire(directions[i].createOffset(20, 20));
-            this.fire(directions[i].createOffset(-20, -20));
+            this.shoot(directions[i].createOffset(20, 20));
+            this.shoot(directions[i].createOffset(-20, -20));
 
-            this.fire(directions[i].createOffset(30, 30));
-            this.fire(directions[i].createOffset(-30, -30));
+            this.shoot(directions[i].createOffset(30, 30));
+            this.shoot(directions[i].createOffset(-30, -30));
 
-            this.fire(directions[i].createOffset(40, 40));
-            this.fire(directions[i].createOffset(-40, -40));
+            this.shoot(directions[i].createOffset(40, 40));
+            this.shoot(directions[i].createOffset(-40, -40));
         }
 
     }
