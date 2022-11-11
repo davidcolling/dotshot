@@ -1030,7 +1030,7 @@ class Character extends Moveable {
 }
 
 class Player extends Character{
-    isFiring: boolean;
+    isFiring: string;
     isMoving: boolean;
     firingAge: number;
     initialSize:number;
@@ -1043,7 +1043,7 @@ class Player extends Character{
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
         this.weapons.push(new Cannon(bullets, this));
         this.initialSize = size;
-        this.isFiring = true; 
+        this.isFiring = "front"; 
         this.isMoving = false;
         this.firingAge = 0;
         this.enemiesKilled = 0;
@@ -1056,10 +1056,15 @@ class Player extends Character{
     }
     control(drawWorker):void {
         this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
-        if (this.isFiring) {
+        if (this.isFiring == "front") {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {
                 this.shoot(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+            }
+        } else if (this.isFiring == "behind") {
+            this.firingAge++;
+            if (this.firingAge % 4 == 0) {
+                this.shoot(World.inverseCoord(new Coord(drawWorker.mouseX, drawWorker.mouseY), this.location));
             }
         } else {
             this.firingAge = 0;
@@ -1605,10 +1610,13 @@ document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
         case "r":
-            game.world.player.isFiring = true;
+            game.world.player.isFiring = "front";
+            break;
+        case "e":
+            game.world.player.isFiring = "behind";
             break;
         case "Shift":
-            game.world.player.isFiring = true;
+            game.world.player.isFiring = "front";
             break;
         case "w":
             game.world.player.isMoving = true;
@@ -1645,10 +1653,13 @@ document.addEventListener('keyup', stopKey);
 function stopKey(e) {
     switch (e.key) {
         case "r":
-            game.world.player.isFiring = false;
+            game.world.player.isFiring = "off";
+            break;
+        case "e":
+            game.world.player.isFiring = "off";
             break;
         case "Shift":
-            game.world.player.isFiring = false;
+            game.world.player.isFiring = "off";
             break;
         case "w":
             game.world.player.isMoving = false;
