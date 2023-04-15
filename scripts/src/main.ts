@@ -878,10 +878,12 @@ class World {
 
     static inverseCoord(coord: Coord, center: Coord):Coord {
         var newDirection = this.calculateDirection(coord, center);
-        return this.calculateCoordinate(
+        var relative = this.calculateCoordinate(
                     this.calculateDistance(coord, center),
                     newDirection
                );
+        var output = center.createOffset(relative.x, relative.y);
+        return output;
     }
 
 }

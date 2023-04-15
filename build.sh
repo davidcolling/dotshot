@@ -1,1 +1,1 @@
-tsc scripts/src/main.ts --outFile scripts/main.js
+tsc scripts/src/main.ts --outFile scripts/main.js $*

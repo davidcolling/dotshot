@@ -752,7 +752,9 @@ var World = /** @class */ (function () {
     };
     World.inverseCoord = function (coord, center) {
         var newDirection = this.calculateDirection(coord, center);
-        return this.calculateCoordinate(this.calculateDistance(coord, center), newDirection);
+        var relative = this.calculateCoordinate(this.calculateDistance(coord, center), newDirection);
+        var output = center.createOffset(relative.x, relative.y);
+        return output;
     };
     return World;
 }());
