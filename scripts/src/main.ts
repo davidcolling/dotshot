@@ -876,6 +876,14 @@ class World {
         return new Coord(dx, dy);
     }
 
+    static inverseCoord(coord: Coord, center: Coord):Coord {
+        var newDirection = this.calculateDirection(coord, center);
+        return this.calculateCoordinate(
+                    this.calculateDistance(coord, center),
+                    newDirection
+               );
+    }
+
 }
 
 class Moveable extends CenteredShape {

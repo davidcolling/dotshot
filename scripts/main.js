@@ -750,6 +750,10 @@ var World = /** @class */ (function () {
         dy *= length;
         return new Coord(dx, dy);
     };
+    World.inverseCoord = function (coord, center) {
+        var newDirection = this.calculateDirection(coord, center);
+        return this.calculateCoordinate(this.calculateDistance(coord, center), newDirection);
+    };
     return World;
 }());
 var Moveable = /** @class */ (function (_super) {
