@@ -765,7 +765,6 @@ var Moveable = /** @class */ (function (_super) {
         _this.direction = direction;
         _this.map = map;
         _this.doesRicochet = doesRicochet;
-        _this.hasRicocheted = false;
         return _this;
     }
     Moveable.prototype.point = function (target) {
@@ -776,7 +775,6 @@ var Moveable = /** @class */ (function (_super) {
         var newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
-                this.hasRicocheted = true;
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
@@ -813,20 +811,6 @@ var Bullet = /** @class */ (function (_super) {
         return _this;
     }
     Bullet.prototype.step = function () {
-        if (this.doesRicochet) {
-            if (this.hasRicocheted) {
-                this.hasPassedTarget = true;
-            }
-        }
-        if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.location, this.target);
-            if (distance > 10) {
-                this.point(this.target);
-            }
-            else {
-                this.hasPassedTarget = true;
-            }
-        }
         this.move(6);
         this.age++;
         if (this.age < 80) {

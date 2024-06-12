@@ -892,14 +892,12 @@ class Moveable extends CenteredShape {
     direction: number;
     map: GridMap;
     doesRicochet: boolean;
-    hasRicocheted: boolean;
 
     constructor(size: number, location: Coord, direction: number, map: GridMap, doesRicochet: boolean) {
         super(size, location);
         this.direction = direction;
         this.map = map;
         this.doesRicochet = doesRicochet;
-        this.hasRicocheted = false;
     }
     point(target: Coord):void {
         this.direction = World.calculateDirection(this.location, target);
@@ -909,7 +907,6 @@ class Moveable extends CenteredShape {
         var newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
-                this.hasRicocheted = true;
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 var angleToAdd = 90;
 
@@ -933,8 +930,6 @@ class Moveable extends CenteredShape {
 
 class Bullet extends Moveable {
     age: number;
-    target: Coord;
-    hasPassedTarget: boolean;
     maxForce:number;
     owner: Character;
 
@@ -947,19 +942,6 @@ class Bullet extends Moveable {
         this.hasPassedTarget = false;
     }
     step():boolean {
-        if (this.doesRicochet) {
-            if (this.hasRicocheted) {
-                this.hasPassedTarget = true;
-            }
-        }
-        if (!this.hasPassedTarget) {
-            var distance = World.calculateDistance(this.location, this.target);
-            if (distance > 10) {
-                this.point(this.target);
-            } else {
-                this.hasPassedTarget = true;
-            }
-        }
         this.move(6);
         this.age++;
         if (this.age < 80) {
