@@ -765,14 +765,22 @@ var Moveable = /** @class */ (function (_super) {
         _this.direction = direction;
         _this.map = map;
         _this.doesRicochet = doesRicochet;
+        _this.originalLocation = location;
+        _this.stepsInDirection = 0;
         return _this;
     }
     Moveable.prototype.point = function (target) {
-        this.direction = World.calculateDirection(this.location, target);
+        this.setDirection(World.calculateDirection(this.location, target));
+    };
+    Moveable.prototype.setDirection = function (direction) {
+        this.direction = direction;
+        this.stepsInDirection = 0;
+        this.originalLocation = this.location;
     };
     Moveable.prototype.move = function (velocity) {
-        var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        var newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        this.stepsInDirection++;
+        var relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        var newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
@@ -791,8 +799,8 @@ var Moveable = /** @class */ (function (_super) {
                 return false;
             }
         }
-        relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };

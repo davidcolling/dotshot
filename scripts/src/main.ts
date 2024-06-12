@@ -892,19 +892,29 @@ class Moveable extends CenteredShape {
     direction: number;
     map: GridMap;
     doesRicochet: boolean;
+    originalLocation: Coord;
+    stepsInDirection: number;
 
     constructor(size: number, location: Coord, direction: number, map: GridMap, doesRicochet: boolean) {
         super(size, location);
         this.direction = direction;
         this.map = map;
         this.doesRicochet = doesRicochet;
+        this.originalLocation = location;
+        this.stepsInDirection = 0;
     }
     point(target: Coord):void {
-        this.direction = World.calculateDirection(this.location, target);
+        this.setDirection(World.calculateDirection(this.location, target));
+    }
+    setDirection(direction: number):void {
+        this.direction = direction;
+        this.stepsInDirection = 0;
+        this.originalLocation = this.location
     }
     move(velocity: number):boolean {
-        var relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        var newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        this.stepsInDirection++;
+        var relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        var newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
@@ -921,8 +931,8 @@ class Moveable extends CenteredShape {
                 return false;
             }
         }
-        relativeChangeCoordinate = World.calculateCoordinate(velocity, this.direction);
-        newLocation = this.location.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
