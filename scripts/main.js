@@ -806,8 +806,6 @@ var Bullet = /** @class */ (function (_super) {
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
-        _this.target = target;
-        _this.hasPassedTarget = false;
         return _this;
     }
     Bullet.prototype.step = function () {

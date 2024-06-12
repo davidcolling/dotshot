@@ -938,8 +938,6 @@ class Bullet extends Moveable {
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
-        this.target = target;
-        this.hasPassedTarget = false;
     }
     step():boolean {
         this.move(6);
