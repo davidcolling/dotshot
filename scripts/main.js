@@ -372,7 +372,7 @@ var GridMap = /** @class */ (function (_super) {
                             // wherever this Moveable is able to move in a "straight" line is visible from the starting place
                             var previousCoord = new Coord(i, j);
                             var currentDistance = 0;
-                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k, _this, false);
+                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k * (180 / Math.PI), _this, false);
                             while (coordinateTracker.move(2)) {
                                 var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
                                 //check if the tracker entered a new grid cell
@@ -620,7 +620,7 @@ var World = /** @class */ (function () {
         return isClose && isInFrontOf;
     };
     World.prototype.isInFrontOf = function (obj1, obj2) {
-        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
+        return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
     };
     World.calculateDirection = function (c1, c2) {
         var dx = c1.x - c2.x;
@@ -628,60 +628,60 @@ var World = /** @class */ (function () {
         var direction;
         if (dx != 0 && dy != 0) {
             if (dx < 0 && dy > 0) { // target is in quadrant 1
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
             }
             else if (dx < 0 && dy < 0) { // target is in q2
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 90;
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
+                direction += Math.PI / 2;
             }
             else if (dx > 0 && dy < 0) { // q3
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                direction += 180;
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
+                direction += Math.PI;
             }
             else if (dx > 0 && dy > 0) { // q4
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 270;
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
+                direction += (2 * Math.PI) - (Math.PI / 2);
             }
             return direction;
         }
     };
     World.calculateAddDirection = function (direction, summand) {
-        return (direction + summand) % 360;
+        return (direction + summand) % (2 * Math.PI);
     };
     World.calculateRicochetDirection = function (currentDirection, faceIsHorizontal) {
         if (faceIsHorizontal) {
-            if (0 <= currentDirection && 90 > currentDirection) {
-                return (90 - currentDirection) + 90;
+            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
+                return ((Math.PI / 2) - currentDirection) + (Math.PI / 2);
             }
-            else if (90 <= currentDirection && 180 > currentDirection) {
-                return 90 - (currentDirection - 90);
+            else if ((Math.PI / 2) <= currentDirection && Math.PI > currentDirection) {
+                return (Math.PI / 2) - (currentDirection - (Math.PI / 2));
             }
-            else if (180 <= currentDirection && 270 > currentDirection) {
-                return (270 - currentDirection) + 270;
+            else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
+                return (((Math.PI * 2) - (Math.PI / 2)) - currentDirection) + ((Math.PI * 2) - (Math.PI / 2));
             }
             else {
-                return 270 - (currentDirection - 270);
+                return ((Math.PI * 2) - (Math.PI / 2)) - (currentDirection - ((Math.PI * 2) - (Math.PI / 2)));
             }
         }
         else {
-            if (0 <= currentDirection && 90 > currentDirection) {
-                return 360 - currentDirection;
+            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
+                return (Math.PI * 2) - currentDirection;
             }
-            else if (90 <= currentDirection && 180 > currentDirection) {
-                return 360 - currentDirection;
+            else if ((Math.PI / 2) <= currentDirection && (Math.PI) > currentDirection) {
+                return (Math.PI * 2) - currentDirection;
             }
-            else if (180 <= currentDirection && 270 > currentDirection) {
-                return 180 - (currentDirection - 180);
+            else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
+                return Math.PI - (currentDirection - Math.PI);
             }
             else {
-                return 360 - currentDirection;
+                return (Math.PI * 2) - currentDirection;
             }
         }
     };
     World.prototype.calculateDifference = function (direction1, direction2) {
         var difference = direction1 - direction2;
-        if (difference > 180) {
-            difference = 360 - difference;
+        if (difference > Math.PI) {
+            difference = (Math.PI * 2) - difference;
         }
         return difference;
     };
@@ -703,17 +703,17 @@ var World = /** @class */ (function () {
     // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
     // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David
     World.calculateCoordinate = function (length, direction) {
-        var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-        var quadrantAngle = direction - (quadrant * 90);
-        var quadrantAngleIsLowHalf = quadrantAngle < 45;
+        var quadrant = Math.floor(direction / (Math.PI / 2)); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
+        var quadrantAngle = direction - (quadrant * (Math.PI / 2));
+        var quadrantAngleIsLowHalf = quadrantAngle < (Math.PI / 4);
         var finalAngle;
         if (quadrantAngleIsLowHalf) {
             finalAngle = quadrantAngle;
         }
         else {
-            finalAngle = 90 - quadrantAngle;
+            finalAngle = (Math.PI / 2) - quadrantAngle;
         }
-        var angleInRadians = finalAngle * (Math.PI / 180);
+        var angleInRadians = finalAngle;
         var dx;
         var dy;
         // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
@@ -784,7 +784,6 @@ var Moveable = /** @class */ (function (_super) {
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                var angleToAdd = 90;
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
                 if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
                     this.direction = World.calculateRicochetDirection(this.direction, true);
@@ -872,7 +871,7 @@ var CannonBall = /** @class */ (function (_super) {
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
     function Character(size, location, map, bullets, maxHP) {
-        var _this = _super.call(this, size, location, Math.random() * 360, map, false) || this;
+        var _this = _super.call(this, size, location, Math.random() * Math.PI * 2, map, false) || this;
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
@@ -967,7 +966,7 @@ var NPC = /** @class */ (function (_super) {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.direction = Math.random() * 360;
+            this.direction = Math.random() * (Math.PI * 2);
         }
         this.idleAge++;
         this.move(1);
@@ -1009,7 +1008,7 @@ var Chicken = /** @class */ (function (_super) {
             }
             else {
                 this.fleeAge = 0;
-                this.direction = Math.random() * 360;
+                this.direction = Math.random() * (Math.PI * 2);
             }
             this.move(2);
         }
@@ -1156,7 +1155,7 @@ var LoadingActor = /** @class */ (function (_super) {
     };
     LoadingActor.prototype.step = function () {
         _super.prototype.step.call(this);
-        if (this.direction < 360) {
+        if (this.direction < Math.PI * 2) {
             this.direction += 3;
         }
         else {

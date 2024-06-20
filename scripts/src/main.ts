@@ -440,7 +440,7 @@ class GridMap extends Drawable {
                             var previousCoord = new Coord(i, j);
                             var currentDistance = 0;
 
-                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k, this, false);
+                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k * (180 / Math.PI), this, false);
                             while (coordinateTracker.move(2)) {
                                 var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
 
@@ -741,7 +741,7 @@ class World {
     }
 
     isInFrontOf(obj1: Character, obj2: Bullet):boolean {
-        return 90 >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
+        return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
     }
 
     static calculateDirection(c1: Coord, c2: Coord):number {
@@ -752,45 +752,45 @@ class World {
 
         if (dx != 0 && dy != 0) {
             if (dx < 0 && dy > 0) { // target is in quadrant 1
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
             } else if (dx < 0 && dy < 0) { // target is in q2
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 90;
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
+                direction += Math.PI / 2;
             } else if (dx > 0 && dy < 0) { // q3
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy)) * (180 / Math.PI);
-                direction += 180;
+                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
+                direction += Math.PI;
             } else if (dx > 0 && dy > 0) { // q4
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx)) * (180 / Math.PI);
-                direction += 270;
+                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
+                direction += (2 * Math.PI) - (Math.PI / 2);
             }
             return direction
         }
     }
 
     static calculateAddDirection(direction: number, summand: number) {
-        return (direction + summand) % 360;
+        return (direction + summand) % (2 * Math.PI);
     }
 
     static calculateRicochetDirection(currentDirection: number, faceIsHorizontal: boolean):number {
         if (faceIsHorizontal) {
-            if (0 <= currentDirection && 90 > currentDirection) {
-                return (90 - currentDirection) + 90;
-            } else if (90 <= currentDirection && 180 > currentDirection) {
-                return 90 - (currentDirection - 90);
-            } else if (180 <= currentDirection && 270 > currentDirection) {
-                return (270 - currentDirection) + 270;
+            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
+                return ((Math.PI / 2) - currentDirection) + (Math.PI / 2);
+            } else if ((Math.PI / 2) <= currentDirection && Math.PI > currentDirection) {
+                return (Math.PI / 2) - (currentDirection - (Math.PI / 2));
+            } else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
+                return (((Math.PI * 2) - (Math.PI / 2)) - currentDirection) + ((Math.PI * 2) - (Math.PI / 2));
             } else {
-                return 270 - (currentDirection - 270);
+                return ((Math.PI * 2) - (Math.PI / 2)) - (currentDirection - ((Math.PI * 2) - (Math.PI / 2)));
             }
         } else {
-            if (0 <= currentDirection && 90 > currentDirection) {
-                return 360 - currentDirection;
-            } else if (90 <= currentDirection && 180 > currentDirection) {
-                return 360 - currentDirection;
-            } else if (180 <= currentDirection && 270 > currentDirection) {
-                return 180 - (currentDirection - 180);
+            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
+                return (Math.PI * 2) - currentDirection;
+            } else if ((Math.PI / 2) <= currentDirection && (Math.PI) > currentDirection) {
+                return (Math.PI * 2) - currentDirection;
+            } else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
+                return Math.PI - (currentDirection - Math.PI);
             } else {
-                return 360 - currentDirection;
+                return (Math.PI * 2) - currentDirection;
             }
         }
     }
@@ -798,8 +798,8 @@ class World {
     calculateDifference(direction1: number, direction2: number):number {
         var difference = direction1 - direction2;
 
-        if (difference > 180) {
-            difference = 360 - difference;
+        if (difference > Math.PI) {
+            difference = (Math.PI * 2) - difference;
         }
 
         return difference
@@ -825,16 +825,16 @@ class World {
     // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
     // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David
     static calculateCoordinate(length: number, direction: number): Coord {
-        var quadrant = Math.floor(direction / 90); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-        var quadrantAngle = direction - (quadrant * 90);
-        var quadrantAngleIsLowHalf = quadrantAngle < 45;
+        var quadrant = Math.floor(direction / (Math.PI / 2)); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
+        var quadrantAngle = direction - (quadrant * (Math.PI / 2));
+        var quadrantAngleIsLowHalf = quadrantAngle < (Math.PI / 4);
         var finalAngle
         if (quadrantAngleIsLowHalf) {
              finalAngle = quadrantAngle;
         } else {
-             finalAngle = 90 - quadrantAngle;
+             finalAngle = (Math.PI / 2) - quadrantAngle;
         }
-        var angleInRadians = finalAngle * (Math.PI / 180);
+        var angleInRadians = finalAngle;
 
         var dx;
         var dy;
@@ -918,7 +918,7 @@ class Moveable extends CenteredShape {
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                var angleToAdd = 90;
+                var angleToAdd = Math.PI / 2;
 
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
                 if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
@@ -1008,7 +1008,7 @@ class Character extends Moveable {
     currentWeapon:number;
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
-        super(size, location, Math.random() * 360, map, false);
+        super(size, location, Math.random() * Math.PI * 2, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
@@ -1110,7 +1110,7 @@ class NPC extends Character {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.direction = Math.random() * 360;
+            this.direction = Math.random() * (Math.PI * 2);
         }
         this.idleAge++;
         this.move(1);
@@ -1153,7 +1153,7 @@ class Chicken extends NPC {
                 this.fleeAge++;
             } else {
                 this.fleeAge = 0;
-                this.direction = Math.random() * 360;
+                this.direction = Math.random() * (Math.PI * 2);
             }
             this.move(2);
         } else {
@@ -1309,7 +1309,7 @@ class LoadingActor extends NPC {
     }
     step():void {   
         super.step();
-        if (this.direction < 360) {
+        if (this.direction < Math.PI * 2) {
             this.direction += 3;
         } else {
             this.direction = 0;
