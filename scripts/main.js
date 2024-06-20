@@ -784,12 +784,13 @@ var Moveable = /** @class */ (function (_super) {
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
                 var newCoordAsGrid = this.map.getGridIndex(newLocation);
+                var angleToAdd = Math.PI / 2;
                 var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
                 if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
-                    this.direction = World.calculateRicochetDirection(this.direction, true);
+                    this.setDirection(World.calculateRicochetDirection(this.direction, true));
                 }
                 else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
-                    this.direction = World.calculateRicochetDirection(this.direction, false);
+                    this.setDirection(World.calculateRicochetDirection(this.direction, false));
                 }
                 else {
                 }
