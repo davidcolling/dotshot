@@ -967,7 +967,7 @@ var NPC = /** @class */ (function (_super) {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.direction = Math.random() * (Math.PI * 2);
+            this.setDirection(Math.random() * (Math.PI * 2));
         }
         this.idleAge++;
         this.move(1);
@@ -1009,7 +1009,7 @@ var Chicken = /** @class */ (function (_super) {
             }
             else {
                 this.fleeAge = 0;
-                this.direction = Math.random() * (Math.PI * 2);
+                this.setDirection(Math.random() * (Math.PI * 2));
             }
             this.move(2);
         }
