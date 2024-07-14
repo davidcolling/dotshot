@@ -1077,6 +1077,12 @@ class Player extends Character{
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
+        drawWorker.line(
+            this.location.x, 
+            this.location.y, 
+            drawWorker.mouseX,
+            drawWorker.mouseY
+        )
     }
     takeDamage(amount: number):void {
         super.takeDamage(amount);
