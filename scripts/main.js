@@ -942,6 +942,8 @@ var Player = /** @class */ (function (_super) {
         drawWorker.fill(shade, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
         drawWorker.line(this.location.x, this.location.y, drawWorker.mouseX, drawWorker.mouseY);
+        var cursor = new CenteredShape(5, new Coord(drawWorker.mouseX, drawWorker.mouseY));
+        cursor.draw(drawWorker, new RGBA(1, 1, 1, 1));
     };
     Player.prototype.takeDamage = function (amount) {
         _super.prototype.takeDamage.call(this, amount);
