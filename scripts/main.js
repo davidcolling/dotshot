@@ -368,23 +368,36 @@ var GridMap = /** @class */ (function (_super) {
                 for (var j = 0; j < gridHeight; j++) {
                     if (_this.map[i][j].isEmpty) {
                         _this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
-                        for (var k = 0; k < 360; k += 2) {
-                            // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-                            var previousCoord = new Coord(i, j);
-                            var currentDistance = 0;
-                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k * (180 / Math.PI), _this, false);
-                            while (coordinateTracker.move(2)) {
-                                var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
-                                //check if the tracker entered a new grid cell
-                                if (gridCoord.x != previousCoord.x ||
-                                    gridCoord.y != previousCoord.y) {
-                                    currentDistance++;
-                                    previousCoord.x = gridCoord.x;
-                                    previousCoord.y = gridCoord.y;
-                                    _this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                        for (var x = -300; x < 300; x++) {
+                            var y;
+                            if (x < 0) {
+                                y = 300 + x;
+                            }
+                            else {
+                                y = 300 - x;
+                            }
+                            for (var k = 0; k < 1; k++) {
+                                if (k == 1) {
+                                    x = -x;
+                                    y = -y;
                                 }
-                                if (currentDistance == viewDistance) {
-                                    break;
+                                // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+                                var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y), 3, _this, false);
+                                var previousCoord = new Coord(i, j);
+                                var currentDistance = 0;
+                                while (coordinateTracker.move(2)) {
+                                    var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
+                                    //check if the tracker entered a new grid cell
+                                    if (gridCoord.x != previousCoord.x ||
+                                        gridCoord.y != previousCoord.y) {
+                                        currentDistance++;
+                                        previousCoord.x = gridCoord.x;
+                                        previousCoord.y = gridCoord.y;
+                                        _this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                                    }
+                                    if (currentDistance == viewDistance) {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -461,6 +474,9 @@ var GridMap = /** @class */ (function (_super) {
         output.push(output[0].createOffset(0, this.gridSquareSize)); // LL
         output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)); // LR
         return output;
+    };
+    GridMap.prototype.randomCoord = function () {
+        return new Coord(Math.random() * this.width, Math.random() * this.height);
     };
     return GridMap;
 }(Drawable));
@@ -616,12 +632,12 @@ var World = /** @class */ (function () {
     // returns true if obj1 (target) is shot by obj2 (projectile)
     World.prototype.isShotBy = function (obj1, obj2) {
         var isClose = 3 > World.calculateDistance(obj1.location, obj2.location);
-        var isInFrontOf = this.isInFrontOf(obj1, obj2);
-        return isClose && isInFrontOf;
+        // var isInFrontOf = this.isInFrontOf(obj1, obj2);
+        return isClose; //&& isInFrontOf;
     };
-    World.prototype.isInFrontOf = function (obj1, obj2) {
-        return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
-    };
+    // isInFrontOf(obj1: Character, obj2: Bullet):boolean {
+    // return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
+    // }
     World.calculateDirection = function (c1, c2) {
         var dx = c1.x - c2.x;
         var dy = c1.y - c2.y;
@@ -760,9 +776,10 @@ var World = /** @class */ (function () {
 }());
 var Moveable = /** @class */ (function (_super) {
     __extends(Moveable, _super);
-    function Moveable(size, location, direction, map, doesRicochet) {
+    function Moveable(size, location, target, currentVelocity, map, doesRicochet) {
         var _this = _super.call(this, size, location) || this;
-        _this.direction = direction;
+        _this.target = target;
+        _this.currentVelocity = currentVelocity;
         _this.map = map;
         _this.doesRicochet = doesRicochet;
         _this.originalLocation = location;
@@ -770,37 +787,37 @@ var Moveable = /** @class */ (function (_super) {
         return _this;
     }
     Moveable.prototype.point = function (target) {
-        this.setDirection(World.calculateDirection(this.location, target));
+        this.setVector(target);
     };
-    Moveable.prototype.setDirection = function (direction) {
-        this.direction = direction;
+    Moveable.prototype.setVector = function (target) {
         this.stepsInDirection = 0;
         this.originalLocation = this.location;
+        var ratio = (target.x - this.location.x) / (target.y - this.location.y);
+        this.dx = this.currentVelocity * ratio;
+        this.dy = this.currentVelocity * (1 / ratio);
     };
     Moveable.prototype.move = function (velocity) {
         this.stepsInDirection++;
-        var relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
-        var newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
-            if (this.doesRicochet) {
-                var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                var angleToAdd = Math.PI / 2;
-                var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
-                if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
-                    this.setDirection(World.calculateRicochetDirection(this.direction, true));
-                }
-                else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
-                    this.setDirection(World.calculateRicochetDirection(this.direction, false));
-                }
-                else {
-                }
-            }
-            else {
-                return false;
-            }
+            this.stepsInDirection = 0;
+            // if (this.doesRicochet) {
+            // var newCoordAsGrid = this.map.getGridIndex(newLocation);
+            // var angleToAdd = Math.PI / 2;
+            // var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
+            // if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
+            // this.setDirection(World.calculateRicochetDirection(this.direction, true));
+            // } else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
+            // this.setDirection(World.calculateRicochetDirection(this.direction, false));
+            // } else {
+            // }
+            // } else {
+            // return false;
+            // }
+            return false;
         }
-        relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
-        newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        // relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        // newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
@@ -810,7 +827,7 @@ var Moveable = /** @class */ (function (_super) {
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(location, target, map, owner) {
-        var _this = _super.call(this, 3, location, World.calculateDirection(location, target), map, true) || this;
+        var _this = _super.call(this, 3, location, target, 2, map, true) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
@@ -871,8 +888,8 @@ var CannonBall = /** @class */ (function (_super) {
 }(Bullet));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
-    function Character(size, location, map, bullets, maxHP) {
-        var _this = _super.call(this, size, location, Math.random() * Math.PI * 2, map, false) || this;
+    function Character(size, location, target, currentVelocity, map, bullets, maxHP) {
+        var _this = _super.call(this, size, location, target, currentVelocity, map, false) || this;
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
@@ -898,7 +915,7 @@ var Character = /** @class */ (function (_super) {
 var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, location, map, bullets) {
-        var _this = _super.call(this, size, location, map, bullets, 32) || this;
+        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, 32) || this;
         _this.weapons.push(new Gun(bullets, _this, 0));
         _this.weapons.push(new DoubleBarrelGun(bullets, _this, 0));
         _this.weapons.push(new ExplodingBulletGun(bullets, _this, 0));
@@ -955,13 +972,13 @@ var Player = /** @class */ (function (_super) {
 }(Character));
 var NPC = /** @class */ (function (_super) {
     __extends(NPC, _super);
-    function NPC(size, location, map, bullets, maxHP, target, life, idleAge, idleLife) {
-        var _this = _super.call(this, size, location, map, bullets, maxHP) || this;
+    function NPC(size, location, map, bullets, maxHP, combatTarget, life, idleAge, idleLife) {
+        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, maxHP) || this;
         _this.isHunting = false;
         _this.age = 0;
         _this.idleAge = idleAge;
         _this.idleLife = idleLife;
-        _this.target = target;
+        _this.combatTarget = combatTarget;
         _this.seesPlayer = false;
         _this.lastSeenPlayerCoord = null;
         return _this;
@@ -970,7 +987,7 @@ var NPC = /** @class */ (function (_super) {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.setDirection(Math.random() * (Math.PI * 2));
+            this.setVector(this.map.randomCoord());
         }
         this.idleAge++;
         this.move(1);
@@ -1012,7 +1029,7 @@ var Chicken = /** @class */ (function (_super) {
             }
             else {
                 this.fleeAge = 0;
-                this.setDirection(Math.random() * (Math.PI * 2));
+                this.setVector(this.map.randomCoord());
             }
             this.move(2);
         }
@@ -1024,8 +1041,8 @@ var Chicken = /** @class */ (function (_super) {
 }(NPC));
 var Spewer = /** @class */ (function (_super) {
     __extends(Spewer, _super);
-    function Spewer(location, map, bullets, target) {
-        var _this = _super.call(this, 5, location, map, bullets, 8, target, 1000, 0, 200) || this;
+    function Spewer(location, map, bullets, combatTarget) {
+        var _this = _super.call(this, 5, location, map, bullets, 8, combatTarget, 1000, 0, 200) || this;
         _this.didIgnite = false;
         _this.igniteAge = 0;
         _this.isGrowing = true;
@@ -1049,13 +1066,13 @@ var Spewer = /** @class */ (function (_super) {
         this.decide();
     };
     Spewer.prototype.explode = function () {
-        this.shoot(this.target.location);
-        this.shoot(this.target.location.createOffset(1, 1));
-        this.shoot(this.target.location.createOffset(-1, -1));
-        this.shoot(this.target.location.createOffset(2, 2));
-        this.shoot(this.target.location.createOffset(-2, -2));
-        this.shoot(this.target.location.createOffset(3, 3));
-        this.shoot(this.target.location.createOffset(-3, -3));
+        this.shoot(this.combatTarget.location);
+        this.shoot(this.combatTarget.location.createOffset(1, 1));
+        this.shoot(this.combatTarget.location.createOffset(-1, -1));
+        this.shoot(this.combatTarget.location.createOffset(2, 2));
+        this.shoot(this.combatTarget.location.createOffset(-2, -2));
+        this.shoot(this.combatTarget.location.createOffset(3, 3));
+        this.shoot(this.combatTarget.location.createOffset(-3, -3));
         this.hp = 0;
     };
     // animation for when its about to explode
@@ -1111,8 +1128,8 @@ var Spewer = /** @class */ (function (_super) {
 ;
 var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
-    function Pirate(location, map, bullets, target) {
-        var _this = _super.call(this, 5, location, map, bullets, 8, target, 1000, 0, 200) || this;
+    function Pirate(location, map, bullets, combatTarget) {
+        var _this = _super.call(this, 5, location, map, bullets, 8, combatTarget, 1000, 0, 200) || this;
         _this.weapons.push(new Gun(bullets, _this, 10));
         return _this;
     }
@@ -1130,7 +1147,7 @@ var Pirate = /** @class */ (function (_super) {
         this.point(this.lastSeenPlayerCoord);
         this.move(0.5);
         if (this.seesPlayer) {
-            this.shoot(this.target.location);
+            this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
             if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {

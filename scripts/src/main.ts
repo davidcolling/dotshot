@@ -435,28 +435,42 @@ class GridMap extends Drawable {
                     if (this.map[i][j].isEmpty) {
                         this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
 
-                        for (var k = 0; k < 360; k += 2) {
-                            // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-                            var previousCoord = new Coord(i, j);
-                            var currentDistance = 0;
+                        for (var x = -300; x < 300; x++) {
+                            var y;
+                            if (x < 0) {
+                                y = 300 + x;
+                            } else {
+                                y = 300 - x;
+                            }
 
-                            var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), k * (180 / Math.PI), this, false);
-                            while (coordinateTracker.move(2)) {
-                                var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
-
-                                //check if the tracker entered a new grid cell
-                                if (
-                                    gridCoord.x != previousCoord.x ||
-                                    gridCoord.y != previousCoord.y
-                                ) {
-                                    currentDistance++;
-                                    previousCoord.x = gridCoord.x;
-                                    previousCoord.y = gridCoord.y;
-                                    this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                            for (var k = 0; k < 1; k++) {
+                                if (k == 1) {
+                                    x = -x;
+                                    y = -y;
                                 }
-
-                                if (currentDistance == viewDistance) {
-                                    break;
+                                // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+                                var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y) , 3, this, false);
+    
+                                var previousCoord = new Coord(i, j);
+                                var currentDistance = 0;
+    
+                                while (coordinateTracker.move(2)) {
+                                    var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
+    
+                                    //check if the tracker entered a new grid cell
+                                    if (
+                                        gridCoord.x != previousCoord.x ||
+                                        gridCoord.y != previousCoord.y
+                                    ) {
+                                        currentDistance++;
+                                        previousCoord.x = gridCoord.x;
+                                        previousCoord.y = gridCoord.y;
+                                        this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                                    }
+    
+                                    if (currentDistance == viewDistance) {
+                                        break;
+                                    }
                                 }
                             }
 
@@ -542,6 +556,10 @@ class GridMap extends Drawable {
         output.push(output[0].createOffset(0, this.gridSquareSize)) // LL
         output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)) // LR
         return output;
+    }
+
+    randomCoord():Coord {
+        return new Coord(Math.random() * this.width, Math.random() * this.height);
     }
     
 }
@@ -736,13 +754,13 @@ class World {
     // returns true if obj1 (target) is shot by obj2 (projectile)
     isShotBy(obj1: Character, obj2: Bullet):boolean {
         var isClose =  3 > World.calculateDistance(obj1.location, obj2.location) 
-        var isInFrontOf = this.isInFrontOf(obj1, obj2);
-        return isClose && isInFrontOf;
+        // var isInFrontOf = this.isInFrontOf(obj1, obj2);
+        return isClose; //&& isInFrontOf;
     }
 
-    isInFrontOf(obj1: Character, obj2: Bullet):boolean {
-        return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
-    }
+    // isInFrontOf(obj1: Character, obj2: Bullet):boolean {
+        // return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
+    // }
 
     static calculateDirection(c1: Coord, c2: Coord):number {
         var dx = c1.x - c2.x;
@@ -889,50 +907,58 @@ class World {
 }
 
 class Moveable extends CenteredShape {
-    direction: number;
+    target: Coord;
+    currentVelocity: number; 
+    dx: number; 
+    dy: number;
+
     map: GridMap;
     doesRicochet: boolean;
     originalLocation: Coord;
     stepsInDirection: number;
 
-    constructor(size: number, location: Coord, direction: number, map: GridMap, doesRicochet: boolean) {
+    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, doesRicochet: boolean) {
         super(size, location);
-        this.direction = direction;
+        this.target = target;
+        this.currentVelocity = currentVelocity;
         this.map = map;
         this.doesRicochet = doesRicochet;
         this.originalLocation = location;
         this.stepsInDirection = 0;
     }
     point(target: Coord):void {
-        this.setDirection(World.calculateDirection(this.location, target));
+        this.setVector(target);
     }
-    setDirection(direction: number):void {
-        this.direction = direction;
+    setVector(target: Coord):void {
         this.stepsInDirection = 0;
         this.originalLocation = this.location
+        let ratio = ( target.x - this.location.x ) / (target.y - this.location.y);
+        this.dx = this.currentVelocity * ratio; 
+        this.dy = this.currentVelocity * ( 1 / ratio );
     }
     move(velocity: number):boolean {
         this.stepsInDirection++;
-        var relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
-        var newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
-            if (this.doesRicochet) {
-                var newCoordAsGrid = this.map.getGridIndex(newLocation);
-                var angleToAdd = Math.PI / 2;
+            this.stepsInDirection = 0;
+            // if (this.doesRicochet) {
+                // var newCoordAsGrid = this.map.getGridIndex(newLocation);
+                // var angleToAdd = Math.PI / 2;
 
-                var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
-                if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
-                    this.setDirection(World.calculateRicochetDirection(this.direction, true));
-                } else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
-                    this.setDirection(World.calculateRicochetDirection(this.direction, false));
-                } else {
-                }
-            } else {
-                return false;
-            }
+                // var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
+                // if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
+                    // this.setDirection(World.calculateRicochetDirection(this.direction, true));
+                // } else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
+                    // this.setDirection(World.calculateRicochetDirection(this.direction, false));
+                // } else {
+                // }
+            // } else {
+                // return false;
+            // }
+            return false;
         }
-        relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
-        newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
+        // relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
+        // newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
@@ -944,7 +970,7 @@ class Bullet extends Moveable {
     owner: Character;
 
     constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
-        super(3, location, World.calculateDirection(location, target), map, true);
+        super(3, location, target, 2, map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
@@ -1007,8 +1033,8 @@ class Character extends Moveable {
     weapons: Array<Weapon>;
     currentWeapon:number;
 
-    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
-        super(size, location, Math.random() * Math.PI * 2, map, false);
+    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
+        super(size, location, target, currentVelocity, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
@@ -1037,7 +1063,7 @@ class Player extends Character{
     enemiesKilled: number;
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
-        super(size, location, map, bullets, 32);
+        super(size, location, new Coord(0, 0), 1, map, bullets, 32);
         this.weapons.push(new Gun(bullets, this, 0));
         this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
@@ -1101,17 +1127,17 @@ class NPC extends Character {
     age: number;
     idleAge: number;
     idleLife: number;
-    target: Character;
+    combatTarget: Character;
     seesPlayer:boolean;
     lastSeenPlayerCoord: Coord;
 
-   constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number, target: Character, life: number, idleAge: number, idleLife: number) {
-        super(size, location, map, bullets, maxHP);
+   constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number, combatTarget: Character, life: number, idleAge: number, idleLife: number) {
+        super(size, location, new Coord(0, 0), 1, map, bullets, maxHP);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
         this.idleLife = idleLife;
-        this.target = target;
+        this.combatTarget = combatTarget;
         this.seesPlayer = false;
         this.lastSeenPlayerCoord = null;
     }
@@ -1119,7 +1145,7 @@ class NPC extends Character {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.setDirection(Math.random() * (Math.PI * 2));
+            this.setVector(this.map.randomCoord());
         }
         this.idleAge++;
         this.move(1);
@@ -1162,7 +1188,7 @@ class Chicken extends NPC {
                 this.fleeAge++;
             } else {
                 this.fleeAge = 0;
-                this.setDirection(Math.random() * (Math.PI * 2));
+                this.setVector(this.map.randomCoord());
             }
             this.move(2);
         } else {
@@ -1177,8 +1203,8 @@ class Spewer extends NPC {
     igniteAge: number;
     isGrowing: boolean;
 
-    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, target: Character) {
-        super(5, location, map, bullets, 8, target, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, combatTarget: Character) {
+        super(5, location, map, bullets, 8, combatTarget, 1000, 0, 200);
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
@@ -1206,16 +1232,16 @@ class Spewer extends NPC {
         this.decide();
     }
     explode():void {
-        this.shoot(this.target.location);
+        this.shoot(this.combatTarget.location);
 
-        this.shoot(this.target.location.createOffset(1, 1));
-        this.shoot(this.target.location.createOffset(-1, -1));
+        this.shoot(this.combatTarget.location.createOffset(1, 1));
+        this.shoot(this.combatTarget.location.createOffset(-1, -1));
 
-        this.shoot(this.target.location.createOffset(2, 2));
-        this.shoot(this.target.location.createOffset(-2, -2));
+        this.shoot(this.combatTarget.location.createOffset(2, 2));
+        this.shoot(this.combatTarget.location.createOffset(-2, -2));
 
-        this.shoot(this.target.location.createOffset(3, 3));
-        this.shoot(this.target.location.createOffset(-3, -3));
+        this.shoot(this.combatTarget.location.createOffset(3, 3));
+        this.shoot(this.combatTarget.location.createOffset(-3, -3));
 
         this.hp = 0;
     }
@@ -1268,8 +1294,8 @@ class Spewer extends NPC {
 };
 
 class Pirate extends NPC {
-    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, target: Character) {
-        super(5 , location, map, bullets, 8, target, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, combatTarget: Character) {
+        super(5 , location, map, bullets, 8, combatTarget, 1000, 0, 200);
         this.weapons.push(new Gun(bullets, this, 10));
     }
     draw(drawWorker, strokeColor: RGBA):void {
@@ -1291,7 +1317,7 @@ class Pirate extends NPC {
         this.point(this.lastSeenPlayerCoord);
         this.move(0.5);
         if (this.seesPlayer) {
-            this.shoot(this.target.location);
+            this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
          if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
@@ -1304,6 +1330,7 @@ class Pirate extends NPC {
 };
 
 class LoadingActor extends NPC {
+    direction: number;
     stepCount: number;
 
     constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
