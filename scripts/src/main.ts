@@ -932,9 +932,11 @@ class Moveable extends CenteredShape {
     setVector(target: Coord):void {
         this.stepsInDirection = 0;
         this.originalLocation = this.location
-        let ratio = ( target.x - this.location.x ) / (target.y - this.location.y);
-        this.dx = this.currentVelocity * ratio; 
-        this.dy = this.currentVelocity * ( 1 / ratio );
+        let targetDx = target.x - this.location.x;
+        let targetDy = target.y - this.location.y;
+        let slope = targetDx / targetDy;
+        this.dx = Math.abs(this.currentVelocity * slope) * (targetDx / Math.abs(targetDx)); 
+        this.dy = this.currentVelocity * ( 1 - slope ) * (targetDy / Math.abs(targetDy));
     }
     move(velocity: number):boolean {
         this.stepsInDirection++;

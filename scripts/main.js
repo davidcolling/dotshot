@@ -792,9 +792,11 @@ var Moveable = /** @class */ (function (_super) {
     Moveable.prototype.setVector = function (target) {
         this.stepsInDirection = 0;
         this.originalLocation = this.location;
-        var ratio = (target.x - this.location.x) / (target.y - this.location.y);
-        this.dx = this.currentVelocity * ratio;
-        this.dy = this.currentVelocity * (1 / ratio);
+        var targetDx = target.x - this.location.x;
+        var targetDy = target.y - this.location.y;
+        var slope = targetDx / targetDy;
+        this.dx = Math.abs(this.currentVelocity * slope) * (targetDx / Math.abs(targetDx));
+        this.dy = this.currentVelocity * (1 - slope) * (targetDy / Math.abs(targetDy));
     };
     Moveable.prototype.move = function (velocity) {
         this.stepsInDirection++;
