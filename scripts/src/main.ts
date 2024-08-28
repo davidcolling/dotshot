@@ -759,65 +759,11 @@ class World {
         return 3 > World.calculateDistance(obj1.location, obj2.location) 
     }
 
-    static calculateDirection(c1: Coord, c2: Coord):number {
-        var dx = c1.x - c2.x;
-        var dy = c1.y - c2.y;
-
-        var direction;
-
-        if (dx != 0 && dy != 0) {
-            if (dx < 0 && dy > 0) { // target is in quadrant 1
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
-            } else if (dx < 0 && dy < 0) { // target is in q2
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
-                direction += Math.PI / 2;
-            } else if (dx > 0 && dy < 0) { // q3
-                direction = Math.atan2(Math.abs(dx), Math.abs(dy));
-                direction += Math.PI;
-            } else if (dx > 0 && dy > 0) { // q4
-                direction = Math.atan2(Math.abs(dy), Math.abs(dx));
-                direction += (2 * Math.PI) - (Math.PI / 2);
-            }
-            return direction
-        }
-    }
-
-    static calculateAddDirection(direction: number, summand: number) {
-        return (direction + summand) % (2 * Math.PI);
-    }
-
-    static calculateRicochetDirection(currentDirection: number, faceIsHorizontal: boolean):number {
+    static calculateRicochetVector(currentVector: Coord, faceIsHorizontal: boolean):number {
         if (faceIsHorizontal) {
-            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
-                return ((Math.PI / 2) - currentDirection) + (Math.PI / 2);
-            } else if ((Math.PI / 2) <= currentDirection && Math.PI > currentDirection) {
-                return (Math.PI / 2) - (currentDirection - (Math.PI / 2));
-            } else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
-                return (((Math.PI * 2) - (Math.PI / 2)) - currentDirection) + ((Math.PI * 2) - (Math.PI / 2));
-            } else {
-                return ((Math.PI * 2) - (Math.PI / 2)) - (currentDirection - ((Math.PI * 2) - (Math.PI / 2)));
-            }
         } else {
-            if (0 <= currentDirection && (Math.PI / 2) > currentDirection) {
-                return (Math.PI * 2) - currentDirection;
-            } else if ((Math.PI / 2) <= currentDirection && (Math.PI) > currentDirection) {
-                return (Math.PI * 2) - currentDirection;
-            } else if (Math.PI <= currentDirection && ((Math.PI * 2) - (Math.PI / 2)) > currentDirection) {
-                return Math.PI - (currentDirection - Math.PI);
-            } else {
-                return (Math.PI * 2) - currentDirection;
-            }
         }
-    }
-
-    calculateDifference(direction1: number, direction2: number):number {
-        var difference = direction1 - direction2;
-
-        if (difference > Math.PI) {
-            difference = (Math.PI * 2) - difference;
-        }
-
-        return difference
+        return 0;
     }
 
     collectDamage(obj: Character, arr: Array<Bullet>):number {
@@ -835,61 +781,6 @@ class World {
 
         return totalDamage;
     };
-
-    // calculates a coordinate relative to (0, 0) that is length units in direction from (0, 0)
-    // since it's relative to 0 its really easy to use addition to calculate a new coordinate from a coordinate that isn't 0
-    // I debated if this should belong to Moveable, but decided it should stay in World because so much imprecision still exists in the calculation of directions in dotshot; may as well that the imprecision is managed closely together; a different world might want to manage all that imprecision all together in a different way. -David
-    static calculateCoordinate(length: number, direction: number): Coord {
-        var quadrant = Math.floor(direction / (Math.PI / 2)); // the quadrant that the new coord will be in relative to the moveable as if the space is a unit circle where the moveable is at (0, 0)
-        var quadrantAngle = direction - (quadrant * (Math.PI / 2));
-        var quadrantAngleIsLowHalf = quadrantAngle < (Math.PI / 4);
-        var finalAngle
-        if (quadrantAngleIsLowHalf) {
-             finalAngle = quadrantAngle;
-        } else {
-             finalAngle = (Math.PI / 2) - quadrantAngle;
-        }
-        var angleInRadians = finalAngle;
-
-        var dx;
-        var dy;
-        // the above calculations shouls have laid out everything needed to determine which trig function to use and the sign
-        if (quadrant % 2 == 0) {
-            if (quadrantAngleIsLowHalf) {
-                dx = Math.asin(angleInRadians);
-                dy = Math.acos(angleInRadians);
-            } else {
-                dx = Math.acos(angleInRadians);
-                dy = Math.asin(angleInRadians);
-            }
-
-            dy *= -1;
-
-            if (quadrant == 2) {
-                dx *= -1;
-                dy *= -1;
-            }
-        } else {
-            if (quadrantAngleIsLowHalf) {
-                dx = Math.acos(angleInRadians);
-                dy = Math.asin(angleInRadians);
-            } else {
-                dx = Math.asin(angleInRadians);
-                dy = Math.acos(angleInRadians);
-            }
-
-            if (quadrant == 3) {
-                dx *= -1;
-                dy *= -1;
-            }
-        }
-
-
-        dx *= length;
-        dy *= length;
-
-        return new Coord(dx, dy);
-    }
 
     static inverseCoord(coord: Coord, center: Coord):Coord {
         return new Coord(coord.x * -1, coord.y * -1);
@@ -1347,8 +1238,7 @@ class LoadingActor extends NPC {
         }
         this.move();
         if (this.stepCount % 8 == 0) {
-            var bulletRelative = World.calculateCoordinate(10, this.direction);
-            this.shoot(this.location.createOffset(bulletRelative.x, bulletRelative.y));
+            // shoot
         }
         this.stepCount++;
     }
