@@ -892,13 +892,7 @@ class World {
     }
 
     static inverseCoord(coord: Coord, center: Coord):Coord {
-        var newDirection = this.calculateDirection(coord, center);
-        var relative = this.calculateCoordinate(
-                    this.calculateDistance(coord, center),
-                    newDirection
-               );
-        var output = center.createOffset(relative.x, relative.y);
-        return output;
+        return new Coord(coord.x * -1, coord.y * -1);
     }
 
 }
