@@ -30,6 +30,9 @@ var Coord = /** @class */ (function () {
     Coord.prototype.createOffset = function (dx, dy) {
         return new Coord(this.x + dx, this.y + dy);
     };
+    Coord.prototype.equals = function (coord) {
+        return (this.x == coord.x) && (this.y == coord.y);
+    };
     return Coord;
 }());
 var Drawable = /** @class */ (function () {
@@ -931,6 +934,7 @@ var Player = /** @class */ (function (_super) {
         _this.isMoving = false;
         _this.firingAge = 0;
         _this.enemiesKilled = 0;
+        _this.previousTarget = new Coord(0, 0);
         return _this;
     }
     Player.prototype.step = function () {
@@ -940,7 +944,10 @@ var Player = /** @class */ (function (_super) {
         }
     };
     Player.prototype.control = function (drawWorker) {
-        this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+        var target = new Coord(drawWorker.mouseX, drawWorker.mouseY);
+        if (!this.previousTarget.equals(target)) {
+            this.point(target);
+        }
         if (this.isFiring == "front") {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {

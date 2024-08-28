@@ -22,6 +22,9 @@ class Coord {
     createOffset(dx: number, dy: number): Coord {
         return new Coord(this.x + dx, this.y + dy);
     }
+    equals(coord: Coord): boolean {
+        return (this.x == coord.x) && (this.y == coord.y);
+    }
 }
 
 class Drawable {
@@ -1073,6 +1076,7 @@ class Player extends Character{
     firingAge: number;
     initialSize:number;
     enemiesKilled: number;
+    previousTarget: Coord
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
         super(size, location, new Coord(0, 0), 1, map, bullets, 32);
@@ -1085,6 +1089,7 @@ class Player extends Character{
         this.isMoving = false;
         this.firingAge = 0;
         this.enemiesKilled = 0;
+        this.previousTarget = new Coord(0, 0);
     }
     step():void {
         super.step();
@@ -1093,7 +1098,10 @@ class Player extends Character{
         }
     }
     control(drawWorker):void {
-        this.point(new Coord(drawWorker.mouseX, drawWorker.mouseY));
+        let target = new Coord(drawWorker.mouseX, drawWorker.mouseY);
+        if (!this.previousTarget.equals(target)) {
+            this.point(target);
+        }
         if (this.isFiring == "front") {
             this.firingAge++;
             if (this.firingAge % 4 == 0) {
