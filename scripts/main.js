@@ -366,7 +366,7 @@ var GridMap = /** @class */ (function (_super) {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 10;
+            var viewDistance = 35;
             for (var i = 0; i < gridWidth; i++) {
                 for (var j = 0; j < gridHeight; j++) {
                     if (_this.map[i][j].isEmpty) {
@@ -921,7 +921,7 @@ var Character = /** @class */ (function (_super) {
 var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
     function Player(size, location, map, bullets) {
-        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, 32) || this;
+        var _this = _super.call(this, size, location, new Coord(0, 0), 2, map, bullets, 32) || this;
         _this.weapons.push(new Gun(bullets, _this, 0));
         _this.weapons.push(new DoubleBarrelGun(bullets, _this, 0));
         _this.weapons.push(new ExplodingBulletGun(bullets, _this, 0));

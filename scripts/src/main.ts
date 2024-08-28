@@ -432,7 +432,7 @@ class GridMap extends Drawable {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 10;
+            var viewDistance = 35;
             for (var i = 0; i < gridWidth; i++) { 
                 for (var j = 0; j < gridHeight; j++) {
                     if (this.map[i][j].isEmpty) {
@@ -1075,7 +1075,7 @@ class Player extends Character{
     previousTarget: Coord
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
-        super(size, location, new Coord(0, 0), 1, map, bullets, 32);
+        super(size, location, new Coord(0, 0), 2, map, bullets, 32);
         this.weapons.push(new Gun(bullets, this, 0));
         this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
