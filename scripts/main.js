@@ -636,13 +636,6 @@ var World = /** @class */ (function () {
     World.prototype.isShotBy = function (obj1, obj2) {
         return 3 > World.calculateDistance(obj1.location, obj2.location);
     };
-    World.calculateRicochetVector = function (currentVector, faceIsHorizontal) {
-        if (faceIsHorizontal) {
-        }
-        else {
-        }
-        return 0;
-    };
     World.prototype.collectDamage = function (obj, arr) {
         var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
@@ -692,23 +685,21 @@ var Moveable = /** @class */ (function (_super) {
     Moveable.prototype.move = function () {
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
-            // if (this.doesRicochet) {
-            // var newCoordAsGrid = this.map.getGridIndex(newLocation);
-            // var angleToAdd = Math.PI / 2;
-            // var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
-            // if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
-            // this.setDirection(World.calculateRicochetDirection(this.direction, true));
-            // } else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
-            // this.setDirection(World.calculateRicochetDirection(this.direction, false));
-            // } else {
-            // }
-            // } else {
-            // return false;
-            // }
-            return false;
+            if (this.doesRicochet) {
+                var newCoordAsGrid = this.map.getGridIndex(newLocation);
+                var squareCoords = this.map.getSquareScreenCoord(newCoordAsGrid);
+                if (squareCoords[0].x <= this.location.x && squareCoords[1].x >= this.location.x) {
+                    this.dy = this.dy * -1;
+                }
+                else if (squareCoords[0].y <= this.location.y && squareCoords[2].y >= this.location.y) {
+                    this.dx = this.dx * -1;
+                }
+                newLocation = this.location.createOffset(this.dx, this.dy);
+            }
+            else {
+                return false;
+            }
         }
-        // relativeChangeCoordinate = World.calculateCoordinate(velocity * this.stepsInDirection, this.direction);
-        // newLocation = this.originalLocation.createOffset(relativeChangeCoordinate.x, relativeChangeCoordinate.y);
         this.location = newLocation;
         return true;
     };
