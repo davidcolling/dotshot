@@ -786,14 +786,13 @@ var Moveable = /** @class */ (function (_super) {
         _this.map = map;
         _this.doesRicochet = doesRicochet;
         _this.originalLocation = location;
-        _this.stepsInDirection = 0;
+        _this.setVector(target);
         return _this;
     }
     Moveable.prototype.point = function (target) {
         this.setVector(target);
     };
     Moveable.prototype.setVector = function (target) {
-        this.stepsInDirection = 0;
         this.originalLocation = this.location;
         var targetDx = target.x - this.location.x;
         var targetDy = target.y - this.location.y;
@@ -806,10 +805,8 @@ var Moveable = /** @class */ (function (_super) {
             (targetDx / Math.abs(targetDx));
     };
     Moveable.prototype.move = function () {
-        this.stepsInDirection++;
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
-            this.stepsInDirection = 0;
             // if (this.doesRicochet) {
             // var newCoordAsGrid = this.map.getGridIndex(newLocation);
             // var angleToAdd = Math.PI / 2;

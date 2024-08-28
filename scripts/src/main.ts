@@ -918,7 +918,6 @@ class Moveable extends CenteredShape {
     map: GridMap;
     doesRicochet: boolean;
     originalLocation: Coord;
-    stepsInDirection: number;
 
     constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, doesRicochet: boolean) {
         super(size, location);
@@ -927,13 +926,12 @@ class Moveable extends CenteredShape {
         this.map = map;
         this.doesRicochet = doesRicochet;
         this.originalLocation = location;
-        this.stepsInDirection = 0;
+        this.setVector(target);
     }
     point(target: Coord):void {
         this.setVector(target);
     }
     setVector(target: Coord):void {
-        this.stepsInDirection = 0;
         this.originalLocation = this.location
         let targetDx = target.x - this.location.x;
         let targetDy = target.y - this.location.y;
@@ -952,10 +950,8 @@ class Moveable extends CenteredShape {
         );
     }
     move():boolean {
-        this.stepsInDirection++;
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
-            this.stepsInDirection = 0;
             // if (this.doesRicochet) {
                 // var newCoordAsGrid = this.map.getGridIndex(newLocation);
                 // var angleToAdd = Math.PI / 2;
