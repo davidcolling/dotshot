@@ -634,13 +634,8 @@ var World = /** @class */ (function () {
     ;
     // returns true if obj1 (target) is shot by obj2 (projectile)
     World.prototype.isShotBy = function (obj1, obj2) {
-        var isClose = 3 > World.calculateDistance(obj1.location, obj2.location);
-        // var isInFrontOf = this.isInFrontOf(obj1, obj2);
-        return isClose; //&& isInFrontOf;
+        return 3 > World.calculateDistance(obj1.location, obj2.location);
     };
-    // isInFrontOf(obj1: Character, obj2: Bullet):boolean {
-    // return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
-    // }
     World.calculateDirection = function (c1, c2) {
         var dx = c1.x - c2.x;
         var dy = c1.y - c2.y;

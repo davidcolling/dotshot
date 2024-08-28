@@ -756,14 +756,8 @@ class World {
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
     isShotBy(obj1: Character, obj2: Bullet):boolean {
-        var isClose =  3 > World.calculateDistance(obj1.location, obj2.location) 
-        // var isInFrontOf = this.isInFrontOf(obj1, obj2);
-        return isClose; //&& isInFrontOf;
+        return 3 > World.calculateDistance(obj1.location, obj2.location) 
     }
-
-    // isInFrontOf(obj1: Character, obj2: Bullet):boolean {
-        // return (Math.PI / 2) >= Math.abs(this.calculateDifference(obj1.direction, World.calculateDirection(obj1.location, obj2.location)));
-    // }
 
     static calculateDirection(c1: Coord, c2: Coord):number {
         var dx = c1.x - c2.x;
