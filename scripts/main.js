@@ -795,8 +795,12 @@ var Moveable = /** @class */ (function (_super) {
         var targetDx = target.x - this.location.x;
         var targetDy = target.y - this.location.y;
         var slope = targetDx / targetDy;
-        this.dx = Math.abs(this.currentVelocity * slope) * (targetDx / Math.abs(targetDx));
-        this.dy = this.currentVelocity * (1 - slope) * (targetDy / Math.abs(targetDy));
+        this.dy = Math.sqrt((this.currentVelocity * this.currentVelocity) /
+            ((slope * slope) + 1)) *
+            (targetDy / Math.abs(targetDy));
+        this.dx = Math.sqrt((this.currentVelocity * this.currentVelocity) -
+            (this.dy * this.dy)) *
+            (targetDx / Math.abs(targetDx));
     };
     Moveable.prototype.move = function (velocity) {
         this.stepsInDirection++;

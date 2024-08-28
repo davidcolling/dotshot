@@ -935,8 +935,18 @@ class Moveable extends CenteredShape {
         let targetDx = target.x - this.location.x;
         let targetDy = target.y - this.location.y;
         let slope = targetDx / targetDy;
-        this.dx = Math.abs(this.currentVelocity * slope) * (targetDx / Math.abs(targetDx)); 
-        this.dy = this.currentVelocity * ( 1 - slope ) * (targetDy / Math.abs(targetDy));
+        this.dy = Math.sqrt(
+                (this.currentVelocity * this.currentVelocity) /
+                ((slope * slope) + 1)
+            ) *
+            (targetDy / Math.abs(targetDy)
+        );
+        this.dx = Math.sqrt(
+                (this.currentVelocity * this.currentVelocity) - 
+                (this.dy * this.dy)
+            ) * 
+            (targetDx / Math.abs(targetDx)
+        );
     }
     move(velocity: number):boolean {
         this.stepsInDirection++;
