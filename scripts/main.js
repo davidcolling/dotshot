@@ -388,7 +388,7 @@ var GridMap = /** @class */ (function (_super) {
                                 var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y), 3, _this, false);
                                 var previousCoord = new Coord(i, j);
                                 var currentDistance = 0;
-                                while (coordinateTracker.move(2)) {
+                                while (coordinateTracker.move()) {
                                     var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
                                     //check if the tracker entered a new grid cell
                                     if (gridCoord.x != previousCoord.x ||
@@ -805,7 +805,7 @@ var Moveable = /** @class */ (function (_super) {
             (this.dy * this.dy)) *
             (targetDx / Math.abs(targetDx));
     };
-    Moveable.prototype.move = function (velocity) {
+    Moveable.prototype.move = function () {
         this.stepsInDirection++;
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
@@ -836,14 +836,14 @@ var Moveable = /** @class */ (function (_super) {
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(location, target, map, owner) {
-        var _this = _super.call(this, 3, location, target, 2, map, true) || this;
+        var _this = _super.call(this, 3, location, target, 8, map, true) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
         return _this;
     }
     Bullet.prototype.step = function () {
-        this.move(6);
+        this.move();
         this.age++;
         if (this.age < 80) {
             return true;
@@ -964,7 +964,7 @@ var Player = /** @class */ (function (_super) {
             this.firingAge = 0;
         }
         if (this.isMoving) {
-            this.move(3);
+            this.move();
         }
     };
     Player.prototype.draw = function (drawWorker, strokeColor) {
@@ -1003,7 +1003,7 @@ var NPC = /** @class */ (function (_super) {
             this.setVector(this.map.randomCoord());
         }
         this.idleAge++;
-        this.move(1);
+        this.move();
     };
     NPC.prototype.attack = function () { };
     NPC.prototype.decide = function () {
@@ -1044,7 +1044,7 @@ var Chicken = /** @class */ (function (_super) {
                 this.fleeAge = 0;
                 this.setVector(this.map.randomCoord());
             }
-            this.move(2);
+            this.move();
         }
         else {
             this.idle();
@@ -1125,7 +1125,7 @@ var Spewer = /** @class */ (function (_super) {
         }
         if (willMove) {
             this.point(this.lastSeenPlayerCoord);
-            this.move(1.6);
+            this.move();
         }
         if (!this.isHunting) {
             this.isHunting = true;
@@ -1158,7 +1158,7 @@ var Pirate = /** @class */ (function (_super) {
     };
     Pirate.prototype.attack = function () {
         this.point(this.lastSeenPlayerCoord);
-        this.move(0.5);
+        this.move();
         if (this.seesPlayer) {
             this.shoot(this.combatTarget.location);
         }
@@ -1195,7 +1195,7 @@ var LoadingActor = /** @class */ (function (_super) {
         else {
             this.direction = 0;
         }
-        this.move(3);
+        this.move();
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
             this.shoot(this.location.createOffset(bulletRelative.x, bulletRelative.y));

@@ -457,7 +457,7 @@ class GridMap extends Drawable {
                                 var previousCoord = new Coord(i, j);
                                 var currentDistance = 0;
     
-                                while (coordinateTracker.move(2)) {
+                                while (coordinateTracker.move()) {
                                     var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
     
                                     //check if the tracker entered a new grid cell
@@ -951,7 +951,7 @@ class Moveable extends CenteredShape {
             (targetDx / Math.abs(targetDx)
         );
     }
-    move(velocity: number):boolean {
+    move():boolean {
         this.stepsInDirection++;
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
@@ -985,13 +985,13 @@ class Bullet extends Moveable {
     owner: Character;
 
     constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
-        super(3, location, target, 2, map, true);
+        super(3, location, target, 8, map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
     }
     step():boolean {
-        this.move(6);
+        this.move();
         this.age++;
         if (this.age < 80) {
             return true;
@@ -1116,7 +1116,7 @@ class Player extends Character{
             this.firingAge = 0;
         }
         if (this.isMoving) {
-            this.move(3);
+            this.move();
         }
     }
     draw(drawWorker, strokeColor: RGBA):void {
@@ -1168,7 +1168,7 @@ class NPC extends Character {
             this.setVector(this.map.randomCoord());
         }
         this.idleAge++;
-        this.move(1);
+        this.move();
     }
     attack() :void{}
     decide():void {
@@ -1210,7 +1210,7 @@ class Chicken extends NPC {
                 this.fleeAge = 0;
                 this.setVector(this.map.randomCoord());
             }
-            this.move(2);
+            this.move();
         } else {
             this.idle();
         }
@@ -1300,7 +1300,7 @@ class Spewer extends NPC {
 
         if (willMove) {
             this.point(this.lastSeenPlayerCoord);
-            this.move(1.6);
+            this.move();
         }
 
         if (!this.isHunting) {
@@ -1335,7 +1335,7 @@ class Pirate extends NPC {
     }
     attack():void {
         this.point(this.lastSeenPlayerCoord);
-        this.move(0.5);
+        this.move();
         if (this.seesPlayer) {
             this.shoot(this.combatTarget.location);
         }
@@ -1370,7 +1370,7 @@ class LoadingActor extends NPC {
         } else {
             this.direction = 0;
         }
-        this.move(3);
+        this.move();
         if (this.stepCount % 8 == 0) {
             var bulletRelative = World.calculateCoordinate(10, this.direction);
             this.shoot(this.location.createOffset(bulletRelative.x, bulletRelative.y));
