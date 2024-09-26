@@ -478,6 +478,32 @@ var GridMap = /** @class */ (function (_super) {
         output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)); // LR
         return output;
     };
+    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare @Untested
+    GridMap.prototype.isWall = function (coord1, coord2) {
+        var square1;
+        var square2;
+        if (coord1.x == coord2.x) {
+            if (coord1.y < coord2.y) {
+                square1 = new Coord(coord1.x, coord1.y);
+                square2 = new Coord(coord1.x - 1, coord1.y);
+            }
+            else {
+                square1 = new Coord(coord2.x, coord1.y);
+                square2 = new Coord(coord2.x - 1, coord1.y);
+            }
+        }
+        else {
+            if (coord1.x < coord2.x) {
+                square1 = new Coord(coord1.x, coord1.y);
+                square2 = new Coord(coord1.x, coord1.y - 1);
+            }
+            else {
+                square1 = new Coord(coord2.x, coord1.y);
+                square2 = new Coord(coord2.x, coord1.y - 1);
+            }
+        }
+        return !(this.isOpen(square1) || this.isOpen(square2));
+    };
     GridMap.prototype.randomCoord = function () {
         return new Coord(Math.random() * this.width, Math.random() * this.height);
     };
@@ -634,7 +660,25 @@ var World = /** @class */ (function () {
     ;
     // returns true if obj1 (target) is shot by obj2 (projectile)
     World.prototype.isShotBy = function (obj1, obj2) {
-        return 3 > World.calculateDistance(obj1.location, obj2.location);
+        var distance = World.calculateDistance(obj1.location, obj2.location);
+        var isInTrajectory = false;
+        var nextLinearLocation = obj2.location.createOffset(obj2.dx, obj2.dy);
+        if (10 > distance) { // @Untested
+            if (obj1.location.x >= obj2.location.x &&
+                obj1.location.x <= nextLinearLocation.x &&
+                obj1.location.y >= obj2.location.y &&
+                obj1.location.y <= nextLinearLocation.y) {
+                var trajectorySlope = (obj2.location.y - nextLinearLocation.y) / (obj2.location.x - nextLinearLocation.x);
+                var trajectoryIntercept = obj2.location.y - (trajectorySlope * obj1.location.x);
+                var perpendicularSlope = trajectorySlope * -1;
+                var perpendicularIntercept = obj1.location.y - (perpendicularSlope * obj1.location.x);
+                var intersectionX = (trajectoryIntercept - perpendicularIntercept) / (trajectorySlope - perpendicularSlope);
+                var intersectionY = (perpendicularSlope * intersectionX) + perpendicularSlope;
+                var intersectionCoord = new Coord(intersectionX, intersectionY);
+                var isInTrajectory_1 = 3 > World.calculateDistance(obj1.location, intersectionCoord);
+            }
+        }
+        return (3 > distance) || isInTrajectory;
     };
     World.prototype.collectDamage = function (obj, arr) {
         var totalDamage = 0;

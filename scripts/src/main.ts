@@ -561,6 +561,32 @@ class GridMap extends Drawable {
         return output;
     }
 
+    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare @Untested
+    isWall(coord1: Coord, coord2: Coord):Boolean {
+        let square1: Coord
+        let square2: Coord
+
+        if (coord1.x == coord2.x) {
+            if (coord1.y < coord2.y) {
+                square1 = new Coord(coord1.x, coord1.y)
+                square2 = new Coord(coord1.x - 1, coord1.y)
+            } else {
+                square1 = new Coord(coord2.x, coord1.y)
+                square2 = new Coord(coord2.x - 1, coord1.y)
+            }
+        } else {
+            if (coord1.x < coord2.x) {
+                square1 = new Coord(coord1.x, coord1.y)
+                square2 = new Coord(coord1.x, coord1.y - 1)
+            } else {
+                square1 = new Coord(coord2.x, coord1.y)
+                square2 = new Coord(coord2.x, coord1.y - 1)
+            }
+        }
+
+        return !(this.isOpen(square1) || this.isOpen(square2))
+    }
+
     randomCoord():Coord {
         return new Coord(Math.random() * this.width, Math.random() * this.height);
     }
@@ -756,7 +782,30 @@ class World {
 
     // returns true if obj1 (target) is shot by obj2 (projectile)
     isShotBy(obj1: Character, obj2: Bullet):boolean {
-        return 3 > World.calculateDistance(obj1.location, obj2.location) 
+        let distance = World.calculateDistance(obj1.location, obj2.location);
+        let isInTrajectory = false;
+        let nextLinearLocation = obj2.location.createOffset(obj2.dx, obj2.dy);
+        if (10 > distance) { // @Untested
+            if (
+                obj1.location.x >= obj2.location.x &&
+                obj1.location.x <= nextLinearLocation.x &&
+                obj1.location.y >= obj2.location.y &&
+                obj1.location.y <= nextLinearLocation.y
+            ) {
+                let trajectorySlope = (obj2.location.y - nextLinearLocation.y) / (obj2.location.x - nextLinearLocation.x);
+                let trajectoryIntercept = obj2.location.y - (trajectorySlope * obj1.location.x);
+
+                let perpendicularSlope = trajectorySlope * -1;
+                let perpendicularIntercept = obj1.location.y - (perpendicularSlope * obj1.location.x);
+                
+                let intersectionX = (trajectoryIntercept - perpendicularIntercept) / (trajectorySlope - perpendicularSlope);
+                let intersectionY = (perpendicularSlope * intersectionX) + perpendicularSlope;
+                let intersectionCoord = new Coord(intersectionX, intersectionY);
+
+                let isInTrajectory = 3 > World.calculateDistance(obj1.location, intersectionCoord);
+            }
+        }
+        return (3 > distance) || isInTrajectory;
     }
 
     collectDamage(obj: Character, arr: Array<Bullet>):number {
@@ -1617,5 +1666,4 @@ var game;
 var loadPage = function() {
     game = new HTMLDotshotUI();
 }
-
 
