@@ -785,24 +785,32 @@ class World {
         let distance = World.calculateDistance(obj1.location, obj2.location);
         let isInTrajectory = false;
         let nextLinearLocation = obj2.location.createOffset(obj2.dx, obj2.dy);
-        if (10 > distance) { // @Untested
+
+        let signDiffNextLocation = new Coord(
+            (obj2.location.x - nextLinearLocation.x)/Math.abs(obj2.location.x - nextLinearLocation.x), 
+            (obj2.location.y - nextLinearLocation.y)/Math.abs(obj2.location.y - nextLinearLocation.y)
+        )
+        let signDiffTargetLocation = new Coord(
+            (obj2.location.x - obj1.location.x)/Math.abs(obj2.location.x - obj1.location.x), 
+            (obj2.location.y - obj1.location.y)/Math.abs(obj2.location.y - obj1.location.y)
+        )
+
+        if (300 > distance) {
             if (
-                obj1.location.x >= obj2.location.x &&
-                obj1.location.x <= nextLinearLocation.x &&
-                obj1.location.y >= obj2.location.y &&
-                obj1.location.y <= nextLinearLocation.y
+                signDiffNextLocation.x == signDiffTargetLocation.x &&
+                signDiffNextLocation.y == signDiffTargetLocation.y 
             ) {
                 let trajectorySlope = (obj2.location.y - nextLinearLocation.y) / (obj2.location.x - nextLinearLocation.x);
                 let trajectoryIntercept = obj2.location.y - (trajectorySlope * obj1.location.x);
 
-                let perpendicularSlope = trajectorySlope * -1;
+                let perpendicularSlope = 1 / (trajectorySlope * -1);
                 let perpendicularIntercept = obj1.location.y - (perpendicularSlope * obj1.location.x);
                 
-                let intersectionX = (trajectoryIntercept - perpendicularIntercept) / (trajectorySlope - perpendicularSlope);
-                let intersectionY = (perpendicularSlope * intersectionX) + perpendicularSlope;
+                let intersectionX = (perpendicularIntercept - trajectoryIntercept) / (trajectoryIntercept - perpendicularIntercept);
+                let intersectionY = (perpendicularSlope * intersectionX) + perpendicularIntercept;
                 let intersectionCoord = new Coord(intersectionX, intersectionY);
 
-                let isInTrajectory = 3 > World.calculateDistance(obj1.location, intersectionCoord);
+                let isInTrajectory = 10 > World.calculateDistance(obj2.location, intersectionCoord);
             }
         }
         return (3 > distance) || isInTrajectory;
