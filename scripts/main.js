@@ -843,8 +843,7 @@ var Character = /** @class */ (function (_super) {
         this.hp -= amount;
     };
     ;
-    Character.prototype.draw = function (drawWorker, strokeColor) {
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
+    Character.prototype.drawPointDirection = function (drawWorker, strokeColor) {
         var directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
         var directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y);
         drawWorker.line(this.location.x, this.location.y, directionIndicatorEndPoint.x, directionIndicatorEndPoint.y);
@@ -901,6 +900,7 @@ var Player = /** @class */ (function (_super) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
+        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
     };
     Player.prototype.takeDamage = function (amount) {
         _super.prototype.takeDamage.call(this, amount);
@@ -957,6 +957,7 @@ var Chicken = /** @class */ (function (_super) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
+        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
     };
     Chicken.prototype.step = function () {
         _super.prototype.step.call(this);
@@ -993,6 +994,7 @@ var Spewer = /** @class */ (function (_super) {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
+        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
     Spewer.prototype.step = function () {
@@ -1077,6 +1079,7 @@ var Pirate = /** @class */ (function (_super) {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
         _super.prototype.draw.call(this, drawWorker, strokeColor);
+        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
     };
     Pirate.prototype.step = function () {

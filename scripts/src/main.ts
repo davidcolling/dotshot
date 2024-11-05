@@ -998,8 +998,7 @@ class Character extends Moveable {
     takeDamage(amount: number):void {
         this.hp -= amount;
     };
-    draw(drawWorker, strokeColor: RGBA):void {
-        super.draw(drawWorker, strokeColor); 
+    drawPointDirection(drawWorker, strokeColor: RGBA):void {
         let directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
         let directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y)
         drawWorker.line(
@@ -1065,6 +1064,7 @@ class Player extends Character{
         var shade = strokeColor.r
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
+        super.drawPointDirection(drawWorker, strokeColor);
     }
     takeDamage(amount: number):void {
         super.takeDamage(amount);
@@ -1130,6 +1130,7 @@ class Chicken extends NPC {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
         super.draw(drawWorker, strokeColor); 
+        super.drawPointDirection(drawWorker, strokeColor);
     }    
     step():void {
         super.step();
@@ -1167,6 +1168,7 @@ class Spewer extends NPC {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
         super.draw(drawWorker, strokeColor); 
+        super.drawPointDirection(drawWorker, strokeColor);
         drawWorker.stroke(
             strokeColor.r, 
             strokeColor.g, 
@@ -1255,6 +1257,7 @@ class Pirate extends NPC {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
         super.draw(drawWorker, strokeColor); 
+        super.drawPointDirection(drawWorker, strokeColor); 
         drawWorker.stroke(
             strokeColor.r, 
             strokeColor.g, 
