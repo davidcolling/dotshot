@@ -697,6 +697,18 @@ var World = /** @class */ (function () {
     World.inverseCoord = function (coord, center) {
         return new Coord(coord.x * -1, coord.y * -1);
     };
+    World.calculateVector = function (location, target, distance) {
+        var targetDx = target.x - location.x;
+        var targetDy = target.y - location.y;
+        var slope = targetDx / targetDy;
+        var dy = Math.sqrt((distance * distance) /
+            ((slope * slope) + 1)) *
+            (targetDy / Math.abs(targetDy));
+        var dx = Math.sqrt((distance * distance) -
+            (dy * dy)) *
+            (targetDx / Math.abs(targetDx));
+        return new Coord(dx, dy);
+    };
     return World;
 }());
 var Moveable = /** @class */ (function (_super) {
@@ -716,15 +728,9 @@ var Moveable = /** @class */ (function (_super) {
     };
     Moveable.prototype.setVector = function (target) {
         this.originalLocation = this.location;
-        var targetDx = target.x - this.location.x;
-        var targetDy = target.y - this.location.y;
-        var slope = targetDx / targetDy;
-        this.dy = Math.sqrt((this.currentVelocity * this.currentVelocity) /
-            ((slope * slope) + 1)) *
-            (targetDy / Math.abs(targetDy));
-        this.dx = Math.sqrt((this.currentVelocity * this.currentVelocity) -
-            (this.dy * this.dy)) *
-            (targetDx / Math.abs(targetDx));
+        var d = World.calculateVector(this.location, target, this.currentVelocity);
+        this.dy = d.y;
+        this.dx = d.x;
     };
     Moveable.prototype.move = function () {
         var newLocation = this.location.createOffset(this.dx, this.dy);

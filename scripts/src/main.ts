@@ -836,6 +836,25 @@ class World {
         return new Coord(coord.x * -1, coord.y * -1);
     }
 
+    static calculateVector(location: Coord, target: Coord, distance: number):Coord {
+        let targetDx = target.x - location.x;
+        let targetDy = target.y - location.y;
+        let slope = targetDx / targetDy;
+        let dy = Math.sqrt(
+                (distance * distance) /
+                ((slope * slope) + 1)
+            ) *
+            (targetDy / Math.abs(targetDy)
+        );
+        let dx = Math.sqrt(
+                (distance * distance) - 
+                (dy * dy)
+            ) * 
+            (targetDx / Math.abs(targetDx)
+        );    
+        return new Coord(dx, dy);
+    }
+
 }
 
 class Moveable extends CenteredShape {
@@ -862,21 +881,9 @@ class Moveable extends CenteredShape {
     }
     setVector(target: Coord):void {
         this.originalLocation = this.location
-        let targetDx = target.x - this.location.x;
-        let targetDy = target.y - this.location.y;
-        let slope = targetDx / targetDy;
-        this.dy = Math.sqrt(
-                (this.currentVelocity * this.currentVelocity) /
-                ((slope * slope) + 1)
-            ) *
-            (targetDy / Math.abs(targetDy)
-        );
-        this.dx = Math.sqrt(
-                (this.currentVelocity * this.currentVelocity) - 
-                (this.dy * this.dy)
-            ) * 
-            (targetDx / Math.abs(targetDx)
-        );
+        let d = World.calculateVector(this.location, target, this.currentVelocity);
+        this.dy = d.y;
+        this.dx = d.x
     }
     move():boolean {
         var newLocation = this.location.createOffset(this.dx, this.dy);
