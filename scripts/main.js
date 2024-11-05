@@ -724,6 +724,7 @@ var Moveable = /** @class */ (function (_super) {
         return _this;
     }
     Moveable.prototype.point = function (target) {
+        this.target = target;
         this.setVector(target);
     };
     Moveable.prototype.setVector = function (target) {
@@ -842,6 +843,12 @@ var Character = /** @class */ (function (_super) {
         this.hp -= amount;
     };
     ;
+    Character.prototype.draw = function (drawWorker, strokeColor) {
+        _super.prototype.draw.call(this, drawWorker, strokeColor);
+        var directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
+        var directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y);
+        drawWorker.line(this.location.x, this.location.y, directionIndicatorEndPoint.x, directionIndicatorEndPoint.y);
+    };
     return Character;
 }(Moveable));
 var Player = /** @class */ (function (_super) {
@@ -920,7 +927,7 @@ var NPC = /** @class */ (function (_super) {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.setVector(this.map.randomCoord());
+            this.point(this.map.randomCoord());
         }
         this.idleAge++;
         this.move();
@@ -962,7 +969,7 @@ var Chicken = /** @class */ (function (_super) {
             }
             else {
                 this.fleeAge = 0;
-                this.setVector(this.map.randomCoord());
+                this.point(this.map.randomCoord());
             }
             this.move();
         }

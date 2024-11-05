@@ -877,6 +877,7 @@ class Moveable extends CenteredShape {
         this.setVector(target);
     }
     point(target: Coord):void {
+        this.target = target;
         this.setVector(target);
     }
     setVector(target: Coord):void {
@@ -997,6 +998,18 @@ class Character extends Moveable {
     takeDamage(amount: number):void {
         this.hp -= amount;
     };
+    draw(drawWorker, strokeColor: RGBA):void {
+        super.draw(drawWorker, strokeColor); 
+        let directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
+        let directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y)
+        drawWorker.line(
+            this.location.x,
+            this.location.y, 
+            directionIndicatorEndPoint.x,
+            directionIndicatorEndPoint.y
+        );
+    }
+
 }
 
 class Player extends Character{
@@ -1085,7 +1098,7 @@ class NPC extends Character {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
-            this.setVector(this.map.randomCoord());
+            this.point(this.map.randomCoord());
         }
         this.idleAge++;
         this.move();
@@ -1128,7 +1141,7 @@ class Chicken extends NPC {
                 this.fleeAge++;
             } else {
                 this.fleeAge = 0;
-                this.setVector(this.map.randomCoord());
+                this.point(this.map.randomCoord());
             }
             this.move();
         } else {
