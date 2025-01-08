@@ -366,47 +366,48 @@ var GridMap = /** @class */ (function (_super) {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 35;
-            for (var i = 0; i < gridWidth; i++) {
-                for (var j = 0; j < gridHeight; j++) {
-                    if (_this.map[i][j].isEmpty) {
-                        _this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
-                        for (var x = -300; x < 300; x++) {
-                            var y;
-                            if (x < 0) {
-                                y = 300 + x;
-                            }
-                            else {
-                                y = 300 - x;
-                            }
-                            for (var k = 0; k < 1; k++) {
-                                if (k == 1) {
-                                    x = -x;
-                                    y = -y;
-                                }
-                                // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-                                var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y), 3, _this, false);
-                                var previousCoord = new Coord(i, j);
-                                var currentDistance = 0;
-                                while (coordinateTracker.move()) {
-                                    var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
-                                    //check if the tracker entered a new grid cell
-                                    if (gridCoord.x != previousCoord.x ||
-                                        gridCoord.y != previousCoord.y) {
-                                        currentDistance++;
-                                        previousCoord.x = gridCoord.x;
-                                        previousCoord.y = gridCoord.y;
-                                        _this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
-                                    }
-                                    if (currentDistance == viewDistance) {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // var viewDistance = 35;
+            // for (var i = 0; i < gridWidth; i++) { 
+            // for (var j = 0; j < gridHeight; j++) {
+            // if (this.map[i][j].isEmpty) {
+            // this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
+            // for (var x = -300; x < 300; x++) {
+            // var y;
+            // if (x < 0) {
+            // y = 300 + x;
+            // } else {
+            // y = 300 - x;
+            // }
+            // for (var k = 0; k < 1; k++) {
+            // if (k == 1) {
+            // x = -x;
+            // y = -y;
+            // }
+            // // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+            // var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y) , 3, this, false);
+            // var previousCoord = new Coord(i, j);
+            // var currentDistance = 0;
+            // while (coordinateTracker.move()) {
+            // var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
+            // //check if the tracker entered a new grid cell
+            // if (
+            // gridCoord.x != previousCoord.x ||
+            // gridCoord.y != previousCoord.y
+            // ) {
+            // currentDistance++;
+            // previousCoord.x = gridCoord.x;
+            // previousCoord.y = gridCoord.y;
+            // this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+            // }
+            // if (currentDistance == viewDistance) {
+            // break;
+            // }
+            // }
+            // }
+            // }
+            // }
+            // }
+            // }
         }
         else {
             _this.gridSquareSize = null;
@@ -659,11 +660,13 @@ var World = /** @class */ (function () {
                 //check for shots
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
-                if (this.player != null) {
-                    var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                    this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location); // set this to false and nothing but vision is broken
-                    if (this.nPCs[i].seesPlayer) {
-                        this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                if (200 > World.calculateDistance(this.player.location, this.nPCs[i].location)) {
+                    if (this.player != null) {
+                        var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
+                        this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
+                        if (this.nPCs[i].seesPlayer) {
+                            this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                        }
                     }
                 }
                 this.nPCs[i].step();

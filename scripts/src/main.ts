@@ -432,55 +432,55 @@ class GridMap extends Drawable {
                 }
             }
             // populate visibleIndexes for each GridSquare
-            var viewDistance = 35;
-            for (var i = 0; i < gridWidth; i++) { 
-                for (var j = 0; j < gridHeight; j++) {
-                    if (this.map[i][j].isEmpty) {
-                        this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
+            // var viewDistance = 35;
+            // for (var i = 0; i < gridWidth; i++) { 
+                // for (var j = 0; j < gridHeight; j++) {
+                    // if (this.map[i][j].isEmpty) {
+                        // this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
 
-                        for (var x = -300; x < 300; x++) {
-                            var y;
-                            if (x < 0) {
-                                y = 300 + x;
-                            } else {
-                                y = 300 - x;
-                            }
+                        // for (var x = -300; x < 300; x++) {
+                            // var y;
+                            // if (x < 0) {
+                                // y = 300 + x;
+                            // } else {
+                                // y = 300 - x;
+                            // }
 
-                            for (var k = 0; k < 1; k++) {
-                                if (k == 1) {
-                                    x = -x;
-                                    y = -y;
-                                }
-                                // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-                                var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y) , 3, this, false);
+                            // for (var k = 0; k < 1; k++) {
+                                // if (k == 1) {
+                                    // x = -x;
+                                    // y = -y;
+                                // }
+                                // // wherever this Moveable is able to move in a "straight" line is visible from the starting place
+                                // var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y) , 3, this, false);
     
-                                var previousCoord = new Coord(i, j);
-                                var currentDistance = 0;
+                                // var previousCoord = new Coord(i, j);
+                                // var currentDistance = 0;
     
-                                while (coordinateTracker.move()) {
-                                    var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
+                                // while (coordinateTracker.move()) {
+                                    // var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
     
-                                    //check if the tracker entered a new grid cell
-                                    if (
-                                        gridCoord.x != previousCoord.x ||
-                                        gridCoord.y != previousCoord.y
-                                    ) {
-                                        currentDistance++;
-                                        previousCoord.x = gridCoord.x;
-                                        previousCoord.y = gridCoord.y;
-                                        this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
-                                    }
+                                    // //check if the tracker entered a new grid cell
+                                    // if (
+                                        // gridCoord.x != previousCoord.x ||
+                                        // gridCoord.y != previousCoord.y
+                                    // ) {
+                                        // currentDistance++;
+                                        // previousCoord.x = gridCoord.x;
+                                        // previousCoord.y = gridCoord.y;
+                                        // this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
+                                    // }
     
-                                    if (currentDistance == viewDistance) {
-                                        break;
-                                    }
-                                }
-                            }
+                                    // if (currentDistance == viewDistance) {
+                                        // break;
+                                    // }
+                                // }
+                            // }
 
-                        }
-                    }
-                }
-            }
+                        // }
+                    // }
+                // }
+            // }
         } else {
             this.gridSquareSize = null;
             this.gridWidth = null;
@@ -602,6 +602,8 @@ class GridMap extends Drawable {
             endingX = coord1.x;
         }
         for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += this.gridSquareSize) {
+            // in this loop, if the starting i or the last value of i are on the same horizontal/vertical as a wall, that wall is not counted as blocking. eg end when i <= endingX, and if startingX is on wall, start there instead of adding gridSquareSize first
+                // this depends on if the wall that one characer is flush with is between the characters or not
             var wallIntersection = (slope * i) + intercept;
 
             var wallEnd1 = new Coord(
@@ -791,14 +793,16 @@ class World {
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
 
-                if (this.player != null) {
-                    var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                    this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location); // set this to false and nothing but vision is broken
-                    if (this.nPCs[i].seesPlayer) {
-                        this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                if (200 > World.calculateDistance(this.player.location, this.nPCs[i].location)) {
+                    if (this.player != null) {
+                        var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
+                        this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
+                        if (this.nPCs[i].seesPlayer) {
+                            this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                        }
                     }
                 }
-
+    
                 this.nPCs[i].step();
 
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
