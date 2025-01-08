@@ -589,7 +589,7 @@ class GridMap extends Drawable {
 
     isOpenBetween(coord1: Coord, coord2:Coord):boolean {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
-        var slope = (coord2.y = coord1.y) / (coord2.x - coord1.x);
+        var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
         var intercept = coord2.y - (slope * coord2.x);
 
         var startingX:number;

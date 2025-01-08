@@ -506,7 +506,7 @@ var GridMap = /** @class */ (function (_super) {
     };
     GridMap.prototype.isOpenBetween = function (coord1, coord2) {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
-        var slope = (coord2.y = coord1.y) / (coord2.x - coord1.x);
+        var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
         var intercept = coord2.y - (slope * coord2.x);
         var startingX;
         var endingX;
