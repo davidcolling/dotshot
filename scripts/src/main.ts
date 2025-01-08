@@ -562,7 +562,7 @@ class GridMap extends Drawable {
     }
 
     // the parameters must constitute a wall ie a line which represents a single side of a GridSquare @Untested
-    isWall(coord1: Coord, coord2: Coord):Boolean {
+    isWall(coord1: Coord, coord2: Coord):boolean {
         let square1: Coord
         let square2: Coord
 
@@ -584,7 +584,65 @@ class GridMap extends Drawable {
             }
         }
 
-        return !(this.isOpen(square1) || this.isOpen(square2))
+        return !(this.isOpen(square1) && this.isOpen(square2))
+    }
+
+    isOpenBetween(coord1: Coord, coord2:Coord):boolean {
+        // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
+        var slope = (coord2.y = coord1.y) / (coord2.x - coord1.x);
+        var intercept = coord2.y - (slope * coord2.x);
+
+        var startingX:number;
+        var endingX:number;
+        if (coord1.x < coord2.x) {
+            startingX = coord1.x;
+            endingX = coord2.x;
+        } else {
+            startingX = coord2.x;
+            endingX = coord1.x;
+        }
+        for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += this.gridSquareSize) {
+            var wallIntersection = (slope * i) + intercept;
+
+            var wallEnd1 = new Coord(
+                i,
+                wallIntersection - (wallIntersection % this.gridSquareSize)
+            );
+            var wallEnd2 = new Coord(
+                i,
+                wallIntersection + (this.gridSquareSize - (wallIntersection % this.gridSquareSize))
+            );
+            if (this.isWall(wallEnd1, wallEnd2)) {
+                return false
+            }
+        }
+
+        var startingY:number;
+        var endingY:number;
+        if (coord1.y < coord2.y) {
+            startingY = coord1.y;
+            endingY = coord2.y;
+        } else {
+            startingY = coord2.y;
+            endingY = coord1.y;
+        }
+        for (var i = startingY + (this.gridSquareSize - (startingY % this.gridSquareSize)); i < endingY; i += this.gridSquareSize) {
+            var wallIntersection = (i - intercept) / slope; // this was slope * (i - intercept); // this should be (i - intercept) / slope
+
+            var wallEnd1 = new Coord(
+                wallIntersection - (wallIntersection % this.gridSquareSize),
+                i
+            );
+            var wallEnd2 = new Coord(
+                wallIntersection + (this.gridSquareSize - (wallIntersection % this.gridSquareSize)),
+                i
+            );
+            if (this.isWall(wallEnd1, wallEnd2)) {
+                return false
+            }
+        }
+
+        return true;
     }
 
     randomCoord():Coord {
@@ -735,7 +793,7 @@ class World {
 
                 if (this.player != null) {
                     var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                    this.nPCs[i].seesPlayer = this.map.map[playerIndex.x][playerIndex.y].isVisible(npcGridCoord);
+                    this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location); // set this to false and nothing but vision is broken
                     if (this.nPCs[i].seesPlayer) {
                         this.nPCs[i].lastSeenPlayerCoord = this.player.location;
                     }
