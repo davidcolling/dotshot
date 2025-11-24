@@ -594,7 +594,7 @@ class GridMap extends Drawable {
 
         var startingX:number;
         var endingX:number;
-        if (coord1.x < coord2.x) {
+        if (coord1.x < coord2.x) { // is there an error when these are equal?
             startingX = coord1.x;
             endingX = coord2.x;
         } else {
@@ -695,27 +695,11 @@ class World {
             for (var i = 0; i < 5; i++) {
                 this.food.push(new Food(new Coord(Math.random() * this.map.width, Math.random() * this.map.height)));
             }
-
             this.nPCs = new Array();
-            for (var i = 0; i < numberOfEnemies; i++ ) {
-                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     
-                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
-                    
-                this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(),     
-                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
-
-                this.nPCs.push(new Mine(    new Coord(this.map.width * Math.random(),     
-                    (this.map.height) * Math.random()),      this.map, this.bullets));
-
-                this.nPCs.push(new Chicken( new Coord(Math.random() * this.map.width,     
-                    Math.random() * this.map.height),        this.map, this.food));
-            }
+            this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     
+                (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
 
             this.spawners = new Array();
-            if (includeSpawner) {
-                this.spawners.push(new NPcSpawner(new Coord(this.map.width / 2, this.map.height / 2), this));
-            }
-
         } else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
             this.player = null;
@@ -793,13 +777,12 @@ class World {
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
 
-                if (200 > World.calculateDistance(this.player.location, this.nPCs[i].location)) {
-                    if (this.player != null) {
-                        var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                        this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
-                        if (this.nPCs[i].seesPlayer) {
-                            this.nPCs[i].lastSeenPlayerCoord = this.player.location;
-                        }
+                if (this.player != null) {
+                    var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
+                    this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
+                    console.log("sees player " + this.nPCs[i].seesPlayer);
+                    if (this.nPCs[i].seesPlayer) {
+                        this.nPCs[i].lastSeenPlayerCoord = this.player.location;
                     }
                 }
     
@@ -1335,10 +1318,11 @@ class Pirate extends NPC {
         this.point(this.lastSeenPlayerCoord);
         this.move();
         if (this.seesPlayer) {
-            this.shoot(this.combatTarget.location);
+            this.shoot(new Coord(0, 0))
+            // this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
-         if (0 != World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
+            if (3 < World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
                 this.isHunting = false;
             }
         } else {
