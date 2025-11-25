@@ -342,8 +342,14 @@ var GridMap = /** @class */ (function (_super) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
                 _this.map[randomCoord.x][randomCoord.y].isEmpty = false;
                 // Determine along which axes the wall moves 
-                var dx = Math.random() < .5;
-                var dy = Math.random() < .5;
+                if (Math.random() < .5) {
+                    var dx = Math.random() < .5;
+                    var dy = 0;
+                }
+                else {
+                    var dx = 0;
+                    var dy = Math.random() < .5;
+                }
                 for (var j = 0; j < wallLength; j++) {
                     var newX = randomCoord.x;
                     var newY = randomCoord.y;
@@ -365,49 +371,6 @@ var GridMap = /** @class */ (function (_super) {
                     }
                 }
             }
-            // populate visibleIndexes for each GridSquare
-            // var viewDistance = 35;
-            // for (var i = 0; i < gridWidth; i++) { 
-            // for (var j = 0; j < gridHeight; j++) {
-            // if (this.map[i][j].isEmpty) {
-            // this.map[i][j].visibleIndexes = new GridMapImage(gridWidth, gridHeight, new Coord(i, j), viewDistance);
-            // for (var x = -300; x < 300; x++) {
-            // var y;
-            // if (x < 0) {
-            // y = 300 + x;
-            // } else {
-            // y = 300 - x;
-            // }
-            // for (var k = 0; k < 1; k++) {
-            // if (k == 1) {
-            // x = -x;
-            // y = -y;
-            // }
-            // // wherever this Moveable is able to move in a "straight" line is visible from the starting place
-            // var coordinateTracker = new Moveable(1, new Coord(i * gridSquareSize, j * gridSquareSize), new Coord(x, y) , 3, this, false);
-            // var previousCoord = new Coord(i, j);
-            // var currentDistance = 0;
-            // while (coordinateTracker.move()) {
-            // var gridCoord = GridMap.getGridIndex(coordinateTracker.location, gridSquareSize);
-            // //check if the tracker entered a new grid cell
-            // if (
-            // gridCoord.x != previousCoord.x ||
-            // gridCoord.y != previousCoord.y
-            // ) {
-            // currentDistance++;
-            // previousCoord.x = gridCoord.x;
-            // previousCoord.y = gridCoord.y;
-            // this.map[i][j].visibleIndexes.set(gridCoord.x, gridCoord.y);
-            // }
-            // if (currentDistance == viewDistance) {
-            // break;
-            // }
-            // }
-            // }
-            // }
-            // }
-            // }
-            // }
         }
         else {
             _this.gridSquareSize = null;
@@ -1128,8 +1091,7 @@ var Pirate = /** @class */ (function (_super) {
         this.point(this.lastSeenPlayerCoord);
         this.move();
         if (this.seesPlayer) {
-            this.shoot(new Coord(0, 0));
-            // this.shoot(this.combatTarget.location);
+            this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
             if (3 < World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
@@ -1232,12 +1194,6 @@ var HTMLDotshotUI = /** @class */ (function () {
         // determine dimensions 
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
-        if (height > 700) {
-            height = 700;
-        }
-        if (width > 700) {
-            width = 700;
-        }
         this.height = height;
         this.width = width;
         // determine light/dark colorscheme
@@ -1253,7 +1209,7 @@ var HTMLDotshotUI = /** @class */ (function () {
         this.worldSettings.push(new NumericalSetting("numberOfEnemies", 10, null));
         this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
         this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", 8, null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", 16, null));
         this.worldSettings.push(new BinarySetting("useSpawner", true, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
