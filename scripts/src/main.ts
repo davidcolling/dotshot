@@ -1690,5 +1690,6 @@ var output = function (drawWorker) {
 var game;
 var loadPage = function() {
     game = new HTMLDotshotUI();
+    game.startNewGame()
 }
 
