@@ -1318,8 +1318,7 @@ class Pirate extends NPC {
         this.point(this.lastSeenPlayerCoord);
         this.move();
         if (this.seesPlayer) {
-            this.shoot(new Coord(0, 0))
-            // this.shoot(this.combatTarget.location);
+            this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
             if (3 < World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
