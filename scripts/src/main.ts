@@ -1303,10 +1303,10 @@ class HTMLDotshotUI {
     
         // Create and display settings
         this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 10, null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
-        this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", 16, null));
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 4, null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", 25, null));
+        this.worldSettings.push(new NumericalSetting("wallLength", 4, null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", 32, null));
         this.worldSettings.push(new BinarySetting("useSpawner", true, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();

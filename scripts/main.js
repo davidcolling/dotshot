@@ -351,7 +351,7 @@ var GridMap = /** @class */ (function (_super) {
         output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)); // LR
         return output;
     };
-    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare @Untested
+    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare 
     GridMap.prototype.isWall = function (coord1, coord2) {
         var square1;
         var square2;
@@ -378,17 +378,13 @@ var GridMap = /** @class */ (function (_super) {
         return !(this.isOpen(square1) && this.isOpen(square2));
     };
     // this would be most efficient if the searching is done from both sides or the expected closer-to-wall side
-    // manual testing observations
-    // when npc (or sometimes player) is right near (within one gridsqure away from) a wall, vision always works correctly
-    // tested this with multiple gridsquare sizes and it is very certain
-    // when npc is not right near a wall does vision ever work correctly?
     GridMap.prototype.isOpenBetween = function (coord1, coord2) {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
         var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
         var intercept = coord2.y - (slope * coord2.x);
         var startingX;
         var endingX;
-        if (coord1.x < coord2.x) { // is there an error when these are equal?
+        if (coord1.x < coord2.x) {
             startingX = coord1.x;
             endingX = coord2.x;
         }
@@ -397,8 +393,6 @@ var GridMap = /** @class */ (function (_super) {
             endingX = coord1.x;
         }
         for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += (this.gridSquareSize - 1)) {
-            // in this loop, if the starting i or the last value of i are on the same horizontal/vertical as a wall, that wall is not counted as blocking. eg end when i <= endingX, and if startingX is on wall, start there instead of adding gridSquareSize first
-            // this depends on if the wall that one characer is flush with is between the characters or not
             var wallIntersection = (slope * i) + intercept;
             var wallEnd1 = new Coord(i, wallIntersection - (wallIntersection % this.gridSquareSize));
             var wallEnd2 = new Coord(i, wallIntersection + (this.gridSquareSize - (wallIntersection % this.gridSquareSize)));
@@ -417,7 +411,7 @@ var GridMap = /** @class */ (function (_super) {
             endingY = coord1.y;
         }
         for (var i = startingY + (this.gridSquareSize - (startingY % this.gridSquareSize)); i < endingY; i += (this.gridSquareSize - 1)) {
-            var wallIntersection = (i - intercept) / slope; // this was slope * (i - intercept); // this should be (i - intercept) / slope
+            var wallIntersection = (i - intercept) / slope;
             var wallEnd1 = new Coord(wallIntersection - (wallIntersection % this.gridSquareSize), i);
             var wallEnd2 = new Coord(wallIntersection + (this.gridSquareSize - (wallIntersection % this.gridSquareSize)), i);
             if (this.isWall(wallEnd1, wallEnd2)) {
@@ -1128,10 +1122,10 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         // Create and display settings
         this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 10, null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", 50, null));
-        this.worldSettings.push(new NumericalSetting("wallLength", 10, null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", 16, null));
+        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 4, null));
+        this.worldSettings.push(new NumericalSetting("numberOfWalls", 25, null));
+        this.worldSettings.push(new NumericalSetting("wallLength", 4, null));
+        this.worldSettings.push(new NumericalSetting("gridSquareSize", 32, null));
         this.worldSettings.push(new BinarySetting("useSpawner", true, null));
         for (var i = 0; i < this.worldSettings.length; i++) {
             this.worldSettings[i].display();
