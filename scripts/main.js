@@ -549,8 +549,16 @@ var World = /** @class */ (function () {
                 this.food.push(new Food(new Coord(Math.random() * this.map.width, Math.random() * this.map.height)));
             }
             this.nPCs = new Array();
-            this.nPCs.push(new Pirate(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.player));
+            for (var i = 0; i < numberOfEnemies; i++) {
+                this.nPCs.push(new Pirate(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.player));
+                this.nPCs.push(new Spewer(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.player));
+                this.nPCs.push(new Mine(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets));
+                this.nPCs.push(new Chicken(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.food));
+            }
             this.spawners = new Array();
+            if (includeSpawner) {
+                this.spawners.push(new NPcSpawner(new Coord(this.map.width / 2, this.map.height / 2), this));
+            }
         }
         else {
             this.map = new GridMap(width, height, 0, 0, 0, true);
