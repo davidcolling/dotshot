@@ -405,11 +405,11 @@ class GridMap extends Drawable {
 
                 // Determine along which axes the wall moves 
                 if (Math.random() < .5) {
-                    var dx = Math.random() < .5;
+                    var dx = 1;
                     var dy = 0;
                 } else {
                     var dx = 0;
-                    var dy = Math.random() < .5;
+                    var dy = 1
                 }
 
                 for (var j = 0; j < wallLength; j++) {
