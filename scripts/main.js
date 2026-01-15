@@ -534,11 +534,13 @@ var World = /** @class */ (function () {
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
                 if (this.player != null) {
-                    var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                    this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
-                    console.log("sees player " + this.nPCs[i].seesPlayer);
-                    if (this.nPCs[i].seesPlayer) {
-                        this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                    if (World.calculateDistance(this.nPCs[i].location, this.player.location) < 200) {
+                        var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
+                        this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
+                        console.log("sees player " + this.nPCs[i].seesPlayer);
+                        if (this.nPCs[i].seesPlayer) {
+                            this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                        }
                     }
                 }
                 this.nPCs[i].step();
