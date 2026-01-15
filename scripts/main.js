@@ -190,71 +190,6 @@ var Food = /** @class */ (function (_super) {
     };
     return Food;
 }(CenteredShape));
-var GridMapImage = /** @class */ (function () {
-    function GridMapImage(width, height, viewPoint, viewDistance) {
-        this.gridWidth = width;
-        this.gridHeight = height;
-        this.viewPoint = viewPoint;
-        this.viewDistance = viewDistance;
-        var distLeft = viewDistance;
-        if (this.viewPoint.x < this.viewDistance)
-            distLeft -= this.viewDistance - this.viewPoint.x;
-        this.distLeft = distLeft;
-        var distRight = viewDistance;
-        if (this.viewPoint.x + this.viewDistance > width)
-            distRight -= this.viewDistance - (width - this.viewPoint.x);
-        this.distRight = distRight;
-        var distAbove = viewDistance;
-        if (this.viewPoint.y < this.viewDistance)
-            distAbove -= this.viewDistance - this.viewPoint.y;
-        this.distAbove = distAbove;
-        var distBelow = viewDistance;
-        if (this.viewPoint.y + this.viewDistance > height)
-            distBelow -= this.viewDistance - (height - this.viewPoint.y);
-        this.distBelow = distBelow;
-        this.map = new Array();
-        for (var i = 0; i < distLeft + distRight + 1; i++) {
-            this.map[i] = new Array();
-            for (var j = 0; j < distAbove + distBelow + 1; j++) {
-                this.map[i][j] = false;
-            }
-        }
-    }
-    GridMapImage.prototype.set = function (x, y) {
-        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(subMapCoord)) {
-            this.map[subMapCoord.x][subMapCoord.y] = true;
-        }
-    };
-    GridMapImage.prototype.unSet = function (x, y) {
-        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(subMapCoord)) {
-            this.map[subMapCoord.x][subMapCoord.y] = false;
-        }
-    };
-    GridMapImage.prototype.canSee = function (coord) {
-        var subMapCoord = this.mapIndexToHashIndex(coord);
-        if (this.indexIsInRange(subMapCoord)) {
-            return this.map[subMapCoord.x][subMapCoord.y];
-        }
-        else {
-            return false;
-        }
-    };
-    // translates a grid index from the whole map to the grid index of the interal hash map representing the visible portion of the entire math
-    GridMapImage.prototype.mapIndexToHashIndex = function (coord) {
-        var dx = this.viewPoint.x - this.distLeft;
-        var dy = this.viewPoint.y - this.distAbove;
-        return new Coord(coord.x - dx, coord.y - dy);
-    };
-    GridMapImage.prototype.indexIsInRange = function (coord) {
-        return (coord.x >= 0 &&
-            coord.x < this.map.length &&
-            coord.y >= 0 &&
-            coord.y < this.map[0].length);
-    };
-    return GridMapImage;
-}());
 var GridSquare = /** @class */ (function (_super) {
     __extends(GridSquare, _super);
     function GridSquare(size, coord, isEmpty) {
@@ -262,7 +197,6 @@ var GridSquare = /** @class */ (function (_super) {
         _this.size = size;
         _this.isEmpty = isEmpty;
         _this.coord = coord;
-        _this.visibleIndexes = null;
         _this.isHighlighted = false;
         return _this;
     }
@@ -280,14 +214,6 @@ var GridSquare = /** @class */ (function (_super) {
                 drawWorker.fill(shade, 256);
                 drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
             }
-        }
-    };
-    GridSquare.prototype.isVisible = function (coord) {
-        if (this.visibleIndexes == null) {
-            return true;
-        }
-        else {
-            return this.visibleIndexes.canSee(coord);
         }
     };
     return GridSquare;
@@ -385,23 +311,6 @@ var GridMap = /** @class */ (function (_super) {
             for (var i = 0; i < this.gridWidth; i++) {
                 for (var j = 0; j < this.gridHeight; j++) {
                     this.map[i][j].draw(drawWorker, strokeColor);
-                }
-            }
-        }
-    };
-    // blocks out gridSquares that aren't visible from the viewpoint
-    GridMap.prototype.drawVisible = function (viewPointScreenCoord, drawWorker, strokeColor) {
-        if (!this.isEmpty) {
-            var viewPoint = this.getGridIndex(viewPointScreenCoord);
-            for (var i = 0; i < this.gridWidth; i++) {
-                for (var j = 0; j < this.gridHeight; j++) {
-                    if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                        this.map[i][j].draw(drawWorker, strokeColor);
-                    }
-                    else {
-                        drawWorker.fill(0, 256);
-                        drawWorker.rect(i * this.gridSquareSize, j * this.gridSquareSize, this.gridSquareSize, this.gridSquareSize);
-                    }
                 }
             }
         }

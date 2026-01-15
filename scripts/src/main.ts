@@ -200,94 +200,10 @@ class Food extends CenteredShape {
     }
 }
 
-class GridMapImage {
-    gridWidth:number;
-    gridHeight:number;
-    map: Array<Array<boolean>>;
-    viewPoint: Coord;
-    viewDistance: number;
-
-    distLeft: number;
-    distRight: number;
-    distAbove: number;
-    distBelow:number;
-
-    constructor(width: number, height: number, viewPoint: Coord, viewDistance: number) {
-        this.gridWidth = width;
-        this.gridHeight = height;
-        this.viewPoint = viewPoint;
-        this.viewDistance = viewDistance;
-
-        var distLeft = viewDistance;
-        if (this.viewPoint.x < this.viewDistance) 
-            distLeft -= this.viewDistance - this.viewPoint.x;
-        this.distLeft = distLeft ;
-        var distRight = viewDistance;
-        if (this.viewPoint.x + this.viewDistance > width) 
-            distRight -= this.viewDistance - (width - this.viewPoint.x);
-        this.distRight = distRight ;
-
-        var distAbove = viewDistance;
-        if (this.viewPoint.y < this.viewDistance) 
-            distAbove -= this.viewDistance - this.viewPoint.y;
-        this.distAbove = distAbove ;
-        var distBelow = viewDistance;
-        if (this.viewPoint.y + this.viewDistance > height) 
-            distBelow -= this.viewDistance - (height - this.viewPoint.y);
-        this.distBelow = distBelow ;
-
-        this.map = new Array();
-        for (var i = 0; i < distLeft + distRight + 1; i++) {
-            this.map[i] = new Array();
-            for (var j = 0; j < distAbove + distBelow + 1; j++) {
-                this.map[i][j] = false;
-            }
-        }
-    }
-    set(x: number, y: number):void {
-        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(subMapCoord)) {
-            this.map[subMapCoord.x][subMapCoord.y] = true;
-        }
-    }
-    unSet(x: number, y: number):void {
-        var subMapCoord = this.mapIndexToHashIndex(new Coord(x, y));
-        if (this.indexIsInRange(subMapCoord)) {
-            this.map[subMapCoord.x][subMapCoord.y] = false;
-        }
-    }
-
-    canSee(coord: Coord): boolean {
-        var subMapCoord = this.mapIndexToHashIndex(coord);
-        if (this.indexIsInRange(subMapCoord)) {
-            return this.map[subMapCoord.x][subMapCoord.y];
-        } else {
-            return false;
-        }
-    }
-
-    // translates a grid index from the whole map to the grid index of the interal hash map representing the visible portion of the entire math
-    private mapIndexToHashIndex(coord: Coord): Coord {
-        var dx = this.viewPoint.x - this.distLeft;
-        var dy = this.viewPoint.y - this.distAbove;
-        return new Coord(coord.x - dx, coord.y - dy);
-    }
-    private indexIsInRange(coord: Coord): boolean {
-        return (
-            coord.x >= 0 &&
-            coord.x < this.map.length &&
-            coord.y >= 0 &&
-            coord.y < this.map[0].length
-        )
-    }
-
-}
-
 class GridSquare extends Drawable {
     size: number;
     isEmpty: boolean; // is the square wall or open space?
     coord: Coord;
-    visibleIndexes: GridMapImage // it is assumed the scope that calls this constructor will create and add an image;
     isHighlighted: boolean; // for ad-hoc debugging
 
     constructor(size: number, coord: Coord, isEmpty: boolean) {
@@ -295,7 +211,6 @@ class GridSquare extends Drawable {
         this.size = size;
         this.isEmpty = isEmpty;
         this.coord = coord;
-        this.visibleIndexes = null;
         this.isHighlighted = false;
     }
 
@@ -321,14 +236,6 @@ class GridSquare extends Drawable {
                     this.size
                 );
             }
-        }
-    }
-
-    isVisible(coord: Coord):boolean {
-        if (this.visibleIndexes == null) {
-            return true;
-        } else {
-            return this.visibleIndexes.canSee(coord);
         }
     }
 }
@@ -454,28 +361,6 @@ class GridMap extends Drawable {
         }
     }
 
-    // blocks out gridSquares that aren't visible from the viewpoint
-    drawVisible(viewPointScreenCoord: Coord, drawWorker, strokeColor: RGBA):void {
-        if( !this.isEmpty) {
-            var viewPoint = this.getGridIndex(viewPointScreenCoord);
-            for (var i = 0; i < this.gridWidth; i ++) {
-                for (var j = 0; j < this.gridHeight; j ++) {
-                    if (this.map[viewPoint.x][viewPoint.y].isVisible(new Coord(i, j))) {
-                        this.map[i][j].draw(drawWorker, strokeColor);
-                    } else {
-                        drawWorker.fill(0, 256);
-                        drawWorker.rect(
-                            i * this.gridSquareSize,
-                            j * this.gridSquareSize,
-                            this.gridSquareSize,
-                            this.gridSquareSize
-                        );
-                    }
-                }
-            }
-        }
-    }
-
     isOpen(screenCoord: Coord):boolean {
         if(!this.isEmpty) {
             if (
@@ -516,7 +401,7 @@ class GridMap extends Drawable {
         return output;
     }
 
-    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare @Untested
+    // the parameters must constitute a wall ie a line which represents a single side of a GridSquare 
     isWall(coord1: Coord, coord2: Coord):boolean {
         let square1: Coord
         let square2: Coord
@@ -543,10 +428,6 @@ class GridMap extends Drawable {
     }
 
     // this would be most efficient if the searching is done from both sides or the expected closer-to-wall side
-    // manual testing observations
-        // when npc (or sometimes player) is right near (within one gridsqure away from) a wall, vision always works correctly
-            // tested this with multiple gridsquare sizes and it is very certain
-        // when npc is not right near a wall does vision ever work correctly?
     isOpenBetween(coord1: Coord, coord2:Coord):boolean {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
         var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
@@ -554,7 +435,7 @@ class GridMap extends Drawable {
 
         var startingX:number;
         var endingX:number;
-        if (coord1.x < coord2.x) { // is there an error when these are equal?
+        if (coord1.x < coord2.x) { 
             startingX = coord1.x;
             endingX = coord2.x;
         } else {
@@ -562,8 +443,6 @@ class GridMap extends Drawable {
             endingX = coord1.x;
         }
         for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += (this.gridSquareSize - 1)) {
-            // in this loop, if the starting i or the last value of i are on the same horizontal/vertical as a wall, that wall is not counted as blocking. eg end when i <= endingX, and if startingX is on wall, start there instead of adding gridSquareSize first
-                // this depends on if the wall that one characer is flush with is between the characters or not
             var wallIntersection = (slope * i) + intercept;
 
             var wallEnd1 = new Coord(
@@ -589,7 +468,7 @@ class GridMap extends Drawable {
             endingY = coord1.y;
         }
         for (var i = startingY + (this.gridSquareSize - (startingY % this.gridSquareSize)); i < endingY; i += (this.gridSquareSize - 1)) {
-            var wallIntersection = (i - intercept) / slope; // this was slope * (i - intercept); // this should be (i - intercept) / slope
+            var wallIntersection = (i - intercept) / slope; 
 
             var wallEnd1 = new Coord(
                 wallIntersection - (wallIntersection % this.gridSquareSize),
