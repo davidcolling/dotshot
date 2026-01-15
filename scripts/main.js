@@ -468,6 +468,11 @@ var GridMap = /** @class */ (function (_super) {
         }
         return !(this.isOpen(square1) && this.isOpen(square2));
     };
+    // this would be most efficient if the searching is done from both sides or the expected closer-to-wall side
+    // manual testing observations
+    // when npc (or sometimes player) is right near (within one gridsqure away from) a wall, vision always works correctly
+    // tested this with multiple gridsquare sizes and it is very certain
+    // when npc is not right near a wall does vision ever work correctly?
     GridMap.prototype.isOpenBetween = function (coord1, coord2) {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
         var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
