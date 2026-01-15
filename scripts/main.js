@@ -344,13 +344,11 @@ var GridMap = /** @class */ (function (_super) {
                 // Determine along which axes the wall moves 
                 if (Math.random() < .5) {
                     var dx = 1;
-                    // var dx = Math.random() < .5;
                     var dy = 0;
                 }
                 else {
                     var dx = 0;
                     var dy = 1;
-                    // var dy = Math.random() < .5;
                 }
                 for (var j = 0; j < wallLength; j++) {
                     var newX = randomCoord.x;
@@ -489,7 +487,7 @@ var GridMap = /** @class */ (function (_super) {
             startingX = coord2.x;
             endingX = coord1.x;
         }
-        for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += this.gridSquareSize) {
+        for (var i = startingX + (this.gridSquareSize - (startingX % this.gridSquareSize)); i < endingX; i += (this.gridSquareSize - 1)) {
             // in this loop, if the starting i or the last value of i are on the same horizontal/vertical as a wall, that wall is not counted as blocking. eg end when i <= endingX, and if startingX is on wall, start there instead of adding gridSquareSize first
             // this depends on if the wall that one characer is flush with is between the characters or not
             var wallIntersection = (slope * i) + intercept;
@@ -509,7 +507,7 @@ var GridMap = /** @class */ (function (_super) {
             startingY = coord2.y;
             endingY = coord1.y;
         }
-        for (var i = startingY + (this.gridSquareSize - (startingY % this.gridSquareSize)); i < endingY; i += this.gridSquareSize) {
+        for (var i = startingY + (this.gridSquareSize - (startingY % this.gridSquareSize)); i < endingY; i += (this.gridSquareSize - 1)) {
             var wallIntersection = (i - intercept) / slope; // this was slope * (i - intercept); // this should be (i - intercept) / slope
             var wallEnd1 = new Coord(wallIntersection - (wallIntersection % this.gridSquareSize), i);
             var wallEnd2 = new Coord(wallIntersection + (this.gridSquareSize - (wallIntersection % this.gridSquareSize)), i);
