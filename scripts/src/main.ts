@@ -1342,7 +1342,7 @@ class HTMLDotshotUI {
         this.worldSettings.numberOfEnemies.value = Math.random() * 100;
         this.worldSettings.numberOfWalls.value = Math.random() * 50;
         this.worldSettings.wallLength.value = Math.random() * 15;
-        this.worldSettings.gridSquareSize.value = Math.random() * 100;
+        this.worldSettings.gridSquareSize.value = Math.random() * 50;
 
         for (const s in this.worldSettings) {
             this.worldSettings[s].setHTMLFromValue()
