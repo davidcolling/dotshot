@@ -1283,7 +1283,7 @@ class HTMLDotshotUI {
     world: World;
     defaultStrokeColor: RGBA;
     display: Object;
-    worldSettings: Array<Setting<any, any>>;
+    worldSettings: SettingsProfile;
     height: number;
     width: number;
     console: HTMLDotshotMessageConsole;
@@ -1304,18 +1304,19 @@ class HTMLDotshotUI {
         }
     
         // Create and display settings
-        this.worldSettings = new Array();
-        this.worldSettings.push(new NumericalSetting("numberOfEnemies", 4, null));
-        this.worldSettings.push(new NumericalSetting("numberOfWalls", 25, null));
-        this.worldSettings.push(new NumericalSetting("wallLength", 4, null));
-        this.worldSettings.push(new NumericalSetting("gridSquareSize", 32, null));
-        this.worldSettings.push(new BinarySetting("useSpawner", true, null));
-        for (var i = 0; i < this.worldSettings.length; i++) {
-            this.worldSettings[i].display();
+        this.worldSettings = new SettingsProfile(4, 25, 5, 32, true);
+        for (const s in this.worldSettings) {
+            this.worldSettings[s].display();
         }
 
         this.console = new HTMLDotshotMessageConsole();
         this.console.display();
+    }
+
+    setWorldSettings():void {
+        for (const s in this.worldSettings) {
+            this.worldSettings[s].setValueFromDocument();
+        }
     }
 
     startNewGame():void {
@@ -1323,17 +1324,31 @@ class HTMLDotshotUI {
             this.display.remove();
         }
     
-        for (var i = 0; i < this.worldSettings.length; i++) {
-            this.worldSettings[i].setValueFromDocument();
-        }
-
         this.console.post("Loading...");
 
-        var map = new GridMap(this.width, this.height, this.worldSettings[3].value, this.worldSettings[1].value, this.worldSettings[2].value, false);
-        this.world = new World(this.width, this.height, this.worldSettings[0].value, map, false, this.defaultStrokeColor, this.worldSettings[4].value);
+        var map = new GridMap(this.width, this.height, this.worldSettings.gridSquareSize.value, this.worldSettings.numberOfWalls.value, this.worldSettings.wallLength.value, false);
+        this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.useSpawner.value);
         this.display = new p5(output, "canvas");
 
         this.console.post("'w' to move; 'r' to shoot; player faces the cursor; desktop only");
+    }
+
+    startNewGameFromSettings():void {
+        this.setWorldSettings();
+        this.startNewGame();
+    }
+
+    startNewRandomGame():void {
+        this.worldSettings.numberOfEnemies.value = Math.random() * 100;
+        this.worldSettings.numberOfWalls.value = Math.random() * 50;
+        this.worldSettings.wallLength.value = Math.random() * 15;
+        this.worldSettings.gridSquareSize.value = Math.random() * 100;
+
+        for (const s in this.worldSettings) {
+            this.worldSettings[s].setHTMLFromValue()
+        }
+
+        this.startNewGame();
     }
 
     saveMap():void {
@@ -1485,6 +1500,22 @@ class BinarySetting extends Setting<boolean, string> {
             this.htmlExtraAttributes = "";
         }
         this.setValueFromHTML();
+    }
+}
+
+class SettingsProfile {
+    numberOfEnemies: NumericalSetting;
+    numberOfWalls: NumericalSetting;
+    wallLength: NumericalSetting;
+    gridSquareSize: NumericalSetting;
+    useSpawner: BinarySetting;
+
+    constructor (numberOfEnemies: number, numberOfWalls: number, wallLength: number, gridSquareSize: number, useSpawner: boolean) {
+        this.numberOfEnemies = new NumericalSetting("numberOfEnemies", numberOfEnemies, null);
+        this.numberOfWalls = new NumericalSetting("numberOfWalls", numberOfWalls, null);
+        this.wallLength = new NumericalSetting("wallLength", wallLength, null);
+        this.gridSquareSize = new NumericalSetting("gridSquareSize", gridSquareSize, null);
+        this.useSpawner = new BinarySetting("useSpawner", useSpawner, null);
     }
 }
 
