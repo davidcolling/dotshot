@@ -761,7 +761,7 @@ class World {
 
 class Moveable extends CenteredShape {
     target: Coord;
-    currentVelocity: number; 
+    velocity: number; 
     dx: number; 
     dy: number;
 
@@ -769,10 +769,10 @@ class Moveable extends CenteredShape {
     doesRicochet: boolean;
     originalLocation: Coord;
 
-    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, doesRicochet: boolean) {
+    constructor(size: number, location: Coord, target: Coord, startingVelocity: number, map: GridMap, doesRicochet: boolean) {
         super(size, location);
         this.target = target;
-        this.currentVelocity = currentVelocity;
+        this.velocity = startingVelocity;
         this.map = map;
         this.doesRicochet = doesRicochet;
         this.originalLocation = location;
@@ -784,7 +784,7 @@ class Moveable extends CenteredShape {
     }
     setVector(target: Coord):void {
         this.originalLocation = this.location
-        let d = World.calculateVector(this.location, target, this.currentVelocity);
+        let d = World.calculateVector(this.location, target, this.velocity);
         this.dy = d.y;
         this.dx = d.x
     }
@@ -882,8 +882,8 @@ class Character extends Moveable {
     mainWeaponBaseVelocity: number
     currentWeapon:number;
 
-    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number) {
-        super(size, location, target, currentVelocity, map, false);
+    constructor(size: number, location: Coord, target: Coord, startingVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number) {
+        super(size, location, target, startingVelocity, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();

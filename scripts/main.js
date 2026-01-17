@@ -635,10 +635,10 @@ var World = /** @class */ (function () {
 }());
 var Moveable = /** @class */ (function (_super) {
     __extends(Moveable, _super);
-    function Moveable(size, location, target, currentVelocity, map, doesRicochet) {
+    function Moveable(size, location, target, startingVelocity, map, doesRicochet) {
         var _this = _super.call(this, size, location) || this;
         _this.target = target;
-        _this.currentVelocity = currentVelocity;
+        _this.velocity = startingVelocity;
         _this.map = map;
         _this.doesRicochet = doesRicochet;
         _this.originalLocation = location;
@@ -651,7 +651,7 @@ var Moveable = /** @class */ (function (_super) {
     };
     Moveable.prototype.setVector = function (target) {
         this.originalLocation = this.location;
-        var d = World.calculateVector(this.location, target, this.currentVelocity);
+        var d = World.calculateVector(this.location, target, this.velocity);
         this.dy = d.y;
         this.dx = d.x;
     };
@@ -744,8 +744,8 @@ var CannonBall = /** @class */ (function (_super) {
 }(Bullet));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
-    function Character(size, location, target, currentVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
-        var _this = _super.call(this, size, location, target, currentVelocity, map, false) || this;
+    function Character(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
+        var _this = _super.call(this, size, location, target, startingVelocity, map, false) || this;
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
