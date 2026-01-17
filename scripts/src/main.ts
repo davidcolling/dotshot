@@ -139,8 +139,10 @@ class DoubleBarrelGun extends Weapon {
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, 8));
-        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, 8));
+
+        const velocity = 8;
+        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, velocity));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, velocity));
     }
 }
 
@@ -207,38 +209,26 @@ class GridSquare extends Drawable {
     size: number;
     isEmpty: boolean; // is the square wall or open space?
     coord: Coord;
-    isHighlighted: boolean; // for ad-hoc debugging
 
     constructor(size: number, coord: Coord, isEmpty: boolean) {
         super();
         this.size = size;
         this.isEmpty = isEmpty;
         this.coord = coord;
-        this.isHighlighted = false;
     }
 
     draw(drawWorker, strokeColor: RGBA):boolean {
-        if (this.isHighlighted) {
-            drawWorker.fill(256, 0, 0, 256);
+        if (this.isEmpty) {
+            return;
+        } else {
+            var shade = strokeColor.r;
+            drawWorker.fill(shade, 256);
             drawWorker.rect(
                 this.coord.x,
                 this.coord.y,
                 this.size,
                 this.size
             );
-        } else {
-            if (this.isEmpty) {
-                return;
-            } else {
-                var shade = strokeColor.r;
-                drawWorker.fill(shade, 256);
-                drawWorker.rect(
-                    this.coord.x,
-                    this.coord.y,
-                    this.size,
-                    this.size
-                );
-            }
         }
     }
 }
