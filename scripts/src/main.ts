@@ -61,7 +61,7 @@ class NPcSpawner extends CenteredShape {
     step():void {
         this.counter++;
         if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
-            this.world.nPCs.push(new Pirate(this.location,  this.world.map, this.world.bullets, this.world.player));
+            this.world.nPCs.push(new Pirate(this.location,  this.world.map, this.world.bullets, this.world.bulletSpeed, this.world.player));
         }
     }
     draw(drawWorker, strokeColor: RGBA):void {
@@ -108,13 +108,16 @@ class Weapon {
 }
 
 class Gun extends Weapon {
-    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number) {
+    baseVelocity: number;
+
+    constructor(bullets: Array<Bullet>, owner: Character, coolDownTimer: number, baseVelocity: number) {
         super(bullets, owner, coolDownTimer);
+        this.baseVelocity = baseVelocity;
     }
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner, this.baseVelocity));
     }
 }
 
@@ -136,8 +139,8 @@ class DoubleBarrelGun extends Weapon {
 
     fire(target: Coord):void {
         super.fire(target);
-        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, 8));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, 8));
     }
 }
 
@@ -509,14 +512,16 @@ class World {
     pings: Array<Ping>;
     drawWorker: Object;
     strokeColor: RGBA;
+    bulletSpeed: number;
     spawners: Array<NPcSpawner>;
     messages: Array<string>;
 
-    constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA, includeSpawner: boolean) {
+    constructor(width: number, height: number, numberOfEnemies: number, map: GridMap, loading: boolean, strokeColor: RGBA, bulletSpeed: number, includeSpawner: boolean) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
         this.strokeColor = strokeColor;
+        this.bulletSpeed = bulletSpeed;
         this.messages = new Array();
 
         this.pings = new Array();
@@ -527,7 +532,7 @@ class World {
             while (!map.isOpen(playerCoordinate)) {
                 playerCoordinate.x--;
             }
-            this.player = new Player(5, playerCoordinate, this.map, this.bullets);
+            this.player = new Player(5, playerCoordinate, this.map, this.bullets, this.bulletSpeed);
             this.healthBar = new HealthBar(32, this.map);
 
             this.food = new Array();
@@ -537,9 +542,9 @@ class World {
             this.nPCs = new Array();
             for (var i = 0; i< numberOfEnemies; i++) {
                 this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     
-                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
                 this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(),     
-                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.player));
+                    (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
                 this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(),     
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets));
                 this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(),     
@@ -556,7 +561,7 @@ class World {
             this.healthBar = null;
             this.food = null;
             this.nPCs = new Array();
-            this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets));
+            this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets, this.bulletSpeed));
         }
     }
 
@@ -811,8 +816,8 @@ class Bullet extends Moveable {
     maxForce:number;
     owner: Character;
 
-    constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
-        super(3, location, target, 8, map, true);
+    constructor(location: Coord, target: Coord, map: GridMap, owner: Character, baseVelocity: number) {
+        super(3, location, target, baseVelocity, map, true);
         this.maxForce = 1;
         this.owner = owner;
         this.age = 0;
@@ -836,17 +841,18 @@ class ExplodingBullet extends Bullet {
     bullets: Array<Bullet>;
 
     constructor(location: Coord, target: Coord, map: GridMap, owner: Character, bullets: Array<Bullet>) {
-        super(location, target, map, owner);
+        super(location, target, map, owner, 8);
         this.bullets = bullets;
     }
     step():boolean {
         super.step();
 
+        const velocity = 8; 
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, -10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, 10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, -10), this.map, this.owner, velocity));
             return false;
         }
 
@@ -859,7 +865,7 @@ class ExplodingBullet extends Bullet {
 
 class CannonBall extends Bullet {
     constructor(location: Coord, target: Coord, map: GridMap, owner: Character) {
-        super(location, target, map, owner);
+        super(location, target, map, owner, 8);
         this.size = 7;
         this.maxForce = 10;
     }
@@ -873,13 +879,15 @@ class Character extends Moveable {
     hp: number;
     bullets: Array<Bullet>;
     weapons: Array<Weapon>;
+    mainWeaponBaseVelocity: number
     currentWeapon:number;
 
-    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, bullets: Array<Bullet>, maxHP: number) {
+    constructor(size: number, location: Coord, target: Coord, currentVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number) {
         super(size, location, target, currentVelocity, map, false);
         this.hp = maxHP;
         this.bullets = bullets;
         this.weapons = new Array();
+        this.mainWeaponBaseVelocity = mainWeaponBaseVelocity; 
         this.currentWeapon = 0;
     }
     shoot(target: Coord):void {
@@ -916,9 +924,9 @@ class Player extends Character{
     enemiesKilled: number;
     previousTarget: Coord
 
-    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>) {
-        super(size, location, new Coord(0, 0), 2, map, bullets, 32);
-        this.weapons.push(new Gun(bullets, this, 0));
+    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity) {
+        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32);
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
         this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
         this.weapons.push(new Cannon(bullets, this));
@@ -981,8 +989,8 @@ class NPC extends Character {
     seesPlayer:boolean;
     lastSeenPlayerCoord: Coord;
 
-   constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, maxHP: number, combatTarget: Character, life: number, idleAge: number, idleLife: number) {
-        super(size, location, new Coord(0, 0), 1, map, bullets, maxHP);
+   constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number, combatTarget: Character, life: number, idleAge: number, idleLife: number) {
+        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
@@ -1017,7 +1025,7 @@ class Chicken extends NPC {
     food: Array<Food>;
 
     constructor(location: Coord, map: GridMap, food: Array<Food>) {
-        super(5, location, map, null, 8, null, 1000, 0, 200);
+        super(5, location, map, null, 1, 8, null, 1000, 0, 200);
         this.isRunning = false;
         this.fleeAge = 0;
         this.fleeLife = 20;
@@ -1054,12 +1062,12 @@ class Spewer extends NPC {
     igniteAge: number;
     isGrowing: boolean;
 
-    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, combatTarget: Character) {
-        super(5, location, map, bullets, 8, combatTarget, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, combatTarget: Character) {
+        super(5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200);
         this.didIgnite = false;
         this.igniteAge = 0
         this.isGrowing = true;
-        this.weapons.push(new Gun(bullets, this, 0));
+        this.weapons.push(new Gun(bullets, this, 0, mainWeaponBaseVelocity));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(128, 0, 0, 256);
@@ -1146,9 +1154,9 @@ class Spewer extends NPC {
 };
 
 class Pirate extends NPC {
-    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, combatTarget: Character) {
-        super(5 , location, map, bullets, 8, combatTarget, 1000, 0, 200);
-        this.weapons.push(new Gun(bullets, this, 10));
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, combatTarget: Character) {
+        super(5 , location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200);
+        this.weapons.push(new Gun(bullets, this, 10, this.mainWeaponBaseVelocity));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(256, 0, 0, 256);
@@ -1186,10 +1194,10 @@ class LoadingActor extends NPC {
     direction: number;
     stepCount: number;
 
-    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
-        super(5, location, map, bullets, 1, null, 1000, 0, 200);
+    constructor(location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number) {
+        super(5, location, map, bullets, mainWeaponBaseVelocity, 1, null, 1000, 0, 200);
         this.stepCount = 0;
-        this.weapons.push(new Gun(bullets, this, 0));
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
     }
     draw(drawWorker, strokeColor):void {
         var shade = strokeColor.r
@@ -1213,8 +1221,8 @@ class LoadingActor extends NPC {
 
 class Mine extends NPC {
     constructor(location: Coord, map: GridMap, bullets: Array<Bullet>) {
-        super(5, location, map, bullets, 1, null, 1000, 0, 200);
-        this.weapons.push(new Gun(bullets, this, 0));
+        super(5, location, map, bullets, 8, 1, null, 1000, 0, 200);
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
     }
     draw(drawWorker, strokeColor: RGBA):void {
         drawWorker.stroke(130, 128, 128, 256);
@@ -1304,7 +1312,7 @@ class HTMLDotshotUI {
         }
     
         // Create and display settings
-        this.worldSettings = new SettingsProfile(4, 25, 5, 32, true);
+        this.worldSettings = new SettingsProfile(4, 25, 5, 32, 10, true);
         for (const s in this.worldSettings) {
             this.worldSettings[s].display();
         }
@@ -1327,7 +1335,7 @@ class HTMLDotshotUI {
         this.console.post("Loading...");
 
         var map = new GridMap(this.width, this.height, this.worldSettings.gridSquareSize.value, this.worldSettings.numberOfWalls.value, this.worldSettings.wallLength.value, false);
-        this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.useSpawner.value);
+        this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.bulletSpeed.value, this.worldSettings.useSpawner.value);
         this.display = new p5(output, "canvas");
 
         this.console.post("'w' to move; 'r' to shoot; player faces the cursor; desktop only");
@@ -1508,13 +1516,15 @@ class SettingsProfile {
     numberOfWalls: NumericalSetting;
     wallLength: NumericalSetting;
     gridSquareSize: NumericalSetting;
+    bulletSpeed: NumericalSetting;
     useSpawner: BinarySetting;
 
-    constructor (numberOfEnemies: number, numberOfWalls: number, wallLength: number, gridSquareSize: number, useSpawner: boolean) {
+    constructor (numberOfEnemies: number, numberOfWalls: number, wallLength: number, gridSquareSize: number, bulletSpeed: number, useSpawner: boolean) {
         this.numberOfEnemies = new NumericalSetting("numberOfEnemies", numberOfEnemies, null);
         this.numberOfWalls = new NumericalSetting("numberOfWalls", numberOfWalls, null);
         this.wallLength = new NumericalSetting("wallLength", wallLength, null);
         this.gridSquareSize = new NumericalSetting("gridSquareSize", gridSquareSize, null);
+        this.bulletSpeed = new NumericalSetting("bulletSpeed", bulletSpeed, null);
         this.useSpawner = new BinarySetting("useSpawner", useSpawner, null);
     }
 }

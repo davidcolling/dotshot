@@ -65,7 +65,7 @@ var NPcSpawner = /** @class */ (function (_super) {
     NPcSpawner.prototype.step = function () {
         this.counter++;
         if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
-            this.world.nPCs.push(new Pirate(this.location, this.world.map, this.world.bullets, this.world.player));
+            this.world.nPCs.push(new Pirate(this.location, this.world.map, this.world.bullets, this.world.bulletSpeed, this.world.player));
         }
     };
     NPcSpawner.prototype.draw = function (drawWorker, strokeColor) {
@@ -98,12 +98,14 @@ var Weapon = /** @class */ (function () {
 }());
 var Gun = /** @class */ (function (_super) {
     __extends(Gun, _super);
-    function Gun(bullets, owner, coolDownTimer) {
-        return _super.call(this, bullets, owner, coolDownTimer) || this;
+    function Gun(bullets, owner, coolDownTimer, baseVelocity) {
+        var _this = _super.call(this, bullets, owner, coolDownTimer) || this;
+        _this.baseVelocity = baseVelocity;
+        return _this;
     }
     Gun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner, this.baseVelocity));
     };
     return Gun;
 }(Weapon));
@@ -125,8 +127,8 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
-        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, 8));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, 8));
     };
     return DoubleBarrelGun;
 }(Weapon));
@@ -432,11 +434,12 @@ var GridMap = /** @class */ (function (_super) {
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
 var World = /** @class */ (function () {
-    function World(width, height, numberOfEnemies, map, loading, strokeColor, includeSpawner) {
+    function World(width, height, numberOfEnemies, map, loading, strokeColor, bulletSpeed, includeSpawner) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
         this.strokeColor = strokeColor;
+        this.bulletSpeed = bulletSpeed;
         this.messages = new Array();
         this.pings = new Array();
         if (!loading) {
@@ -445,7 +448,7 @@ var World = /** @class */ (function () {
             while (!map.isOpen(playerCoordinate)) {
                 playerCoordinate.x--;
             }
-            this.player = new Player(5, playerCoordinate, this.map, this.bullets);
+            this.player = new Player(5, playerCoordinate, this.map, this.bullets, this.bulletSpeed);
             this.healthBar = new HealthBar(32, this.map);
             this.food = new Array();
             for (var i = 0; i < 5; i++) {
@@ -453,8 +456,8 @@ var World = /** @class */ (function () {
             }
             this.nPCs = new Array();
             for (var i = 0; i < numberOfEnemies; i++) {
-                this.nPCs.push(new Pirate(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.player));
-                this.nPCs.push(new Spewer(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.player));
+                this.nPCs.push(new Pirate(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.bulletSpeed, this.player));
+                this.nPCs.push(new Spewer(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.bulletSpeed, this.player));
                 this.nPCs.push(new Mine(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets));
                 this.nPCs.push(new Chicken(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.food));
             }
@@ -469,7 +472,7 @@ var World = /** @class */ (function () {
             this.healthBar = null;
             this.food = null;
             this.nPCs = new Array();
-            this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets));
+            this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets, this.bulletSpeed));
         }
     }
     World.prototype.draw = function () {
@@ -678,8 +681,8 @@ var Moveable = /** @class */ (function (_super) {
 }(CenteredShape));
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
-    function Bullet(location, target, map, owner) {
-        var _this = _super.call(this, 3, location, target, 8, map, true) || this;
+    function Bullet(location, target, map, owner, baseVelocity) {
+        var _this = _super.call(this, 3, location, target, baseVelocity, map, true) || this;
         _this.maxForce = 1;
         _this.owner = owner;
         _this.age = 0;
@@ -704,17 +707,18 @@ var Bullet = /** @class */ (function (_super) {
 var ExplodingBullet = /** @class */ (function (_super) {
     __extends(ExplodingBullet, _super);
     function ExplodingBullet(location, target, map, owner, bullets) {
-        var _this = _super.call(this, location, target, map, owner) || this;
+        var _this = _super.call(this, location, target, map, owner, 8) || this;
         _this.bullets = bullets;
         return _this;
     }
     ExplodingBullet.prototype.step = function () {
         _super.prototype.step.call(this);
+        var velocity = 8;
         if (this.age > 30) {
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, 10), this.map, this.owner));
-            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, -10), this.map, this.owner));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, 10), this.map, this.owner, velocity));
+            this.bullets.push(new Bullet(this.location, this.location.createOffset(-10, -10), this.map, this.owner, velocity));
             return false;
         }
         return true;
@@ -727,7 +731,7 @@ var ExplodingBullet = /** @class */ (function (_super) {
 var CannonBall = /** @class */ (function (_super) {
     __extends(CannonBall, _super);
     function CannonBall(location, target, map, owner) {
-        var _this = _super.call(this, location, target, map, owner) || this;
+        var _this = _super.call(this, location, target, map, owner, 8) || this;
         _this.size = 7;
         _this.maxForce = 10;
         return _this;
@@ -740,11 +744,12 @@ var CannonBall = /** @class */ (function (_super) {
 }(Bullet));
 var Character = /** @class */ (function (_super) {
     __extends(Character, _super);
-    function Character(size, location, target, currentVelocity, map, bullets, maxHP) {
+    function Character(size, location, target, currentVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
         var _this = _super.call(this, size, location, target, currentVelocity, map, false) || this;
         _this.hp = maxHP;
         _this.bullets = bullets;
         _this.weapons = new Array();
+        _this.mainWeaponBaseVelocity = mainWeaponBaseVelocity;
         _this.currentWeapon = 0;
         return _this;
     }
@@ -771,9 +776,9 @@ var Character = /** @class */ (function (_super) {
 }(Moveable));
 var Player = /** @class */ (function (_super) {
     __extends(Player, _super);
-    function Player(size, location, map, bullets) {
-        var _this = _super.call(this, size, location, new Coord(0, 0), 2, map, bullets, 32) || this;
-        _this.weapons.push(new Gun(bullets, _this, 0));
+    function Player(size, location, map, bullets, mainWeaponBaseVelocity) {
+        var _this = _super.call(this, size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32) || this;
+        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
         _this.weapons.push(new DoubleBarrelGun(bullets, _this, 0));
         _this.weapons.push(new ExplodingBulletGun(bullets, _this, 0));
         _this.weapons.push(new Cannon(bullets, _this));
@@ -831,8 +836,8 @@ var Player = /** @class */ (function (_super) {
 }(Character));
 var NPC = /** @class */ (function (_super) {
     __extends(NPC, _super);
-    function NPC(size, location, map, bullets, maxHP, combatTarget, life, idleAge, idleLife) {
-        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, maxHP) || this;
+    function NPC(size, location, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget, life, idleAge, idleLife) {
+        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP) || this;
         _this.isHunting = false;
         _this.age = 0;
         _this.idleAge = idleAge;
@@ -865,7 +870,7 @@ var NPC = /** @class */ (function (_super) {
 var Chicken = /** @class */ (function (_super) {
     __extends(Chicken, _super);
     function Chicken(location, map, food) {
-        var _this = _super.call(this, 5, location, map, null, 8, null, 1000, 0, 200) || this;
+        var _this = _super.call(this, 5, location, map, null, 1, 8, null, 1000, 0, 200) || this;
         _this.isRunning = false;
         _this.fleeAge = 0;
         _this.fleeLife = 20;
@@ -901,12 +906,12 @@ var Chicken = /** @class */ (function (_super) {
 }(NPC));
 var Spewer = /** @class */ (function (_super) {
     __extends(Spewer, _super);
-    function Spewer(location, map, bullets, combatTarget) {
-        var _this = _super.call(this, 5, location, map, bullets, 8, combatTarget, 1000, 0, 200) || this;
+    function Spewer(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
+        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200) || this;
         _this.didIgnite = false;
         _this.igniteAge = 0;
         _this.isGrowing = true;
-        _this.weapons.push(new Gun(bullets, _this, 0));
+        _this.weapons.push(new Gun(bullets, _this, 0, mainWeaponBaseVelocity));
         return _this;
     }
     Spewer.prototype.draw = function (drawWorker, strokeColor) {
@@ -989,9 +994,9 @@ var Spewer = /** @class */ (function (_super) {
 ;
 var Pirate = /** @class */ (function (_super) {
     __extends(Pirate, _super);
-    function Pirate(location, map, bullets, combatTarget) {
-        var _this = _super.call(this, 5, location, map, bullets, 8, combatTarget, 1000, 0, 200) || this;
-        _this.weapons.push(new Gun(bullets, _this, 10));
+    function Pirate(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
+        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200) || this;
+        _this.weapons.push(new Gun(bullets, _this, 10, _this.mainWeaponBaseVelocity));
         return _this;
     }
     Pirate.prototype.draw = function (drawWorker, strokeColor) {
@@ -1025,10 +1030,10 @@ var Pirate = /** @class */ (function (_super) {
 ;
 var LoadingActor = /** @class */ (function (_super) {
     __extends(LoadingActor, _super);
-    function LoadingActor(location, map, bullets) {
-        var _this = _super.call(this, 5, location, map, bullets, 1, null, 1000, 0, 200) || this;
+    function LoadingActor(location, map, bullets, mainWeaponBaseVelocity) {
+        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 1, null, 1000, 0, 200) || this;
         _this.stepCount = 0;
-        _this.weapons.push(new Gun(bullets, _this, 0));
+        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
         return _this;
     }
     LoadingActor.prototype.draw = function (drawWorker, strokeColor) {
@@ -1055,8 +1060,8 @@ var LoadingActor = /** @class */ (function (_super) {
 var Mine = /** @class */ (function (_super) {
     __extends(Mine, _super);
     function Mine(location, map, bullets) {
-        var _this = _super.call(this, 5, location, map, bullets, 1, null, 1000, 0, 200) || this;
-        _this.weapons.push(new Gun(bullets, _this, 0));
+        var _this = _super.call(this, 5, location, map, bullets, 8, 1, null, 1000, 0, 200) || this;
+        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
         return _this;
     }
     Mine.prototype.draw = function (drawWorker, strokeColor) {
@@ -1123,7 +1128,7 @@ var HTMLDotshotUI = /** @class */ (function () {
             this.defaultStrokeColor = new RGBA(0, 0, 0, 256);
         }
         // Create and display settings
-        this.worldSettings = new SettingsProfile(4, 25, 5, 32, true);
+        this.worldSettings = new SettingsProfile(4, 25, 5, 32, 10, true);
         for (var s in this.worldSettings) {
             this.worldSettings[s].display();
         }
@@ -1141,7 +1146,7 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         this.console.post("Loading...");
         var map = new GridMap(this.width, this.height, this.worldSettings.gridSquareSize.value, this.worldSettings.numberOfWalls.value, this.worldSettings.wallLength.value, false);
-        this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.useSpawner.value);
+        this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.bulletSpeed.value, this.worldSettings.useSpawner.value);
         this.display = new p5(output, "canvas");
         this.console.post("'w' to move; 'r' to shoot; player faces the cursor; desktop only");
     };
@@ -1305,11 +1310,12 @@ var BinarySetting = /** @class */ (function (_super) {
     return BinarySetting;
 }(Setting));
 var SettingsProfile = /** @class */ (function () {
-    function SettingsProfile(numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, useSpawner) {
+    function SettingsProfile(numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, bulletSpeed, useSpawner) {
         this.numberOfEnemies = new NumericalSetting("numberOfEnemies", numberOfEnemies, null);
         this.numberOfWalls = new NumericalSetting("numberOfWalls", numberOfWalls, null);
         this.wallLength = new NumericalSetting("wallLength", wallLength, null);
         this.gridSquareSize = new NumericalSetting("gridSquareSize", gridSquareSize, null);
+        this.bulletSpeed = new NumericalSetting("bulletSpeed", bulletSpeed, null);
         this.useSpawner = new BinarySetting("useSpawner", useSpawner, null);
     }
     return SettingsProfile;
