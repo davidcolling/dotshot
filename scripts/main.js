@@ -127,8 +127,9 @@ var DoubleBarrelGun = /** @class */ (function (_super) {
     }
     DoubleBarrelGun.prototype.fire = function (target) {
         _super.prototype.fire.call(this, target);
-        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, 8));
-        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, 8));
+        var velocity = 8;
+        this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, velocity));
+        this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, velocity));
     };
     return DoubleBarrelGun;
 }(Weapon));
@@ -199,23 +200,16 @@ var GridSquare = /** @class */ (function (_super) {
         _this.size = size;
         _this.isEmpty = isEmpty;
         _this.coord = coord;
-        _this.isHighlighted = false;
         return _this;
     }
     GridSquare.prototype.draw = function (drawWorker, strokeColor) {
-        if (this.isHighlighted) {
-            drawWorker.fill(256, 0, 0, 256);
-            drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
+        if (this.isEmpty) {
+            return;
         }
         else {
-            if (this.isEmpty) {
-                return;
-            }
-            else {
-                var shade = strokeColor.r;
-                drawWorker.fill(shade, 256);
-                drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
-            }
+            var shade = strokeColor.r;
+            drawWorker.fill(shade, 256);
+            drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
         }
     };
     return GridSquare;
@@ -1193,14 +1187,13 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
             this.lines[i] = "";
         }
         this.currentLineNumber = 1;
-        this.constructHTML();
+        this.generateHTML();
     }
-    HTMLDotshotMessageConsole.prototype.constructHTML = function () {
+    HTMLDotshotMessageConsole.prototype.generateHTML = function () {
         this.html = "";
         for (var i = 0; i < this.numberOfLines; i++) {
             this.html += "<p>" + this.lines[i] + "</p>";
         }
-        this.display();
     };
     HTMLDotshotMessageConsole.prototype.display = function () {
         var element = document.getElementById("console");
@@ -1218,7 +1211,8 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
             }
         }
         this.currentLineNumber++;
-        this.constructHTML();
+        this.generateHTML();
+        this.display();
     };
     return HTMLDotshotMessageConsole;
 }());

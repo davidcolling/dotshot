@@ -1384,15 +1384,14 @@ class HTMLDotshotMessageConsole {
             this.lines[i] = "";
         }
         this.currentLineNumber = 1;
-        this.constructHTML();
+        this.generateHTML();
     }
 
-    constructHTML():void {
+    generateHTML():void {
         this.html = "";
         for (var i = 0; i < this.numberOfLines; i++) {
             this.html += "<p>" + this.lines[i] + "</p>";
         }
-        this.display();
     }
 
     display():void {
@@ -1411,7 +1410,8 @@ class HTMLDotshotMessageConsole {
             }
         }
         this.currentLineNumber++;
-        this.constructHTML();
+        this.generateHTML();
+        this.display();
     }
 }
 
