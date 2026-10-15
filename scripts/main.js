@@ -448,8 +448,10 @@ class World {
             for (var i = 0; i < numberOfEnemies; i++) {
                 this.nPCs.push(new Pirate(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.bulletSpeed, this.player));
                 this.nPCs.push(new Spewer(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets, this.bulletSpeed, this.player));
-                this.nPCs.push(new Mine(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.bullets));
-                this.nPCs.push(new Chicken(new Coord(this.map.width * Math.random(), (this.map.height / 2) * Math.random()), this.map, this.food));
+                // this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(),     
+                // (this.map.height / 2) * Math.random()),  this.map, this.bullets));
+                // this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(),     
+                // (this.map.height / 2) * Math.random()),  this.map, this.food));
             }
             this.spawners = new Array();
             if (includeSpawner) {
@@ -526,13 +528,17 @@ class World {
                 //check for shots
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
+                if (this.nPCs[i].combatTarget == null) {
+                    this.nPCs[i].combatTarget = this.player;
+                    console.log("it happened");
+                }
                 if (this.player != null) {
-                    if (World.calculateDistance(this.nPCs[i].location, this.player.location) < 200) {
+                    var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
+                    if (distanceFromCombatTarget < 200) {
                         var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                        this.nPCs[i].seesPlayer = this.map.isOpenBetween(this.nPCs[i].location, this.player.location);
-                        console.log("sees player " + this.nPCs[i].seesPlayer);
-                        if (this.nPCs[i].seesPlayer) {
-                            this.nPCs[i].lastSeenPlayerCoord = this.player.location;
+                        this.nPCs[i].seesCombatTarget = this.map.isOpenBetween(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
+                        if (this.nPCs[i].seesCombatTarget) {
+                            this.nPCs[i].lastSeenCombatTargetCoord = this.nPCs[i].combatTarget.location;
                         }
                     }
                 }
@@ -599,6 +605,9 @@ class World {
                 if (this.isShotBy(obj, arr[i])) {
                     if (obj != arr[i].owner) {
                         totalDamage += arr[i].maxForce;
+                    }
+                    if (obj instanceof NPC) {
+                        obj.combatTarget = arr[i].owner;
                     }
                 }
             }
@@ -833,8 +842,8 @@ class NPC extends Character {
     idleAge;
     idleLife;
     combatTarget;
-    seesPlayer;
-    lastSeenPlayerCoord;
+    seesCombatTarget;
+    lastSeenCombatTargetCoord;
     constructor(size, location, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget, life, idleAge, idleLife) {
         super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP);
         this.isHunting = false;
@@ -842,8 +851,8 @@ class NPC extends Character {
         this.idleAge = idleAge;
         this.idleLife = idleLife;
         this.combatTarget = combatTarget;
-        this.seesPlayer = false;
-        this.lastSeenPlayerCoord = null;
+        this.seesCombatTarget = false;
+        this.lastSeenCombatTargetCoord = null;
     }
     idle() {
         if (!(this.idleAge < this.idleLife)) {
@@ -856,7 +865,7 @@ class NPC extends Character {
     }
     attack() { }
     decide() {
-        if (this.isHunting || this.seesPlayer) {
+        if (this.isHunting || this.seesCombatTarget) {
             this.attack();
         }
         else {
@@ -887,7 +896,7 @@ class Chicken extends NPC {
         if (this.hp <= 0) {
             this.food.push(new Food(this.location));
         }
-        if (this.seesPlayer) {
+        if (this.seesCombatTarget) {
             if (this.fleeAge < this.fleeLife) {
                 this.fleeAge++;
             }
@@ -962,9 +971,9 @@ class Spewer extends NPC {
         }
     }
     attack() {
-        var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
+        var distance = World.calculateDistance(this.location, this.lastSeenCombatTargetCoord);
         var willMove = true;
-        if (this.seesPlayer) {
+        if (this.seesCombatTarget) {
             if (distance < 300) {
                 this.pulse();
                 if (distance < 200) {
@@ -976,7 +985,7 @@ class Spewer extends NPC {
             }
         }
         if (willMove) {
-            this.point(this.lastSeenPlayerCoord);
+            this.point(this.lastSeenCombatTargetCoord);
             this.move();
         }
         if (!this.isHunting) {
@@ -1007,13 +1016,15 @@ class Pirate extends NPC {
         this.decide();
     }
     attack() {
-        this.point(this.lastSeenPlayerCoord);
-        this.move();
-        if (this.seesPlayer) {
+        this.point(this.lastSeenCombatTargetCoord);
+        if (World.calculateDistance(this.location, this.lastSeenCombatTargetCoord) > 20) {
+            this.move();
+        }
+        if (this.seesCombatTarget) {
             this.shoot(this.combatTarget.location);
         }
         if (this.isHunting) {
-            if (3 < World.calculateDistance(this.location, this.lastSeenPlayerCoord)) {
+            if (3 < World.calculateDistance(this.location, this.lastSeenCombatTargetCoord)) {
                 this.isHunting = false;
             }
         }
