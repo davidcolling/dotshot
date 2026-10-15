@@ -1,87 +1,78 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var RGBA = /** @class */ (function () {
-    function RGBA(r, g, b, a) {
+"use strict";
+class RGBA {
+    r;
+    g;
+    b;
+    a;
+    constructor(r, g, b, a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
     }
-    return RGBA;
-}());
-var Coord = /** @class */ (function () {
-    function Coord(x, y) {
+}
+class Coord {
+    x;
+    y;
+    constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    Coord.prototype.createOffset = function (dx, dy) {
+    createOffset(dx, dy) {
         return new Coord(this.x + dx, this.y + dy);
-    };
-    Coord.prototype.equals = function (coord) {
+    }
+    equals(coord) {
         return (this.x == coord.x) && (this.y == coord.y);
-    };
-    return Coord;
-}());
-var Drawable = /** @class */ (function () {
-    function Drawable() {
     }
-    Drawable.prototype.draw = function (drawWorker, strokeColor) { };
-    return Drawable;
-}());
-var CenteredShape = /** @class */ (function (_super) {
-    __extends(CenteredShape, _super);
-    function CenteredShape(size, location) {
-        var _this = _super.call(this) || this;
-        _this.size = size;
-        _this.location = location;
-        return _this;
+}
+class Drawable {
+    draw(drawWorker, strokeColor) { }
+}
+class CenteredShape extends Drawable {
+    size;
+    location;
+    constructor(size, location) {
+        super();
+        this.size = size;
+        this.location = location;
     }
-    CenteredShape.prototype.draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor) {
         drawWorker.circle(this.location.x, this.location.y, this.size);
-    };
-    return CenteredShape;
-}(Drawable));
-var NPcSpawner = /** @class */ (function (_super) {
-    __extends(NPcSpawner, _super);
-    function NPcSpawner(location, world) {
-        var _this = _super.call(this, 8, location) || this;
-        _this.counter = 0;
-        _this.world = world;
-        return _this;
     }
-    NPcSpawner.prototype.step = function () {
+}
+class NPcSpawner extends CenteredShape {
+    counter;
+    world;
+    constructor(location, world) {
+        super(8, location);
+        this.counter = 0;
+        this.world = world;
+    }
+    step() {
         this.counter++;
         if (this.counter % (Math.floor(World.calculateDistance(this.world.player.location, this.location))) == 0) {
             this.world.nPCs.push(new Pirate(this.location, this.world.map, this.world.bullets, this.world.bulletSpeed, this.world.player));
         }
-    };
-    NPcSpawner.prototype.draw = function (drawWorker, strokeColor) {
+    }
+    draw(drawWorker, strokeColor) {
         drawWorker.circle(this.location.x, this.location.y, this.size);
-    };
-    return NPcSpawner;
-}(CenteredShape));
-var Weapon = /** @class */ (function () {
-    function Weapon(bullets, owner, coolDownTimer) {
+    }
+}
+class Weapon {
+    bullets;
+    owner;
+    counter;
+    lastCount;
+    coolDownTimer;
+    hasShot;
+    constructor(bullets, owner, coolDownTimer) {
         this.bullets = bullets;
         this.owner = owner;
         this.counter = 0;
         this.lastCount = 0;
         this.coolDownTimer = coolDownTimer;
     }
-    Weapon.prototype.shoot = function (target) {
+    shoot(target) {
         if (!this.hasShot || this.counter - this.lastCount >= this.coolDownTimer) {
             if (!this.hasShot) {
                 this.hasShot = true;
@@ -89,88 +80,77 @@ var Weapon = /** @class */ (function () {
             this.counter = this.lastCount;
             this.fire(target);
         }
-    };
-    Weapon.prototype.fire = function (target) { };
-    Weapon.prototype.step = function () {
+    }
+    fire(target) { }
+    step() {
         this.counter++;
-    };
-    return Weapon;
-}());
-var Gun = /** @class */ (function (_super) {
-    __extends(Gun, _super);
-    function Gun(bullets, owner, coolDownTimer, baseVelocity) {
-        var _this = _super.call(this, bullets, owner, coolDownTimer) || this;
-        _this.baseVelocity = baseVelocity;
-        return _this;
     }
-    Gun.prototype.fire = function (target) {
-        _super.prototype.fire.call(this, target);
+}
+class Gun extends Weapon {
+    baseVelocity;
+    constructor(bullets, owner, coolDownTimer, baseVelocity) {
+        super(bullets, owner, coolDownTimer);
+        this.baseVelocity = baseVelocity;
+    }
+    fire(target) {
+        super.fire(target);
         this.bullets.push(new Bullet(this.owner.location, target, this.owner.map, this.owner, this.baseVelocity));
-    };
-    return Gun;
-}(Weapon));
-var ExplodingBulletGun = /** @class */ (function (_super) {
-    __extends(ExplodingBulletGun, _super);
-    function ExplodingBulletGun(bullets, owner, coolDownTimer) {
-        return _super.call(this, bullets, owner, coolDownTimer) || this;
     }
-    ExplodingBulletGun.prototype.fire = function (target) {
-        _super.prototype.fire.call(this, target);
+}
+class ExplodingBulletGun extends Weapon {
+    constructor(bullets, owner, coolDownTimer) {
+        super(bullets, owner, coolDownTimer);
+    }
+    fire(target) {
+        super.fire(target);
         this.bullets.push(new ExplodingBullet(this.owner.location, target, this.owner.map, this.owner, this.bullets));
-    };
-    return ExplodingBulletGun;
-}(Weapon));
-var DoubleBarrelGun = /** @class */ (function (_super) {
-    __extends(DoubleBarrelGun, _super);
-    function DoubleBarrelGun(bullets, owner, coolDownTimer) {
-        return _super.call(this, bullets, owner, coolDownTimer) || this;
     }
-    DoubleBarrelGun.prototype.fire = function (target) {
-        _super.prototype.fire.call(this, target);
-        var velocity = 8;
+}
+class DoubleBarrelGun extends Weapon {
+    constructor(bullets, owner, coolDownTimer) {
+        super(bullets, owner, coolDownTimer);
+    }
+    fire(target) {
+        super.fire(target);
+        const velocity = 8;
         this.bullets.push(new Bullet(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner, velocity));
         this.bullets.push(new Bullet(this.owner.location.createOffset(-5, 0), target, this.owner.map, this.owner, velocity));
-    };
-    return DoubleBarrelGun;
-}(Weapon));
-var Cannon = /** @class */ (function (_super) {
-    __extends(Cannon, _super);
-    function Cannon(bullets, owner) {
-        return _super.call(this, bullets, owner, 35) || this;
     }
-    Cannon.prototype.fire = function (target) {
-        _super.prototype.fire.call(this, target);
+}
+class Cannon extends Weapon {
+    constructor(bullets, owner) {
+        super(bullets, owner, 35);
+    }
+    fire(target) {
+        super.fire(target);
         this.bullets.push(new CannonBall(this.owner.location.createOffset(5, 0), target, this.owner.map, this.owner));
         this.lastCount = this.counter;
-    };
-    return Cannon;
-}(Weapon));
-var Ping = /** @class */ (function (_super) {
-    __extends(Ping, _super);
-    function Ping(location) {
-        var _this = _super.call(this, 1, location) || this;
-        _this.age = 0;
-        return _this;
     }
-    Ping.prototype.step = function () {
+}
+class Ping extends CenteredShape {
+    age;
+    constructor(location) {
+        super(1, location);
+        this.age = 0;
+    }
+    step() {
         this.age++;
         this.size++;
-    };
-    Ping.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.fill(strokeColor.r, 0);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-    };
-    return Ping;
-}(CenteredShape));
-var Food = /** @class */ (function (_super) {
-    __extends(Food, _super);
-    function Food(location) {
-        var _this = _super.call(this, 2, location) || this;
-        _this.isGrowing = true;
-        _this.growAge = 0;
-        return _this;
     }
-    Food.prototype.step = function () {
+    draw(drawWorker, strokeColor) {
+        drawWorker.fill(strokeColor.r, 0);
+        super.draw(drawWorker, strokeColor);
+    }
+}
+class Food extends CenteredShape {
+    isGrowing;
+    growAge;
+    constructor(location) {
+        super(2, location);
+        this.isGrowing = true;
+        this.growAge = 0;
+    }
+    step() {
         this.growAge++;
         if (this.growAge % 3 == 0) {
             if (this.size == 4) {
@@ -186,23 +166,23 @@ var Food = /** @class */ (function (_super) {
                 this.size--;
             }
         }
-    };
-    Food.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.fill(strokeColor.r, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-    };
-    return Food;
-}(CenteredShape));
-var GridSquare = /** @class */ (function (_super) {
-    __extends(GridSquare, _super);
-    function GridSquare(size, coord, isEmpty) {
-        var _this = _super.call(this) || this;
-        _this.size = size;
-        _this.isEmpty = isEmpty;
-        _this.coord = coord;
-        return _this;
     }
-    GridSquare.prototype.draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor) {
+        drawWorker.fill(strokeColor.r, 256);
+        super.draw(drawWorker, strokeColor);
+    }
+}
+class GridSquare extends Drawable {
+    size;
+    isEmpty; // is the square wall or open space?
+    coord;
+    constructor(size, coord, isEmpty) {
+        super();
+        this.size = size;
+        this.isEmpty = isEmpty;
+        this.coord = coord;
+    }
+    draw(drawWorker, strokeColor) {
         if (this.isEmpty) {
             return;
         }
@@ -211,19 +191,19 @@ var GridSquare = /** @class */ (function (_super) {
             drawWorker.fill(shade, 256);
             drawWorker.rect(this.coord.x, this.coord.y, this.size, this.size);
         }
-    };
-    return GridSquare;
-}(Drawable));
-var HealthBar = /** @class */ (function (_super) {
-    __extends(HealthBar, _super);
-    function HealthBar(max, map) {
-        var _this = _super.call(this) || this;
-        _this.max = max;
-        _this.map = map;
-        _this.hp = _this.max;
-        return _this;
     }
-    HealthBar.prototype.draw = function (drawWorker, strokeColor) {
+}
+class HealthBar extends Drawable {
+    max;
+    hp;
+    map;
+    constructor(max, map) {
+        super();
+        this.max = max;
+        this.map = map;
+        this.hp = this.max;
+    }
+    draw(drawWorker, strokeColor) {
         if (this.hp != 0) {
             drawWorker.stroke(256, 0, 0, 256);
             drawWorker.fill(256, 0, 0, 256);
@@ -232,37 +212,42 @@ var HealthBar = /** @class */ (function (_super) {
             drawWorker.strokeWeight(1);
             drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
         }
-    };
-    return HealthBar;
-}(Drawable));
-var GridMap = /** @class */ (function (_super) {
-    __extends(GridMap, _super);
-    function GridMap(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
-        var _this = _super.call(this) || this;
+    }
+}
+class GridMap extends Drawable {
+    width; // number of p5 screen units wide game map is
+    height;
+    gridWidth; // number of GridSquare long that the game map is
+    gridHeight;
+    map; // hash table used to represent the map
+    gridSquareSize; // number of p5 units wide a single square of the map is; gridSquareSize * gridWidth == width
+    isEmpty;
+    constructor(screenWidth, screenHeight, gridSquareSize, numberOfWalls, wallLength, isEmpty) {
+        super();
         var gridWidth = Math.floor(screenWidth / gridSquareSize);
         var gridHeight = Math.floor(screenHeight / gridSquareSize);
         var width = gridSquareSize * gridWidth;
         var height = gridSquareSize * gridHeight;
-        _this.width = width;
-        _this.height = height;
-        _this.isEmpty = isEmpty;
+        this.width = width;
+        this.height = height;
+        this.isEmpty = isEmpty;
         if (!isEmpty) {
-            _this.gridSquareSize = gridSquareSize;
-            _this.gridWidth = gridWidth;
-            _this.gridHeight = gridHeight;
-            _this.map = Array();
+            this.gridSquareSize = gridSquareSize;
+            this.gridWidth = gridWidth;
+            this.gridHeight = gridHeight;
+            this.map = Array();
             // make empty map
             for (var i = 0; i < gridWidth; i++) {
-                _this.map[i] = new Array();
+                this.map[i] = new Array();
                 for (var j = 0; j < gridHeight; j++) {
                     var coord = new Coord((i * gridSquareSize), (j * gridSquareSize));
-                    _this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
+                    this.map[i][j] = new GridSquare(gridSquareSize, coord, true);
                 }
             }
             // make walls
             for (var i = 0; i < numberOfWalls; i++) {
                 var randomCoord = GridMap.getGridIndex(new Coord(Math.random() * width, Math.random() * height), gridSquareSize);
-                _this.map[randomCoord.x][randomCoord.y].isEmpty = false;
+                this.map[randomCoord.x][randomCoord.y].isEmpty = false;
                 // Determine along which axes the wall moves 
                 if (Math.random() < .5) {
                     var dx = 1;
@@ -289,20 +274,19 @@ var GridMap = /** @class */ (function (_super) {
                         break; // don't go off the map
                     }
                     else {
-                        _this.map[newCoord.x][newCoord.y].isEmpty = false;
+                        this.map[newCoord.x][newCoord.y].isEmpty = false;
                     }
                 }
             }
         }
         else {
-            _this.gridSquareSize = null;
-            _this.gridWidth = null;
-            _this.gridHeight = null;
-            _this.map = null;
+            this.gridSquareSize = null;
+            this.gridWidth = null;
+            this.gridHeight = null;
+            this.map = null;
         }
-        return _this;
     }
-    GridMap.prototype.draw = function (drawWorker, strokeColor) {
+    draw(drawWorker, strokeColor) {
         if (!this.isEmpty) {
             for (var i = 0; i < this.gridWidth; i++) {
                 for (var j = 0; j < this.gridHeight; j++) {
@@ -310,8 +294,8 @@ var GridMap = /** @class */ (function (_super) {
                 }
             }
         }
-    };
-    GridMap.prototype.isOpen = function (screenCoord) {
+    }
+    isOpen(screenCoord) {
         if (!this.isEmpty) {
             if (0 < screenCoord.x &&
                 screenCoord.x < this.width &&
@@ -327,18 +311,18 @@ var GridMap = /** @class */ (function (_super) {
         else {
             return true;
         }
-    };
-    GridMap.getGridIndex = function (screenCoord, gridSquareSize) {
+    }
+    static getGridIndex(screenCoord, gridSquareSize) {
         var indexX = Math.floor(screenCoord.x / gridSquareSize);
         var indexY = Math.floor(screenCoord.y / gridSquareSize);
         var indexCoord = new Coord(indexX, indexY);
         return indexCoord;
-    };
-    GridMap.prototype.getGridIndex = function (screenCoord) {
+    }
+    getGridIndex(screenCoord) {
         if (!this.isEmpty)
             return GridMap.getGridIndex(screenCoord, this.gridSquareSize);
-    };
-    GridMap.prototype.getSquareScreenCoord = function (square) {
+    }
+    getSquareScreenCoord(square) {
         // 0: UL, 1: UR, 2: LL, 3: LR
         var output = new Array();
         output.push(new Coord(square.x * this.gridSquareSize, square.y * this.gridSquareSize)); // UL
@@ -346,11 +330,11 @@ var GridMap = /** @class */ (function (_super) {
         output.push(output[0].createOffset(0, this.gridSquareSize)); // LL
         output.push(output[0].createOffset(this.gridSquareSize, this.gridSquareSize)); // LR
         return output;
-    };
+    }
     // the parameters must constitute a wall ie a line which represents a single side of a GridSquare 
-    GridMap.prototype.isWall = function (coord1, coord2) {
-        var square1;
-        var square2;
+    isWall(coord1, coord2) {
+        let square1;
+        let square2;
         if (coord1.x == coord2.x) {
             if (coord1.y < coord2.y) {
                 square1 = new Coord(coord1.x, coord1.y);
@@ -372,9 +356,9 @@ var GridMap = /** @class */ (function (_super) {
             }
         }
         return !(this.isOpen(square1) && this.isOpen(square2));
-    };
+    }
     // this would be most efficient if the searching is done from both sides or the expected closer-to-wall side
-    GridMap.prototype.isOpenBetween = function (coord1, coord2) {
+    isOpenBetween(coord1, coord2) {
         // the line is y = mx + b. m, b are known. just calculate the coordinates for eash x, y that are on the grid, check if they are walls
         var slope = (coord2.y - coord1.y) / (coord2.x - coord1.x);
         var intercept = coord2.y - (slope * coord2.x);
@@ -415,20 +399,32 @@ var GridMap = /** @class */ (function (_super) {
             }
         }
         return true;
-    };
-    GridMap.prototype.randomCoord = function () {
+    }
+    randomCoord() {
         return new Coord(Math.random() * this.width, Math.random() * this.height);
-    };
-    return GridMap;
-}(Drawable));
+    }
+}
 // facade and factory of all game objects: bullets, map, characters (player and npc)
 // an unenforced singleton
 // an observer of when bullets should be collected from characters
 // an observer of when objects need to become null, eg old bullets and dead npc
 // an observer of when characters lose hp
 // an observer of NPC "sight" for hunting
-var World = /** @class */ (function () {
-    function World(width, height, numberOfEnemies, map, loading, strokeColor, bulletSpeed, includeSpawner) {
+class World {
+    frameCount; // used for optionally offsetting the frequency of certain calculations
+    map;
+    bullets;
+    nPCs;
+    player;
+    healthBar;
+    food;
+    pings;
+    drawWorker;
+    strokeColor;
+    bulletSpeed;
+    spawners;
+    messages;
+    constructor(width, height, numberOfEnemies, map, loading, strokeColor, bulletSpeed, includeSpawner) {
         this.frameCount = 0;
         this.bullets = new Array();
         this.drawWorker = null;
@@ -469,7 +465,7 @@ var World = /** @class */ (function () {
             this.nPCs.push(new LoadingActor(new Coord(width / 2, height / 2), this.map, this.bullets, this.bulletSpeed));
         }
     }
-    World.prototype.draw = function () {
+    draw() {
         var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
         // world 
         this.frameCount++;
@@ -555,12 +551,12 @@ var World = /** @class */ (function () {
         else {
             return true;
         }
-    };
+    }
     ;
-    World.prototype.save = function () {
+    save() {
         return JSON.stringify(this.map);
-    };
-    World.prototype.drawBullets = function (list) {
+    }
+    drawBullets(list) {
         for (var i = 0; i < list.length; i++) {
             if (list[i] != null) {
                 list[i].draw(this.drawWorker, this.strokeColor);
@@ -569,34 +565,34 @@ var World = /** @class */ (function () {
                 }
             }
         }
-    };
-    World.calculateDistance = function (coord1, coord2) {
-        return Math.sqrt(Math.pow(Math.abs(coord2.x - coord1.x), 2) + Math.pow(Math.abs(coord2.y - coord1.y), 2));
-    };
+    }
+    static calculateDistance(coord1, coord2) {
+        return Math.sqrt(Math.abs(coord2.x - coord1.x) ** 2 + Math.abs(coord2.y - coord1.y) ** 2);
+    }
     ;
     // returns true if obj1 (target) is shot by obj2 (projectile)
-    World.prototype.isShotBy = function (obj1, obj2) {
-        var distance = World.calculateDistance(obj1.location, obj2.location);
-        var isInTrajectory = false;
-        var nextLinearLocation = obj2.location.createOffset(obj2.dx, obj2.dy);
-        var signDiffNextLocation = new Coord((obj2.location.x - nextLinearLocation.x) / Math.abs(obj2.location.x - nextLinearLocation.x), (obj2.location.y - nextLinearLocation.y) / Math.abs(obj2.location.y - nextLinearLocation.y));
-        var signDiffTargetLocation = new Coord((obj2.location.x - obj1.location.x) / Math.abs(obj2.location.x - obj1.location.x), (obj2.location.y - obj1.location.y) / Math.abs(obj2.location.y - obj1.location.y));
+    isShotBy(obj1, obj2) {
+        let distance = World.calculateDistance(obj1.location, obj2.location);
+        let isInTrajectory = false;
+        let nextLinearLocation = obj2.location.createOffset(obj2.dx, obj2.dy);
+        let signDiffNextLocation = new Coord((obj2.location.x - nextLinearLocation.x) / Math.abs(obj2.location.x - nextLinearLocation.x), (obj2.location.y - nextLinearLocation.y) / Math.abs(obj2.location.y - nextLinearLocation.y));
+        let signDiffTargetLocation = new Coord((obj2.location.x - obj1.location.x) / Math.abs(obj2.location.x - obj1.location.x), (obj2.location.y - obj1.location.y) / Math.abs(obj2.location.y - obj1.location.y));
         if (300 > distance) {
             if (signDiffNextLocation.x == signDiffTargetLocation.x &&
                 signDiffNextLocation.y == signDiffTargetLocation.y) {
-                var trajectorySlope = (obj2.location.y - nextLinearLocation.y) / (obj2.location.x - nextLinearLocation.x);
-                var trajectoryIntercept = obj2.location.y - (trajectorySlope * obj1.location.x);
-                var perpendicularSlope = 1 / (trajectorySlope * -1);
-                var perpendicularIntercept = obj1.location.y - (perpendicularSlope * obj1.location.x);
-                var intersectionX = (perpendicularIntercept - trajectoryIntercept) / (trajectoryIntercept - perpendicularIntercept);
-                var intersectionY = (perpendicularSlope * intersectionX) + perpendicularIntercept;
-                var intersectionCoord = new Coord(intersectionX, intersectionY);
-                var isInTrajectory_1 = 10 > World.calculateDistance(obj2.location, intersectionCoord);
+                let trajectorySlope = (obj2.location.y - nextLinearLocation.y) / (obj2.location.x - nextLinearLocation.x);
+                let trajectoryIntercept = obj2.location.y - (trajectorySlope * obj1.location.x);
+                let perpendicularSlope = 1 / (trajectorySlope * -1);
+                let perpendicularIntercept = obj1.location.y - (perpendicularSlope * obj1.location.x);
+                let intersectionX = (perpendicularIntercept - trajectoryIntercept) / (trajectoryIntercept - perpendicularIntercept);
+                let intersectionY = (perpendicularSlope * intersectionX) + perpendicularIntercept;
+                let intersectionCoord = new Coord(intersectionX, intersectionY);
+                let isInTrajectory = 10 > World.calculateDistance(obj2.location, intersectionCoord);
             }
         }
         return (3 > distance) || isInTrajectory;
-    };
-    World.prototype.collectDamage = function (obj, arr) {
+    }
+    collectDamage(obj, arr) {
         var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
@@ -608,48 +604,52 @@ var World = /** @class */ (function () {
             }
         }
         return totalDamage;
-    };
+    }
     ;
-    World.inverseCoord = function (coord, center) {
+    static inverseCoord(coord, center) {
         return new Coord(coord.x * -1, coord.y * -1);
-    };
-    World.calculateVector = function (location, target, distance) {
-        var targetDx = target.x - location.x;
-        var targetDy = target.y - location.y;
-        var slope = targetDx / targetDy;
-        var dy = Math.sqrt((distance * distance) /
+    }
+    static calculateVector(location, target, distance) {
+        let targetDx = target.x - location.x;
+        let targetDy = target.y - location.y;
+        let slope = targetDx / targetDy;
+        let dy = Math.sqrt((distance * distance) /
             ((slope * slope) + 1)) *
             (targetDy / Math.abs(targetDy));
-        var dx = Math.sqrt((distance * distance) -
+        let dx = Math.sqrt((distance * distance) -
             (dy * dy)) *
             (targetDx / Math.abs(targetDx));
         return new Coord(dx, dy);
-    };
-    return World;
-}());
-var Moveable = /** @class */ (function (_super) {
-    __extends(Moveable, _super);
-    function Moveable(size, location, target, startingVelocity, map, doesRicochet) {
-        var _this = _super.call(this, size, location) || this;
-        _this.target = target;
-        _this.velocity = startingVelocity;
-        _this.map = map;
-        _this.doesRicochet = doesRicochet;
-        _this.originalLocation = location;
-        _this.setVector(target);
-        return _this;
     }
-    Moveable.prototype.point = function (target) {
+}
+class Moveable extends CenteredShape {
+    target;
+    velocity;
+    dx;
+    dy;
+    map;
+    doesRicochet;
+    originalLocation;
+    constructor(size, location, target, startingVelocity, map, doesRicochet) {
+        super(size, location);
+        this.target = target;
+        this.velocity = startingVelocity;
+        this.map = map;
+        this.doesRicochet = doesRicochet;
+        this.originalLocation = location;
+        this.setVector(target);
+    }
+    point(target) {
         this.target = target;
         this.setVector(target);
-    };
-    Moveable.prototype.setVector = function (target) {
+    }
+    setVector(target) {
         this.originalLocation = this.location;
-        var d = World.calculateVector(this.location, target, this.velocity);
+        let d = World.calculateVector(this.location, target, this.velocity);
         this.dy = d.y;
         this.dx = d.x;
-    };
-    Moveable.prototype.move = function () {
+    }
+    move() {
         var newLocation = this.location.createOffset(this.dx, this.dy);
         if (!this.map.isOpen(newLocation)) {
             if (this.doesRicochet) {
@@ -669,20 +669,20 @@ var Moveable = /** @class */ (function (_super) {
         }
         this.location = newLocation;
         return true;
-    };
-    ;
-    return Moveable;
-}(CenteredShape));
-var Bullet = /** @class */ (function (_super) {
-    __extends(Bullet, _super);
-    function Bullet(location, target, map, owner, baseVelocity) {
-        var _this = _super.call(this, 3, location, target, baseVelocity, map, true) || this;
-        _this.maxForce = 1;
-        _this.owner = owner;
-        _this.age = 0;
-        return _this;
     }
-    Bullet.prototype.step = function () {
+    ;
+}
+class Bullet extends Moveable {
+    age;
+    maxForce;
+    owner;
+    constructor(location, target, map, owner, baseVelocity) {
+        super(3, location, target, baseVelocity, map, true);
+        this.maxForce = 1;
+        this.owner = owner;
+        this.age = 0;
+    }
+    step() {
         this.move();
         this.age++;
         if (this.age < 80) {
@@ -691,23 +691,21 @@ var Bullet = /** @class */ (function (_super) {
         else {
             return false;
         }
-    };
-    Bullet.prototype.draw = function (drawWorker, strokeColor) {
-        drawWorker.fill(256, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-    };
-    return Bullet;
-}(Moveable));
-var ExplodingBullet = /** @class */ (function (_super) {
-    __extends(ExplodingBullet, _super);
-    function ExplodingBullet(location, target, map, owner, bullets) {
-        var _this = _super.call(this, location, target, map, owner, 8) || this;
-        _this.bullets = bullets;
-        return _this;
     }
-    ExplodingBullet.prototype.step = function () {
-        _super.prototype.step.call(this);
-        var velocity = 8;
+    draw(drawWorker, strokeColor) {
+        drawWorker.fill(256, 256);
+        super.draw(drawWorker, strokeColor);
+    }
+}
+class ExplodingBullet extends Bullet {
+    bullets;
+    constructor(location, target, map, owner, bullets) {
+        super(location, target, map, owner, 8);
+        this.bullets = bullets;
+    }
+    step() {
+        super.step();
+        const velocity = 8;
         if (this.age > 30) {
             this.bullets.push(new Bullet(this.location, this.location.createOffset(10, 10), this.map, this.owner, velocity));
             this.bullets.push(new Bullet(this.location, this.location.createOffset(10, -10), this.map, this.owner, velocity));
@@ -716,82 +714,84 @@ var ExplodingBullet = /** @class */ (function (_super) {
             return false;
         }
         return true;
-    };
-    ExplodingBullet.prototype.draw = function (drawWorker, strokeColor) {
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-    };
-    return ExplodingBullet;
-}(Bullet));
-var CannonBall = /** @class */ (function (_super) {
-    __extends(CannonBall, _super);
-    function CannonBall(location, target, map, owner) {
-        var _this = _super.call(this, location, target, map, owner, 8) || this;
-        _this.size = 7;
-        _this.maxForce = 10;
-        return _this;
     }
-    CannonBall.prototype.step = function () {
+    draw(drawWorker, strokeColor) {
+        super.draw(drawWorker, strokeColor);
+    }
+}
+class CannonBall extends Bullet {
+    constructor(location, target, map, owner) {
+        super(location, target, map, owner, 8);
+        this.size = 7;
+        this.maxForce = 10;
+    }
+    step() {
         this.size = 5 + (this.age % 10);
-        return _super.prototype.step.call(this);
-    };
-    return CannonBall;
-}(Bullet));
-var Character = /** @class */ (function (_super) {
-    __extends(Character, _super);
-    function Character(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
-        var _this = _super.call(this, size, location, target, startingVelocity, map, false) || this;
-        _this.hp = maxHP;
-        _this.bullets = bullets;
-        _this.weapons = new Array();
-        _this.mainWeaponBaseVelocity = mainWeaponBaseVelocity;
-        _this.currentWeapon = 0;
-        return _this;
+        return super.step();
     }
-    Character.prototype.shoot = function (target) {
+}
+class Character extends Moveable {
+    hp;
+    bullets;
+    weapons;
+    mainWeaponBaseVelocity;
+    currentWeapon;
+    constructor(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
+        super(size, location, target, startingVelocity, map, false);
+        this.hp = maxHP;
+        this.bullets = bullets;
+        this.weapons = new Array();
+        this.mainWeaponBaseVelocity = mainWeaponBaseVelocity;
+        this.currentWeapon = 0;
+    }
+    shoot(target) {
         this.weapons[this.currentWeapon].shoot(target);
-    };
-    Character.prototype.step = function () {
+    }
+    step() {
         for (var i = 0; i < this.weapons.length; i++) {
             if (null != this.weapons[i]) {
                 this.weapons[i].step();
             }
         }
-    };
-    Character.prototype.takeDamage = function (amount) {
-        this.hp -= amount;
-    };
-    ;
-    Character.prototype.drawPointDirection = function (drawWorker, strokeColor) {
-        var directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
-        var directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y);
-        drawWorker.line(this.location.x, this.location.y, directionIndicatorEndPoint.x, directionIndicatorEndPoint.y);
-    };
-    return Character;
-}(Moveable));
-var Player = /** @class */ (function (_super) {
-    __extends(Player, _super);
-    function Player(size, location, map, bullets, mainWeaponBaseVelocity) {
-        var _this = _super.call(this, size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32) || this;
-        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
-        _this.weapons.push(new DoubleBarrelGun(bullets, _this, 0));
-        _this.weapons.push(new ExplodingBulletGun(bullets, _this, 0));
-        _this.weapons.push(new Cannon(bullets, _this));
-        _this.initialSize = size;
-        _this.isFiring = "front";
-        _this.isMoving = false;
-        _this.firingAge = 0;
-        _this.enemiesKilled = 0;
-        _this.previousTarget = new Coord(0, 0);
-        return _this;
     }
-    Player.prototype.step = function () {
-        _super.prototype.step.call(this);
+    takeDamage(amount) {
+        this.hp -= amount;
+    }
+    ;
+    drawPointDirection(drawWorker, strokeColor) {
+        let directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
+        let directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y);
+        drawWorker.line(this.location.x, this.location.y, directionIndicatorEndPoint.x, directionIndicatorEndPoint.y);
+    }
+}
+class Player extends Character {
+    isFiring;
+    isMoving;
+    firingAge;
+    initialSize;
+    enemiesKilled;
+    previousTarget;
+    constructor(size, location, map, bullets, mainWeaponBaseVelocity) {
+        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32);
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
+        this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
+        this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
+        this.weapons.push(new Cannon(bullets, this));
+        this.initialSize = size;
+        this.isFiring = "front";
+        this.isMoving = false;
+        this.firingAge = 0;
+        this.enemiesKilled = 0;
+        this.previousTarget = new Coord(0, 0);
+    }
+    step() {
+        super.step();
         if (this.size != this.initialSize) {
             this.size = this.initialSize;
         }
-    };
-    Player.prototype.control = function (drawWorker) {
-        var target = new Coord(drawWorker.mouseX, drawWorker.mouseY);
+    }
+    control(drawWorker) {
+        let target = new Coord(drawWorker.mouseX, drawWorker.mouseY);
         if (!this.previousTarget.equals(target)) {
             this.point(target);
         }
@@ -813,35 +813,39 @@ var Player = /** @class */ (function (_super) {
         if (this.isMoving) {
             this.move();
         }
-    };
-    Player.prototype.draw = function (drawWorker, strokeColor) {
+    }
+    draw(drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
-    };
-    Player.prototype.takeDamage = function (amount) {
-        _super.prototype.takeDamage.call(this, amount);
+        super.draw(drawWorker, strokeColor);
+        super.drawPointDirection(drawWorker, strokeColor);
+    }
+    takeDamage(amount) {
+        super.takeDamage(amount);
         if (amount > 0) {
             this.size = 30;
         }
-    };
-    return Player;
-}(Character));
-var NPC = /** @class */ (function (_super) {
-    __extends(NPC, _super);
-    function NPC(size, location, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget, life, idleAge, idleLife) {
-        var _this = _super.call(this, size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP) || this;
-        _this.isHunting = false;
-        _this.age = 0;
-        _this.idleAge = idleAge;
-        _this.idleLife = idleLife;
-        _this.combatTarget = combatTarget;
-        _this.seesPlayer = false;
-        _this.lastSeenPlayerCoord = null;
-        return _this;
     }
-    NPC.prototype.idle = function () {
+}
+class NPC extends Character {
+    isHunting;
+    age;
+    idleAge;
+    idleLife;
+    combatTarget;
+    seesPlayer;
+    lastSeenPlayerCoord;
+    constructor(size, location, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget, life, idleAge, idleLife) {
+        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP);
+        this.isHunting = false;
+        this.age = 0;
+        this.idleAge = idleAge;
+        this.idleLife = idleLife;
+        this.combatTarget = combatTarget;
+        this.seesPlayer = false;
+        this.lastSeenPlayerCoord = null;
+    }
+    idle() {
         if (!(this.idleAge < this.idleLife)) {
             this.idleAge = 0;
             this.idleLife = Math.random() * 2000;
@@ -849,36 +853,37 @@ var NPC = /** @class */ (function (_super) {
         }
         this.idleAge++;
         this.move();
-    };
-    NPC.prototype.attack = function () { };
-    NPC.prototype.decide = function () {
+    }
+    attack() { }
+    decide() {
         if (this.isHunting || this.seesPlayer) {
             this.attack();
         }
         else {
             this.idle();
         }
-    };
-    return NPC;
-}(Character));
-var Chicken = /** @class */ (function (_super) {
-    __extends(Chicken, _super);
-    function Chicken(location, map, food) {
-        var _this = _super.call(this, 5, location, map, null, 1, 8, null, 1000, 0, 200) || this;
-        _this.isRunning = false;
-        _this.fleeAge = 0;
-        _this.fleeLife = 20;
-        _this.food = food;
-        return _this;
     }
-    Chicken.prototype.draw = function (drawWorker, strokeColor) {
+}
+class Chicken extends NPC {
+    isRunning;
+    fleeAge;
+    fleeLife;
+    food;
+    constructor(location, map, food) {
+        super(5, location, map, null, 1, 8, null, 1000, 0, 200);
+        this.isRunning = false;
+        this.fleeAge = 0;
+        this.fleeLife = 20;
+        this.food = food;
+    }
+    draw(drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
-    };
-    Chicken.prototype.step = function () {
-        _super.prototype.step.call(this);
+        super.draw(drawWorker, strokeColor);
+        super.drawPointDirection(drawWorker, strokeColor);
+    }
+    step() {
+        super.step();
         if (this.hp <= 0) {
             this.food.push(new Food(this.location));
         }
@@ -895,28 +900,28 @@ var Chicken = /** @class */ (function (_super) {
         else {
             this.idle();
         }
-    };
-    return Chicken;
-}(NPC));
-var Spewer = /** @class */ (function (_super) {
-    __extends(Spewer, _super);
-    function Spewer(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
-        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200) || this;
-        _this.didIgnite = false;
-        _this.igniteAge = 0;
-        _this.isGrowing = true;
-        _this.weapons.push(new Gun(bullets, _this, 0, mainWeaponBaseVelocity));
-        return _this;
     }
-    Spewer.prototype.draw = function (drawWorker, strokeColor) {
+}
+class Spewer extends NPC {
+    didIgnite;
+    igniteAge;
+    isGrowing;
+    constructor(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
+        super(5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200);
+        this.didIgnite = false;
+        this.igniteAge = 0;
+        this.isGrowing = true;
+        this.weapons.push(new Gun(bullets, this, 0, mainWeaponBaseVelocity));
+    }
+    draw(drawWorker, strokeColor) {
         drawWorker.stroke(128, 0, 0, 256);
         drawWorker.fill(128, 0, 0, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
+        super.draw(drawWorker, strokeColor);
+        super.drawPointDirection(drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-    };
-    Spewer.prototype.step = function () {
-        _super.prototype.step.call(this);
+    }
+    step() {
+        super.step();
         if (this.didIgnite) {
             this.igniteAge++;
             if (this.igniteAge > 100) {
@@ -924,8 +929,8 @@ var Spewer = /** @class */ (function (_super) {
             }
         }
         this.decide();
-    };
-    Spewer.prototype.explode = function () {
+    }
+    explode() {
         this.shoot(this.combatTarget.location);
         this.shoot(this.combatTarget.location.createOffset(1, 1));
         this.shoot(this.combatTarget.location.createOffset(-1, -1));
@@ -934,9 +939,9 @@ var Spewer = /** @class */ (function (_super) {
         this.shoot(this.combatTarget.location.createOffset(3, 3));
         this.shoot(this.combatTarget.location.createOffset(-3, -3));
         this.hp = 0;
-    };
+    }
     // animation for when its about to explode
-    Spewer.prototype.pulse = function () {
+    pulse() {
         if (this.isGrowing) {
             if (this.size < 9) {
                 this.size += 1;
@@ -955,8 +960,8 @@ var Spewer = /** @class */ (function (_super) {
                 this.size += 1;
             }
         }
-    };
-    Spewer.prototype.attack = function () {
+    }
+    attack() {
         var distance = World.calculateDistance(this.location, this.lastSeenPlayerCoord);
         var willMove = true;
         if (this.seesPlayer) {
@@ -982,29 +987,26 @@ var Spewer = /** @class */ (function (_super) {
                 this.isHunting = false;
             }
         }
-    };
-    return Spewer;
-}(NPC));
-;
-var Pirate = /** @class */ (function (_super) {
-    __extends(Pirate, _super);
-    function Pirate(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
-        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200) || this;
-        _this.weapons.push(new Gun(bullets, _this, 10, _this.mainWeaponBaseVelocity));
-        return _this;
     }
-    Pirate.prototype.draw = function (drawWorker, strokeColor) {
+}
+;
+class Pirate extends NPC {
+    constructor(location, map, bullets, mainWeaponBaseVelocity, combatTarget) {
+        super(5, location, map, bullets, mainWeaponBaseVelocity, 8, combatTarget, 1000, 0, 200);
+        this.weapons.push(new Gun(bullets, this, 10, this.mainWeaponBaseVelocity));
+    }
+    draw(drawWorker, strokeColor) {
         drawWorker.stroke(256, 0, 0, 256);
         drawWorker.fill(256, 0, 0, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-        _super.prototype.drawPointDirection.call(this, drawWorker, strokeColor);
+        super.draw(drawWorker, strokeColor);
+        super.drawPointDirection(drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-    };
-    Pirate.prototype.step = function () {
-        _super.prototype.step.call(this);
+    }
+    step() {
+        super.step();
         this.decide();
-    };
-    Pirate.prototype.attack = function () {
+    }
+    attack() {
         this.point(this.lastSeenPlayerCoord);
         this.move();
         if (this.seesPlayer) {
@@ -1018,25 +1020,24 @@ var Pirate = /** @class */ (function (_super) {
         else {
             this.isHunting = true;
         }
-    };
-    return Pirate;
-}(NPC));
-;
-var LoadingActor = /** @class */ (function (_super) {
-    __extends(LoadingActor, _super);
-    function LoadingActor(location, map, bullets, mainWeaponBaseVelocity) {
-        var _this = _super.call(this, 5, location, map, bullets, mainWeaponBaseVelocity, 1, null, 1000, 0, 200) || this;
-        _this.stepCount = 0;
-        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
-        return _this;
     }
-    LoadingActor.prototype.draw = function (drawWorker, strokeColor) {
+}
+;
+class LoadingActor extends NPC {
+    direction;
+    stepCount;
+    constructor(location, map, bullets, mainWeaponBaseVelocity) {
+        super(5, location, map, bullets, mainWeaponBaseVelocity, 1, null, 1000, 0, 200);
+        this.stepCount = 0;
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
+    }
+    draw(drawWorker, strokeColor) {
         var shade = strokeColor.r;
         drawWorker.fill(shade, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
-    };
-    LoadingActor.prototype.step = function () {
-        _super.prototype.step.call(this);
+        super.draw(drawWorker, strokeColor);
+    }
+    step() {
+        super.step();
         if (this.direction < Math.PI * 2) {
             this.direction += 3;
         }
@@ -1048,23 +1049,20 @@ var LoadingActor = /** @class */ (function (_super) {
             // shoot
         }
         this.stepCount++;
-    };
-    return LoadingActor;
-}(NPC));
-var Mine = /** @class */ (function (_super) {
-    __extends(Mine, _super);
-    function Mine(location, map, bullets) {
-        var _this = _super.call(this, 5, location, map, bullets, 8, 1, null, 1000, 0, 200) || this;
-        _this.weapons.push(new Gun(bullets, _this, 0, _this.mainWeaponBaseVelocity));
-        return _this;
     }
-    Mine.prototype.draw = function (drawWorker, strokeColor) {
+}
+class Mine extends NPC {
+    constructor(location, map, bullets) {
+        super(5, location, map, bullets, 8, 1, null, 1000, 0, 200);
+        this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
+    }
+    draw(drawWorker, strokeColor) {
         drawWorker.stroke(130, 128, 128, 256);
         drawWorker.fill(128, 128, 128, 256);
-        _super.prototype.draw.call(this, drawWorker, strokeColor);
+        super.draw(drawWorker, strokeColor);
         drawWorker.stroke(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-    };
-    Mine.prototype.explode = function () {
+    }
+    explode() {
         var directions = Array();
         directions.push(this.location.createOffset(0, -300));
         directions.push(this.location.createOffset(300, 0));
@@ -1091,23 +1089,29 @@ var Mine = /** @class */ (function (_super) {
             this.shoot(directions[i].createOffset(40, 40));
             this.shoot(directions[i].createOffset(-40, -40));
         }
-    };
-    Mine.prototype.move = function () {
+    }
+    move() {
         return false;
-    };
-    Mine.prototype.idle = function () { };
-    Mine.prototype.attack = function () { };
-    Mine.prototype.step = function () {
-        _super.prototype.step.call(this);
+    }
+    idle() { }
+    attack() { }
+    step() {
+        super.step();
         if (this.hp <= 0) {
             this.explode();
         }
-    };
-    return Mine;
-}(NPC));
+    }
+}
 ;
-var HTMLDotshotUI = /** @class */ (function () {
-    function HTMLDotshotUI() {
+class HTMLDotshotUI {
+    world;
+    defaultStrokeColor;
+    display;
+    worldSettings;
+    height;
+    width;
+    console;
+    constructor() {
         // determine dimensions 
         var height = window.innerHeight * 0.9;
         var width = window.innerWidth * 0.98;
@@ -1123,18 +1127,18 @@ var HTMLDotshotUI = /** @class */ (function () {
         }
         // Create and display settings
         this.worldSettings = new SettingsProfile(4, 25, 5, 32, 10, true);
-        for (var s in this.worldSettings) {
+        for (const s in this.worldSettings) {
             this.worldSettings[s].display();
         }
         this.console = new HTMLDotshotMessageConsole();
         this.console.display();
     }
-    HTMLDotshotUI.prototype.setWorldSettings = function () {
-        for (var s in this.worldSettings) {
+    setWorldSettings() {
+        for (const s in this.worldSettings) {
             this.worldSettings[s].setValueFromDocument();
         }
-    };
-    HTMLDotshotUI.prototype.startNewGame = function () {
+    }
+    startNewGame() {
         if (this.display != null) {
             this.display.remove();
         }
@@ -1143,22 +1147,22 @@ var HTMLDotshotUI = /** @class */ (function () {
         this.world = new World(this.width, this.height, this.worldSettings.numberOfEnemies.value, map, false, this.defaultStrokeColor, this.worldSettings.bulletSpeed.value, this.worldSettings.useSpawner.value);
         this.display = new p5(output, "canvas");
         this.console.post("'w' to move; 'r' to shoot; player faces the cursor; desktop only");
-    };
-    HTMLDotshotUI.prototype.startNewGameFromSettings = function () {
+    }
+    startNewGameFromSettings() {
         this.setWorldSettings();
         this.startNewGame();
-    };
-    HTMLDotshotUI.prototype.startNewRandomGame = function () {
+    }
+    startNewRandomGame() {
         this.worldSettings.numberOfEnemies.value = Math.random() * 100;
         this.worldSettings.numberOfWalls.value = Math.random() * 50;
         this.worldSettings.wallLength.value = Math.random() * 15;
         this.worldSettings.gridSquareSize.value = Math.random() * 50;
-        for (var s in this.worldSettings) {
+        for (const s in this.worldSettings) {
             this.worldSettings[s].setHTMLFromValue();
         }
         this.startNewGame();
-    };
-    HTMLDotshotUI.prototype.saveMap = function () {
+    }
+    saveMap() {
         var map = this.world.save();
         // https://stackoverflow.com/questions/13405129/create-and-save-a-file-with-javascript
         var file = new Blob([map], { type: "string" });
@@ -1176,11 +1180,14 @@ var HTMLDotshotUI = /** @class */ (function () {
                 window.URL.revokeObjectURL(url);
             }, 0);
         }
-    };
-    return HTMLDotshotUI;
-}());
-var HTMLDotshotMessageConsole = /** @class */ (function () {
-    function HTMLDotshotMessageConsole() {
+    }
+}
+class HTMLDotshotMessageConsole {
+    currentLineNumber;
+    html;
+    numberOfLines;
+    lines;
+    constructor() {
         this.numberOfLines = 4;
         this.lines = new Array();
         for (var i = 0; i < this.numberOfLines; i++) {
@@ -1189,19 +1196,19 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
         this.currentLineNumber = 1;
         this.generateHTML();
     }
-    HTMLDotshotMessageConsole.prototype.generateHTML = function () {
+    generateHTML() {
         this.html = "";
         for (var i = 0; i < this.numberOfLines; i++) {
             this.html += "<p>" + this.lines[i] + "</p>";
         }
-    };
-    HTMLDotshotMessageConsole.prototype.display = function () {
+    }
+    display() {
         var element = document.getElementById("console");
         if (element) {
             element.innerHTML = this.html;
         }
-    };
-    HTMLDotshotMessageConsole.prototype.post = function (string) {
+    }
+    post(string) {
         for (var i = 0; i < this.numberOfLines; i++) {
             if (i != this.numberOfLines - 1) {
                 this.lines[i] = this.lines[i + 1];
@@ -1213,11 +1220,16 @@ var HTMLDotshotMessageConsole = /** @class */ (function () {
         this.currentLineNumber++;
         this.generateHTML();
         this.display();
-    };
-    return HTMLDotshotMessageConsole;
-}());
-var Setting = /** @class */ (function () {
-    function Setting(name, defaultValue, value) {
+    }
+}
+class Setting {
+    name;
+    defaultValue;
+    value;
+    htmlValue;
+    htmlType;
+    htmlExtraAttributes;
+    constructor(name, defaultValue, value) {
         this.name = name;
         this.defaultValue = defaultValue;
         if (this.value == null) {
@@ -1228,70 +1240,64 @@ var Setting = /** @class */ (function () {
         }
         this.htmlExtraAttributes = "";
     }
-    Setting.prototype.getElementFromDocument = function () {
+    getElementFromDocument() {
         var element = document.getElementById(this.name);
         if (element) {
             return element;
         }
-    };
-    Setting.prototype.setValueFromDocument = function () {
+    }
+    setValueFromDocument() {
         this.htmlValue = this.getElementFromDocument().value;
         this.setValueFromHTML();
-    };
-    Setting.prototype.display = function () {
+    }
+    display() {
         this.setHTMLFromValue();
         var container = document.getElementById("worldSettings");
         if (container) {
             container.innerHTML += this.generateHTML();
         }
-    };
-    Setting.prototype.generateHTML = function () {
+    }
+    generateHTML() {
         return "<p class='label'>" + this.name + "</p><input type='" + this.htmlType + "' " + this.htmlExtraAttributes + "value=" + this.htmlValue + " id='" + this.name + "'>";
-    };
-    Setting.prototype.setValueFromHTML = function () { };
-    Setting.prototype.setHTMLFromValue = function () { };
-    return Setting;
-}());
-var NumericalSetting = /** @class */ (function (_super) {
-    __extends(NumericalSetting, _super);
-    function NumericalSetting(name, defaultValue, value) {
-        var _this = _super.call(this, name, defaultValue, value) || this;
-        _this.htmlType = "range";
-        _this.htmlExtraAttributes = "' min='0' max='500' ";
-        return _this;
     }
-    NumericalSetting.prototype.setValueFromHTML = function () {
+    setValueFromHTML() { }
+    setHTMLFromValue() { }
+}
+class NumericalSetting extends Setting {
+    constructor(name, defaultValue, value) {
+        super(name, defaultValue, value);
+        this.htmlType = "range";
+        this.htmlExtraAttributes = "' min='0' max='500' ";
+    }
+    setValueFromHTML() {
         this.value = this.htmlValue;
-    };
-    NumericalSetting.prototype.setHTMLFromValue = function () {
-        this.htmlValue = this.value;
-    };
-    return NumericalSetting;
-}(Setting));
-var BinarySetting = /** @class */ (function (_super) {
-    __extends(BinarySetting, _super);
-    function BinarySetting(name, defaultValue, value) {
-        var _this = _super.call(this, name, defaultValue, value) || this;
-        _this.htmlType = "checkbox";
-        return _this;
     }
-    BinarySetting.prototype.setValueFromHTML = function () {
+    setHTMLFromValue() {
+        this.htmlValue = this.value;
+    }
+}
+class BinarySetting extends Setting {
+    constructor(name, defaultValue, value) {
+        super(name, defaultValue, value);
+        this.htmlType = "checkbox";
+    }
+    setValueFromHTML() {
         if (this.htmlExtraAttributes == " checked ") {
             this.value = true;
         }
         else {
             this.value = false;
         }
-    };
-    BinarySetting.prototype.setHTMLFromValue = function () {
+    }
+    setHTMLFromValue() {
         if (this.value) {
             this.htmlExtraAttributes = " checked ";
         }
         else {
             this.htmlExtraAttributes = "";
         }
-    };
-    BinarySetting.prototype.setValueFromDocument = function () {
+    }
+    setValueFromDocument() {
         var element = this.getElementFromDocument();
         if (element.checked == true) {
             this.htmlExtraAttributes = " checked ";
@@ -1300,11 +1306,16 @@ var BinarySetting = /** @class */ (function (_super) {
             this.htmlExtraAttributes = "";
         }
         this.setValueFromHTML();
-    };
-    return BinarySetting;
-}(Setting));
-var SettingsProfile = /** @class */ (function () {
-    function SettingsProfile(numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, bulletSpeed, useSpawner) {
+    }
+}
+class SettingsProfile {
+    numberOfEnemies;
+    numberOfWalls;
+    wallLength;
+    gridSquareSize;
+    bulletSpeed;
+    useSpawner;
+    constructor(numberOfEnemies, numberOfWalls, wallLength, gridSquareSize, bulletSpeed, useSpawner) {
         this.numberOfEnemies = new NumericalSetting("numberOfEnemies", numberOfEnemies, null);
         this.numberOfWalls = new NumericalSetting("numberOfWalls", numberOfWalls, null);
         this.wallLength = new NumericalSetting("wallLength", wallLength, null);
@@ -1312,8 +1323,7 @@ var SettingsProfile = /** @class */ (function () {
         this.bulletSpeed = new NumericalSetting("bulletSpeed", bulletSpeed, null);
         this.useSpawner = new BinarySetting("useSpawner", useSpawner, null);
     }
-    return SettingsProfile;
-}());
+}
 document.addEventListener('keydown', recordKey);
 function recordKey(e) {
     switch (e.key) {
