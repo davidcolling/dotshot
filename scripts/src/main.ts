@@ -622,11 +622,12 @@ class World {
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
 
-                if (this.nPCs[i].combatTarget == null) {
+                // We have to check this specifically set field instead of checking if that index is null. Apparently after the array index is set to null, the NPC can keep the reference to its cobatTarget after it has died. It would be better to do this differently. For one, is the array of NPCs getting filled with garbage?
+                if (this.nPCs[i].combatTarget.isDead) {
                     this.nPCs[i].combatTarget = this.player
-                    console.log("it happened");
                 }
 
+                // should no longer need to check if player is null
                 if (this.player != null) {
                     var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
 
@@ -644,6 +645,7 @@ class World {
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
                     this.messages.push("kill");
+                    this.nPCs[i].isDead = true;
                     this.nPCs[i] = null;
                     this.player.enemiesKilled++;
                 }
@@ -881,6 +883,7 @@ class Character extends Moveable {
     weapons: Array<Weapon>;
     mainWeaponBaseVelocity: number
     currentWeapon:number;
+    isDead: boolean;
 
     constructor(size: number, location: Coord, target: Coord, startingVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number) {
         super(size, location, target, startingVelocity, map, false);
@@ -889,6 +892,7 @@ class Character extends Moveable {
         this.weapons = new Array();
         this.mainWeaponBaseVelocity = mainWeaponBaseVelocity; 
         this.currentWeapon = 0;
+        this.isDead = false;
     }
     shoot(target: Coord):void {
         this.weapons[this.currentWeapon].shoot(target);

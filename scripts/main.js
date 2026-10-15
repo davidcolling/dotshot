@@ -528,10 +528,10 @@ class World {
                 //check for shots
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
-                if (this.nPCs[i].combatTarget == null) {
+                if (this.nPCs[i].combatTarget.isDead) {
                     this.nPCs[i].combatTarget = this.player;
-                    console.log("it happened");
                 }
+                // should no longer need to check if player is null
                 if (this.player != null) {
                     var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
                     if (distanceFromCombatTarget < 200) {
@@ -546,6 +546,7 @@ class World {
                 this.nPCs[i].draw(this.drawWorker, this.strokeColor);
                 if (this.nPCs[i].hp <= 0) {
                     this.messages.push("kill");
+                    this.nPCs[i].isDead = true;
                     this.nPCs[i] = null;
                     this.player.enemiesKilled++;
                 }
@@ -745,6 +746,7 @@ class Character extends Moveable {
     weapons;
     mainWeaponBaseVelocity;
     currentWeapon;
+    isDead;
     constructor(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
         super(size, location, target, startingVelocity, map, false);
         this.hp = maxHP;
@@ -752,6 +754,7 @@ class Character extends Moveable {
         this.weapons = new Array();
         this.mainWeaponBaseVelocity = mainWeaponBaseVelocity;
         this.currentWeapon = 0;
+        this.isDead = false;
     }
     shoot(target) {
         this.weapons[this.currentWeapon].shoot(target);
