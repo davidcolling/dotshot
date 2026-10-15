@@ -535,10 +535,10 @@ class World {
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
                 this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(),     
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
-                // this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(),     
-                    // (this.map.height / 2) * Math.random()),  this.map, this.bullets));
-                // this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(),     
-                    // (this.map.height / 2) * Math.random()),  this.map, this.food));
+                this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(),     
+                    (this.map.height / 2) * Math.random()),  this.map, this.bullets));
+                this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(),     
+                    (this.map.height / 2) * Math.random()),  this.map, this.food));
             }
 
             this.spawners = new Array();
@@ -622,20 +622,22 @@ class World {
                 var damage = this.collectDamage(this.nPCs[i], this.bullets);
                 this.nPCs[i].takeDamage(damage);
 
-                // We have to check this specifically set field instead of checking if that index is null. Apparently after the array index is set to null, the NPC can keep the reference to its cobatTarget after it has died. It would be better to do this differently. For one, is the array of NPCs getting filled with garbage?
-                if (this.nPCs[i].combatTarget.isDead) {
-                    this.nPCs[i].combatTarget = this.player
-                }
-
-                // should no longer need to check if player is null
-                if (this.player != null) {
-                    var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
-
-                    if (distanceFromCombatTarget < 200) {
-                        var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
-                        this.nPCs[i].seesCombatTarget = this.map.isOpenBetween(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
-                        if (this.nPCs[i].seesCombatTarget) {
-                            this.nPCs[i].lastSeenCombatTargetCoord = this.nPCs[i].combatTarget.location;
+                if (this.nPCs[i].combatTarget != null) {
+                    // We have to check this specifically set field instead of checking if that index is null. Apparently after the array index is set to null, the NPC can keep the reference to its cobatTarget after it has died. It would be better to do this differently. For one, is the array of NPCs getting filled with garbage?
+                    if (this.nPCs[i].combatTarget.isDead) {
+                        this.nPCs[i].combatTarget = this.player
+                    }
+    
+                    // should no longer need to check if player is null
+                    if (this.player != null) {
+                        var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
+    
+                        if (distanceFromCombatTarget < 200) {
+                            var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
+                            this.nPCs[i].seesCombatTarget = this.map.isOpenBetween(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
+                            if (this.nPCs[i].seesCombatTarget) {
+                                this.nPCs[i].lastSeenCombatTargetCoord = this.nPCs[i].combatTarget.location;
+                            }
                         }
                     }
                 }
