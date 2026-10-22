@@ -491,7 +491,7 @@ class World {
             this.player.control(this.drawWorker);
             this.player.step();
             var damage = this.collectDamage(this.player, this.bullets);
-            this.player.takeDamage(damage);
+            // this.player.takeDamage(damage);
             if (damage) {
                 this.healthBar.hp = this.player.hp;
             }
@@ -603,10 +603,9 @@ class World {
         var totalDamage = 0;
         for (var i = 0; i < arr.length; i++) {
             if (arr[i] != null) {
-                if (this.isShotBy(obj, arr[i])) {
-                    if (obj != arr[i].owner) {
-                        totalDamage += arr[i].maxForce;
-                    }
+                if (this.isShotBy(obj, arr[i]) && obj !== arr[i].owner) {
+                    totalDamage += arr[i].maxForce;
+                    // I don't like using instanceof. How do we make this happen inside NPC?
                     if (obj instanceof NPC) {
                         obj.combatTarget = arr[i].owner;
                     }
@@ -758,9 +757,6 @@ class Character extends Moveable {
     }
     shoot(target) {
         this.weapons[this.currentWeapon].shoot(target);
-        if (this instanceof NPC) {
-            console.log(this.combatTarget === this);
-        }
     }
     step() {
         for (var i = 0; i < this.weapons.length; i++) {
