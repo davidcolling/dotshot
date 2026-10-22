@@ -1033,6 +1033,7 @@ class Pirate extends NPC {
         if (this.isHunting) {
             if (3 < World.calculateDistance(this.location, this.lastSeenCombatTargetCoord)) {
                 this.isHunting = false;
+                this.seesCombatTarget = false;
             }
         }
         else {
