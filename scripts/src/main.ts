@@ -531,13 +531,13 @@ class World {
             }
             this.nPCs = new Array();
             for (var i = 0; i< numberOfEnemies; i++) {
-                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(),     
+                this.nPCs.push(new Pirate(  new Coord(this.map.width * Math.random(), 
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
-                this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(),     
+                this.nPCs.push(new Spewer(  new Coord(this.map.width * Math.random(), 
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets, this.bulletSpeed, this.player));
-                this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(),     
+                this.nPCs.push(new Mine(  new Coord(this.map.width * Math.random(), 
                     (this.map.height / 2) * Math.random()),  this.map, this.bullets));
-                this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(),     
+                this.nPCs.push(new Chicken(  new Coord(this.map.width * Math.random(), 
                     (this.map.height / 2) * Math.random()),  this.map, this.food));
             }
 
@@ -558,7 +558,7 @@ class World {
     draw():boolean {
         var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
 
-        // world 
+        // world
         this.frameCount++;
         this.map.draw(this.drawWorker, this.strokeColor);
         this.drawBullets(this.bullets);
@@ -572,7 +572,7 @@ class World {
             if (this.pings[i] != null) {
                 this.pings[i].step();
                 this.pings[i].draw(this.drawWorker, this.strokeColor);
-    
+
                 if ( this.pings[i].age > 16 ) {
                     this.pings[i] = null;
                 }
@@ -584,7 +584,7 @@ class World {
             this.player.control(this.drawWorker);
             this.player.step();
             var damage = this.collectDamage(this.player, this.bullets);
-            // this.player.takeDamage(damage);
+            this.player.takeDamage(damage);
             if (damage) {
                 this.healthBar.hp = this.player.hp;
             }
@@ -725,10 +725,7 @@ class World {
                 if (this.isShotBy(obj, arr[i]) && obj !== arr[i].owner) {
                     totalDamage += arr[i].maxForce;
 
-                    // I don't like using instanceof. How do we make this happen inside NPC?
-                    if (obj instanceof NPC) {
-                        obj.combatTarget = arr[i].owner
-                    }
+                    obj.setCombatTarget(arr[i].owner);
                 }
             }
         }
@@ -883,11 +880,13 @@ class Character extends Moveable {
     weapons: Array<Weapon>;
     mainWeaponBaseVelocity: number
     currentWeapon:number;
+    combatTarget: Character;
     isDead: boolean;
 
-    constructor(size: number, location: Coord, target: Coord, startingVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number) {
+    constructor(size: number, location: Coord, target: Coord, startingVelocity: number, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number, combatTarget: Character) {
         super(size, location, target, startingVelocity, map, false);
         this.hp = maxHP;
+        this.combatTarget = combatTarget;
         this.bullets = bullets;
         this.weapons = new Array();
         this.mainWeaponBaseVelocity = mainWeaponBaseVelocity; 
@@ -907,6 +906,7 @@ class Character extends Moveable {
     takeDamage(amount: number):void {
         this.hp -= amount;
     };
+    setCombatTarget(combatTarget: Character):void { }
     drawPointDirection(drawWorker, strokeColor: RGBA):void {
         let directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
         let directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y)
@@ -929,7 +929,7 @@ class Player extends Character{
     previousTarget: Coord
 
     constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity) {
-        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32);
+        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32, null);
         this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
         this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
@@ -981,6 +981,7 @@ class Player extends Character{
             this.size = 30;
         }
     }
+    setCombatTarget(combatTarget: Character):void { }
     
 }
 
@@ -989,12 +990,11 @@ class NPC extends Character {
     age: number;
     idleAge: number;
     idleLife: number;
-    combatTarget: Character;
     seesCombatTarget:boolean;
     lastSeenCombatTargetCoord: Coord;
 
    constructor(size: number, location: Coord, map: GridMap, bullets: Array<Bullet>, mainWeaponBaseVelocity: number, maxHP: number, combatTarget: Character, life: number, idleAge: number, idleLife: number) {
-        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP);
+        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP, null);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
@@ -1018,6 +1018,11 @@ class NPC extends Character {
             this.attack();
         } else {
             this.idle();
+        }
+    }
+    setCombatTarget(combatTarget: Character):void {
+        if (combatTarget !== this) {
+            this.combatTarget = combatTarget;
         }
     }
 }

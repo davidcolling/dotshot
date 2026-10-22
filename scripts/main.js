@@ -467,7 +467,7 @@ class World {
     }
     draw() {
         var playerIsDead = false; // setting this allows the rest of the function to finish running before the game is stopped
-        // world 
+        // world
         this.frameCount++;
         this.map.draw(this.drawWorker, this.strokeColor);
         this.drawBullets(this.bullets);
@@ -491,7 +491,7 @@ class World {
             this.player.control(this.drawWorker);
             this.player.step();
             var damage = this.collectDamage(this.player, this.bullets);
-            // this.player.takeDamage(damage);
+            this.player.takeDamage(damage);
             if (damage) {
                 this.healthBar.hp = this.player.hp;
             }
@@ -605,10 +605,7 @@ class World {
             if (arr[i] != null) {
                 if (this.isShotBy(obj, arr[i]) && obj !== arr[i].owner) {
                     totalDamage += arr[i].maxForce;
-                    // I don't like using instanceof. How do we make this happen inside NPC?
-                    if (obj instanceof NPC) {
-                        obj.combatTarget = arr[i].owner;
-                    }
+                    obj.setCombatTarget(arr[i].owner);
                 }
             }
         }
@@ -745,10 +742,12 @@ class Character extends Moveable {
     weapons;
     mainWeaponBaseVelocity;
     currentWeapon;
+    combatTarget;
     isDead;
-    constructor(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP) {
+    constructor(size, location, target, startingVelocity, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget) {
         super(size, location, target, startingVelocity, map, false);
         this.hp = maxHP;
+        this.combatTarget = combatTarget;
         this.bullets = bullets;
         this.weapons = new Array();
         this.mainWeaponBaseVelocity = mainWeaponBaseVelocity;
@@ -769,6 +768,7 @@ class Character extends Moveable {
         this.hp -= amount;
     }
     ;
+    setCombatTarget(combatTarget) { }
     drawPointDirection(drawWorker, strokeColor) {
         let directionIndicatorEndPointRelative = World.calculateVector(this.location, this.target, 5);
         let directionIndicatorEndPoint = this.location.createOffset(directionIndicatorEndPointRelative.x, directionIndicatorEndPointRelative.y);
@@ -783,7 +783,7 @@ class Player extends Character {
     enemiesKilled;
     previousTarget;
     constructor(size, location, map, bullets, mainWeaponBaseVelocity) {
-        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32);
+        super(size, location, new Coord(0, 0), 2, map, bullets, mainWeaponBaseVelocity, 32, null);
         this.weapons.push(new Gun(bullets, this, 0, this.mainWeaponBaseVelocity));
         this.weapons.push(new DoubleBarrelGun(bullets, this, 0));
         this.weapons.push(new ExplodingBulletGun(bullets, this, 0));
@@ -837,17 +837,17 @@ class Player extends Character {
             this.size = 30;
         }
     }
+    setCombatTarget(combatTarget) { }
 }
 class NPC extends Character {
     isHunting;
     age;
     idleAge;
     idleLife;
-    combatTarget;
     seesCombatTarget;
     lastSeenCombatTargetCoord;
     constructor(size, location, map, bullets, mainWeaponBaseVelocity, maxHP, combatTarget, life, idleAge, idleLife) {
-        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP);
+        super(size, location, new Coord(0, 0), 1, map, bullets, mainWeaponBaseVelocity, maxHP, null);
         this.isHunting = false;
         this.age = 0;
         this.idleAge = idleAge;
@@ -872,6 +872,11 @@ class NPC extends Character {
         }
         else {
             this.idle();
+        }
+    }
+    setCombatTarget(combatTarget) {
+        if (combatTarget !== this) {
+            this.combatTarget = combatTarget;
         }
     }
 }
