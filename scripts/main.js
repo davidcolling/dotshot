@@ -535,7 +535,6 @@ class World {
                     if (this.player != null) {
                         var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
                         if (distanceFromCombatTarget < 200) {
-                            var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
                             this.nPCs[i].seesCombatTarget = this.map.isOpenBetween(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
                             if (this.nPCs[i].seesCombatTarget) {
                                 this.nPCs[i].lastSeenCombatTargetCoord = this.nPCs[i].combatTarget.location;
@@ -759,6 +758,9 @@ class Character extends Moveable {
     }
     shoot(target) {
         this.weapons[this.currentWeapon].shoot(target);
+        if (this instanceof NPC) {
+            console.log(this.combatTarget === this);
+        }
     }
     step() {
         for (var i = 0; i < this.weapons.length; i++) {

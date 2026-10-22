@@ -633,7 +633,6 @@ class World {
                         var distanceFromCombatTarget = World.calculateDistance(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
     
                         if (distanceFromCombatTarget < 200) {
-                            var npcGridCoord = this.map.getGridIndex(this.nPCs[i].location);
                             this.nPCs[i].seesCombatTarget = this.map.isOpenBetween(this.nPCs[i].location, this.nPCs[i].combatTarget.location);
                             if (this.nPCs[i].seesCombatTarget) {
                                 this.nPCs[i].lastSeenCombatTargetCoord = this.nPCs[i].combatTarget.location;
@@ -898,6 +897,9 @@ class Character extends Moveable {
     }
     shoot(target: Coord):void {
         this.weapons[this.currentWeapon].shoot(target);
+        if (this instanceof NPC) {
+            console.log(this.combatTarget === this);
+        }
     }
     step():void {
         for (var i = 0; i < this.weapons.length; i++) {
